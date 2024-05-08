@@ -1,14 +1,23 @@
-import requests
+import googlemaps
+from datetime import datetime
 
-API_KEY = 'AIzaSyC5GbePcqqgPe5OV4vKMr7zUvyb0zVD5rY'
-endpoint = 'https://maps.googleapis.com/maps/api/directions/json'
-params = {
-    'origin': '起始地點',
-    'destination': '目的地點',
-    'key': API_KEY
-}
+gmaps = googlemaps.Client(key='AIzaSyC5GbePcqqgPe5OV4vKMr7zUvyb0zVD5rY')
 
-response = requests.get(endpoint, params=params)
-directions = response.json()
+# Geocoding an address
+geocode_result = gmaps.geocode('1600 Amphitheatre Parkway, Mountain View, CA')
 
-print(directions)
+# Look up an address with reverse geocoding
+reverse_geocode_result = gmaps.reverse_geocode((40.714224, -73.961452))
+
+# Request directions via public transit
+now = datetime.now()
+directions_result = gmaps.directions("Sydney Town Hall",
+                                     "Parramatta, NSW",
+                                     mode="transit",
+                                     departure_time=now)
+
+# Validate an address with address validation
+addressvalidation_result =  gmaps.addressvalidation(['1600 Amphitheatre Pk'], 
+                                                    regionCode='US',
+                                                    locality='Mountain View', 
+                                                    enableUspsCass=True)
