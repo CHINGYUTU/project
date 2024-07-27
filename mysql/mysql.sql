@@ -1,1 +1,1 @@
-SELECT * FROM member.users;
+SELECT * FROM route.favoriteroute;
