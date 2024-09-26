@@ -8,9 +8,9 @@ import HelloWorld from './components/Home.vue'
   <div class="flex flex-col min-h-screen">
     <TopBar />
 
-    <HelloWorld />
+    <router-view></router-view>
 
-    <EndBar />
+    <!-- <EndBar /> -->
   </div>
 </template>
 
