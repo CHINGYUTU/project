@@ -8,8 +8,6 @@
 
         <!-- 右側導航連結 -->
         <div class="hidden md:flex space-x-4">
-        <!-- <a href="#" class="text-gray-300 hover:text-white">Home</a>
-        <a href="#" class="text-gray-300 hover:text-white">About</a> -->
             <router-link to="/register" class="text-gray-300 hover:text-white">註冊</router-link>
             <router-link to="/login" class="text-gray-300 hover:text-white">登入</router-link>
         </div>

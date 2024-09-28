@@ -1,5 +1,43 @@
-# Vue 3 + Vite
+# 如何使用(確保已安裝yarn)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+- 前端部分
+  1. 移動到Web資料夾
+  2. yarn install
+  3. yarn dev
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+
+# 前端目錄
+
+    Web
+    ├── README.md
+    ├── index.html
+    ├── package-lock.json
+    ├── package.json
+    ├── postcss.config.js
+    ├── public
+    │   └── vite.svg
+    ├── src
+    │   ├── App.vue
+    │   ├── assets
+    │   │   └── vue.svg
+    │   ├── components
+    │   │   ├── EndBar.vue
+    │   │   └── TopBar.vue
+    │   ├── main.js
+    │   ├── router
+    │   │   └── router.js
+    │   ├── style.css
+    │   └── views
+    │       ├── adminPage
+    │       │   └── index.vue
+    │       ├── home
+    │       │   └── index.vue
+    │       ├── login
+    │       │   └── index.vue
+    │       ├── register
+    │       │   └── index.vue
+    │       └── userProfile
+    │           └── index.vue
+    ├── tailwind.config.js
+    ├── vite.config.js
+    └── yarn.lock

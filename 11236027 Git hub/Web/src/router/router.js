@@ -6,7 +6,7 @@ export const router = createRouter({
         {
             path: '/',
             name: 'home',
-            component: ()=> import('../components/Home.vue'),
+            component: ()=> import('../views/home/index.vue'),
             //主頁
         },
         {
@@ -20,6 +20,16 @@ export const router = createRouter({
             name: 'register',
             component: ()=> import('../views/register/index.vue'),
             //註冊
+        },
+        {
+            path: '/adminPage',
+            name: 'adminPage',
+            component: ()=> import('../views/adminPage/index.vue')
+        },
+        {
+            path: '/userProfile',
+            name: 'userProfile',
+            component: ()=> import('../views/userProfile/index.vue')
         }
     ]
 })

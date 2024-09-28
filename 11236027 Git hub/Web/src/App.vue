@@ -1,7 +1,6 @@
 <script setup>
 import TopBar from './components/TopBar.vue'
 import EndBar from './components/EndBar.vue'
-import HelloWorld from './components/Home.vue'
 </script>
 
 <template>
