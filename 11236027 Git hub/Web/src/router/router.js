@@ -24,7 +24,19 @@ export const router = createRouter({
         {
             path: '/adminPage',
             name: 'adminPage',
-            component: ()=> import('../views/adminPage/index.vue')
+            component: ()=> import('../views/adminPage/index.vue'),
+            children: [
+                {
+                    path: '/member',
+                    name: 'member',
+                    component: ()=> import("../views/adminPage/components/member.vue"),
+                },
+                {
+                    path: '/notReviewed',
+                    name: 'notReviewed',
+                    component: ()=> import("../views/adminPage/components/notReviewed.vue"),
+                }
+            ]
         },
         {
             path: '/userProfile',

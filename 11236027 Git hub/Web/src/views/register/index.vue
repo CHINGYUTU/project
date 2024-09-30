@@ -25,6 +25,7 @@
               required
             />
           </div>
+
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700" for="password">密碼</label>
             <input
@@ -36,6 +37,7 @@
               required
             />
           </div>
+
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700" for="confirm-password">確認密碼</label>
             <input
@@ -47,10 +49,35 @@
               required
             />
           </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">選擇身份</label>
+            <div class="mt-2">
+              <label class="inline-flex items-center">
+                <input
+                  v-model="role"
+                  type="radio"
+                  value="user"
+                  class="form-radio text-blue-600"
+                />
+                <span class="ml-2">租客</span>
+              </label>
+              <label class="inline-flex items-center ml-6">
+                <input
+                  v-model="role"
+                  type="radio"
+                  value="admin"
+                  class="form-radio text-blue-600"
+                />
+                <span class="ml-2">房東</span>
+              </label>
+            </div>
+          </div>
+
           <button type="submit" class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-blue-600">註冊</button>
         </form>
         <p class="mt-4 text-center text-sm text-gray-600">
-          已有帳號？ <a href="#" class="text-blue-500">登入</a>
+          已有帳號？ <router-link to="/login" class="text-blue-500">登入</router-link>
         </p>
       </div>
     </div>
@@ -63,7 +90,8 @@
         username: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        role:'',
       };
     },
     methods: {

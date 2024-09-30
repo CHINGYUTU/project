@@ -1,0 +1,45 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3307,
+            "driver": "MariaDB",
+            "name": "DataBaseHW",
+            "database": "csie113",
+            "username": "root"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "10.1.1.3",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "ZackTopic",
+            "database": "ZackTopic",
+            "username": "ZackTopic",
+            "password": "2wsx!QAZ"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "本機",
+            "username": "root",
+            "password": "920110",
+            "database": "ZackTopic"
+        }
+    ]
+}
