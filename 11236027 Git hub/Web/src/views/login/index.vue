@@ -36,6 +36,7 @@
           >
             登入
           </button>
+          
         </div>
 
         <!-- Register Link -->
@@ -53,6 +54,7 @@
 
 <script>
 import axios from "axios";
+import { successMessage, warningMessage, errorMessage } from "../../api/messgae"
 
 export default {
   components: {},
@@ -60,18 +62,37 @@ export default {
   data() {
     return {
       email: "",
-      pwd : "",
+      pwd: "",
     };
   },
   watch: {},
-  computed: {},
+  computed: {
+    // loginBtnDisable(){
+    //   return !(this.email && this.pwd);
+    // }
+  },
   methods: {
     login(){
       axios.post("/auth/login",{Email: this.email, Password: this.pwd}).then(res =>{
-        
-      }).catch(error => {
-
+        if(res.status == 200){
+          localStorage.setItem("session", res.data)
+          successMessage("登入成功");
+          if(res.data.Role == "User"){
+            this.$router.push({name: 'userProfile'})
+          }else if(res.data.Role == "Admin"){
+            this.$router.push({name: 'adminPage'})
+          }
+        }
+      }).catch(err => {
+        if(err.response.status == 401){
+          warningMessage("帳號或密碼錯誤")
+        }else{
+          errorMessage("發生錯誤")
+        }
       })
+    },
+    testFun(){
+      successMessage("測試");
     }
   },
   created() {},
