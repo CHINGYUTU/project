@@ -75,11 +75,13 @@ export default {
     login(){
       axios.post("/auth/login",{Email: this.email, Password: this.pwd}).then(res =>{
         if(res.status == 200){
-          localStorage.setItem("session", res.data)
+          localStorage.setItem("session", JSON.stringify(res.data))
           successMessage("登入成功");
           if(res.data.Role == "User"){
             this.$router.push({name: 'userProfile'})
           }else if(res.data.Role == "Admin"){
+            this.$router.push({name: 'adminPage'})
+          }else if(res.data.Role == "Landlord"){
             this.$router.push({name: 'adminPage'})
           }
         }

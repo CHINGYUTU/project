@@ -6,39 +6,40 @@
             <router-link to="/" class="text-gray-300 hover:text-white">隨心租</router-link>
         </div>
 
+        <div class="relative inline-block text-left">
+          <button @click="toggleDropdown" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-700 text-sm font-medium text-white hover:bg-gray-600">
+            路由表
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- 下拉菜單 -->
+          <div v-if="dropdownOpen" class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+            <div class="py-1">
+              <router-link v-for="route in routeNames" :key="route.name" :to="{ name: route }" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                {{ route }}
+              </router-link>
+            </div>
+          </div>
+        </div>
+
         <div v-if="!isAuthenticated" class="hidden md:flex space-x-4">
             <router-link to="/register" class="text-gray-300 hover:text-white" v-if="!isAuthenticated">註冊</router-link>
             <router-link to="/login" class="text-gray-300 hover:text-white" v-if="!isAuthenticated">登入</router-link>
         </div>
         <div v-else class="hidden md:flex space-x-4">
-            <div class="relative inline-block text-left">
+            <div class="flex items-center" v-if="isAuthenticated">
                 <!-- 圖片作為觸發器 -->
-                <img @click="toggleDropdown" class="rounded-full w-7 h-7 cursor-pointer" src="../../public/vite.svg"  alt="image description"/>
-
-                <!-- 下拉菜單 -->
-                <div v-if="dropdownOpen" class="absolute right-0 z-10 mt-2 w-44 rounded-lg shadow-lg bg-white divide-y divide-gray-100 ring-1 ring-black ring-opacity-5">
-                    <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
-                        <li>
-                            <router-link to="/profile" class="block px-4 py-2 hover:bg-gray-100" @click="dropdownOpen = false">
-                                個人資料
-                            </router-link>
-                        </li>
-                        <li>
-                            <router-link to="/settings" class="block px-4 py-2 hover:bg-gray-100" @click="dropdownOpen = false">
-                                設定
-                            </router-link>
-                        </li>
-                        <li>
-                            <button class="block w-full text-left px-4 py-2 hover:bg-gray-100" @click="logout">
-                                登出
-                            </button>
-                        </li>
-                    </ul>
-                </div>
+                 <router-link to="/adminPage" class="mr-2">
+                    <img @click="toggleDropdown" class="rounded-full w-10 h-10 cursor-pointer" src="/vite.svg"  alt="image description"/>
+                 </router-link>
+                
+                <button class="bg-red-500 block text-left px-4 py-2 rounded-full hover:bg-gray-100 " @click="logout">登出</button>
             </div>
-            <!-- <img class="rounded-full w-7 h-7" src="../../public/vite.svg" alt="image description">
-            <button class="text-gray-300 hover:text-white" v-if="isAuthenticated" @click="logout">登出</button> -->
         </div>
+
+        
 
         <!-- 漢堡菜單（在小屏幕顯示）-->
         <div class="md:hidden">
@@ -61,13 +62,14 @@
 </template>
 
 <script>
+import { router } from '../router/router.js';
 
 export default {
   data() {
     return {
       isAuthenticated: false,
       dropdownOpen: false,
-
+      userData: {}
     };
   },
   created() {
@@ -89,6 +91,9 @@ export default {
     },
   },
   computed: {
+    routeNames() {
+      return this.$router.options.routes.map(route => route.name).filter(name => name);
+    },
   }
 };
 </script>

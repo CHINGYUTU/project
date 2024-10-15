@@ -1,20 +1,13 @@
-# 如何使用(確保已安裝yarn)
-
-- 前端部分
-  1. 移動到Web資料夾
-  2. yarn install
-  3. yarn dev
-
-
 # 前端目錄
-
-    .
+    
+    Web
+    ├── README.html
     ├── README.md
     ├── index.html
     ├── package-lock.json
     ├── package.json
     ├── postcss.config.js
-    ├── public                                    
+    ├── public
     │   ├── 404 error.png
     │   ├── Air-con icon.png
     │   ├── Calendar icon.png
@@ -23,6 +16,7 @@
     │   ├── Equipment Cardiogram.png
     │   ├── Gas Stove.png
     │   ├── Introduction Presentation.png
+    │   ├── Like icon.png
     │   ├── Parking icon.png
     │   ├── Potted Plant.png
     │   ├── Refrigerator icon.png
@@ -72,10 +66,28 @@
     │       │   └── index.vue
     │       ├── login
     │       │   └── index.vue
+    │       ├── post
+    │       │   ├── components
+    │       │   │   └── UploadImage.vue
+    │       │   └── index.vue
     │       ├── register
     │       │   └── index.vue
     │       └── userProfile
     │           └── index.vue
     ├── tailwind.config.js
     ├── vite.config.js
+    └── yarn.lock
+
+# 後端目錄
+
+    Server
+    ├── DB
+    │   └── db.js
+    ├── README.md
+    ├── app.js
+    ├── package.json
+    ├── router
+    │   ├── admin.js
+    │   ├── auth.js
+    │   └── main.js
     └── yarn.lock

@@ -5,7 +5,7 @@
         <!-- 第一欄：關於我們 -->
         <div>
         <h3 class="text-white text-lg font-bold mb-4">About Us</h3>
-        <p class="text-gray-400">We provide the best services for our clients and help them to achieve their goals.</p>
+        <p class="text-gray-400">我是一個虎尾資工學生</p>
         </div>
 
         <!-- 第二欄：導航連結 -->
@@ -23,15 +23,14 @@
         <div>
         <h3 class="text-white text-lg font-bold mb-4">Contact Us</h3>
         <ul>
-            <li>Email: info@mywebsite.com</li>
-            <li>Phone: +123 456 7890</li>
-            <li>Address: 123 Main St, City, Country</li>
+            <li>Email: 41043207@nfu.edu.tw</li>
+            
         </ul>
         </div>
     </div>
 
     <div class="border-t border-gray-700 mt-6 pt-4 text-center">
-        <p class="text-gray-500">© 2024 MyWebsite. All Rights Reserved.</p>
+        <p class="text-gray-500">© 2024 EricChen990. All Rights Reserved.</p>
     </div>
     </footer>
 

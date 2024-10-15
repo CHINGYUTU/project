@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const db = require('../DB/db');
 const auth = express.Router();
 
+
+//登入
 auth.post('/login', async (req, res) => {
     if(req.body.Email != "" && req.body.Password != ""){
         const [rows] = await db.query('SELECT * FROM Users WHERE Email = ?', [req.body.Email]);

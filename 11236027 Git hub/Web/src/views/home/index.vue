@@ -1,24 +1,48 @@
 <template>
-    <div class="flex-grow">
-      <p class="p-6 text-4xl">This is the main content of the page.</p>
+    <div class="flex-grow justify-center text-center p-4">
+      <Search @selectCity="searchCityFun" @selectArea="searchAreaFun" @selectAddress="searchAddressFun" />
+      {{ this.selectCity }}
+      {{ this.selectArea }}
+      <ArticleList class="" />
     </div>
   </template>
   
-  <script>
-  export default {
-      components: {},
-      props: {},
-      data() {
-        return {};
+<script>
+import ArticleList from '../../components/ArticleList.vue'
+import Search from './components/Search.vue';
+
+export default {
+    components: {
+      ArticleList,
+      Search,
+    },
+    props: {},
+    data() {
+      return {
+        selectCity: "",
+        selectArea: "",
+        selectAddress: "",
+      };
+    },
+    watch: {},
+    computed: {},
+    methods: {
+      searchCity(data){
+        this.selectCity = data;
       },
-      watch: {},
-      computed: {},
-      methods: {},
-      created() {},
-      mounted() {}
-  };
-  </script>
+      searchArea(data){
+        this.selectArea = data;
+      },
+      searchAddress(data){
+        this.selectAddress = data;
+      },
+    },
+    created() {},
+    mounted() {}
+};
+
+</script>
   
-  <style lang="scss" scoped>
-  
-  </style>
+<style lang="scss" scoped>
+
+</style>
