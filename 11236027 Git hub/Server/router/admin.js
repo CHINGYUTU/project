@@ -20,4 +20,13 @@ admin.post('/listnotreviewed', async (req, res) => {
     res.send(rows);
 })
 
+admin.post('/passpost', async (req, res) => {
+    await db.query('UPDATE HouseInfo SET HouseInfo.Verify = 1 WHERE HouseInfo.ID = ?',[req.body.ID]);
+    res.status(200).send();
+})
+
+admin.post('/failedpost', async (req, res) => {
+
+})
+
 module.exports = admin;

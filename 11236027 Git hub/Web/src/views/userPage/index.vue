@@ -1,9 +1,9 @@
 <template>
-  <div>
+<div>
     <ul class="flex justify-center flex-wrap mt-10 text-sm font-medium text-center text-gray-500 border-b border-gray-200 ">
       <li class="mr-2">
         <router-link 
-          to="/admin/userProfile"
+          to="/user/userProfile"
           class="inline-block p-4 rounded-t-lg transition-colors duration-300 hover:text-blue-600 hover:bg-blue-50 "
           :class="{ 'text-blue-600 bg-blue-100 ': $route.path === '/admin/userProfile' }"
         >
@@ -12,20 +12,11 @@
       </li>
       <li class="mr-2">
         <router-link 
-          to="/admin/member"
+          to="/user/favorites"
           class="inline-block p-4 rounded-t-lg transition-colors duration-300 hover:text-blue-600 hover:bg-blue-50 "
           :class="{ 'text-blue-600 bg-blue-100 ': $route.path === '/admin/member' }"
         >
-          用戶列表
-        </router-link>
-      </li>
-      <li class="mr-2">
-        <router-link 
-          to="/admin/notReviewed"
-          class="inline-block p-4 rounded-t-lg transition-colors duration-300 hover:text-blue-600 hover:bg-blue-50 "
-          :class="{ 'text-blue-600 bg-blue-100 ': $route.path === '/admin/notReviewed' }"
-        >
-          待審核
+          收藏列表
         </router-link>
       </li>
     </ul>
@@ -33,10 +24,13 @@
   </div>
 </template>
 
-
 <script>
+
+
 export default {
-    components: {},
+    components: {
+      
+    },
     props: {},
     data() {
       return {};

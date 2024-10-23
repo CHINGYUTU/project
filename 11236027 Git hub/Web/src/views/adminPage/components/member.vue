@@ -20,7 +20,16 @@
                         名稱
                     </th>
                     <th scope="col" class="px-6 py-3">
-                        身份
+                        <select
+                            id="customSelect"
+                            v-model="selectedOption"
+                            class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            >
+                            <option value="">全部</option>
+                            <option value="Admin">管理員</option>
+                            <option value="Landlord">房東</option>
+                            <option value="User">一般使用者</option>
+                        </select>
                     </th>
                     <th scope="col" class="px-6 py-3">
                         Email
@@ -34,18 +43,16 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" v-for="memberData in memberDatas" :key="memberData.ID">
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" v-for="memberData in filteredMembers" :key="memberData.ID">
                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ memberData.ID }}</th>
                     <td class="px-6 py-4">{{ memberData.Name }}</td>
-                    <td class="px-6 py-4">{{ memberData.Role }}</td>
+                    <td class="px-6 py-4" v-if="memberData.Role === 'Admin'">管理員</td>
+                    <td class="px-6 py-4" v-else-if="memberData.Role === 'User'">一般使用者</td>
+                    <td class="px-6 py-4" v-else-if="memberData.Role === 'Landlord'">房東</td>
                     <td class="px-6 py-4">{{ memberData.Email }}</td>
-                    <td class="px-6 py-4">{{ memberData.Phone }}</td>
-
-                    <td class="px-6 py-4 text-right">
-                        <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                    </td>
-                </tr>
-                
+                    <td class="px-6 py-4" v-if="memberData.Phone">{{ memberData.Phone }}</td>
+                    <td class="px-6 py-4" v-else>尚未填寫</td>
+                </tr>         
             </tbody>
         </table>
         <div v-else>暫無資料</div>
@@ -63,10 +70,18 @@ export default {
       return {
         memberDatas: [],
         isLoader: true,
+        selectedOption: ""
       };
     },
     watch: {},
-    computed: {},
+    computed: {
+        filteredMembers() {
+            if (this.selectedOption) {
+                return this.memberDatas.filter(member => member.Role === this.selectedOption);
+            }
+            return this.memberDatas;
+        }
+    },
     methods: {
         getMember(){
             this.isLoader = true;

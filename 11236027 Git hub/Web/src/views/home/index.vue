@@ -1,14 +1,13 @@
 <template>
     <div class="flex-grow justify-center text-center p-4">
-      <Search @selectCity="searchCityFun" @selectArea="searchAreaFun" @selectAddress="searchAddressFun" />
-      {{ this.selectCity }}
-      {{ this.selectArea }}
-      <ArticleList class="" />
+      <Search @searchCriteriaEvent="searchCriteria" />
+      
+      <ArticleList :selectData="this.searchData" />
     </div>
   </template>
   
 <script>
-import ArticleList from '../../components/ArticleList.vue'
+import ArticleList from './components/ArticleList.vue'
 import Search from './components/Search.vue';
 
 export default {
@@ -19,23 +18,17 @@ export default {
     props: {},
     data() {
       return {
-        selectCity: "",
-        selectArea: "",
-        selectAddress: "",
+        searchData: null,
       };
     },
     watch: {},
     computed: {},
     methods: {
-      searchCity(data){
-        this.selectCity = data;
+      searchCriteria(data){
+        this.searchData = data;
+        
       },
-      searchArea(data){
-        this.selectArea = data;
-      },
-      searchAddress(data){
-        this.selectAddress = data;
-      },
+      
     },
     created() {},
     mounted() {}

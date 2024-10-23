@@ -9,10 +9,20 @@
     "dependencies": {
         "bcrypt": "^5.1.1",
         "body-parser": "^1.20.3",
-        "mysql2": "^3.11.3"
+        "dotenv": "^16.4.5",
+        "express": "^4.21.1",
+        "jsonwebtoken": "^9.0.2",
+        "mysql2": "^3.11.3",
+        "nodemailer": "^6.9.15",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "resend": "^4.0.0"
     },
-    "name": "Server",
+    "name": "server",
     "version": "1.0.0",
-    "main": "main.js",
-    "license": "MIT"
+    "main": "app.js",
+    "license": "MIT",
+    "description": "- 前端部分   1. 移動到Server資料夾   2. yarn install   3. yarn dev   4. 位置在:3000",
+    "keywords": [],
+    "author": ""
 }

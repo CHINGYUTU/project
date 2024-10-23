@@ -48,37 +48,37 @@
                     <td class="px-6 py-4">{{ listinfo.Pattern }}</td>
                     <td class="px-6 py-4">{{ listinfo.Size }}</td>
                     <td class="px-6 py-4 text-right">
-                        <button type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">通過</button>
-                        <button type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">不通過</button>
+                        <router-link :to="{ name: 'housepage', params: { id: listinfo.ID } }" class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">預覽</router-link>
+                        <button @click="pass(listinfo.ID)" type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">通過</button>
+                        <!-- <button @click="failed(listinfo.ID)" type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">不通過</button> -->
                     </td>
                 </tr>
-                <!-- <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700" v-for="listinfo in lists" :key="listinfo.ID">
-                    <th></th>
-                    <td class="px-6 py-4 text-center">房東姓名</td>
-                    <td class="px-6 py-4 text-center" >{{ listinfo.Name }}</td>
-                    <td class="px-6 py-4 text-center">Email</td>
-                    <td class="px-6 py-4 text-center">{{ listinfo.Email }}</td>
-                    <td class="px-6 py-4 text-center">電話</td>
-                    <td class="px-6 py-4 text-center">{{ listinfo.Phone }}</td>
-                </tr> -->
             </tbody>
         </table>
-        <div>暫無資料</div>
+        <div v-if="!lists">暫無資料</div>
+        <!-- <div v-if="isPreview" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" @click.self="isPreview = false">
+            <router-view></router-view>
+        </div> -->
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import housepage from '../../housepage/index.vue';
+import { successMessage, warningMessage, errorMessage } from "../../../api/messgae";
 
 export default {
-    components: {},
+    components: {
+        housepage
+    },
     props: {},
     data() {
       return {
         lists : [],
         key: 1,
         isLoader: true,
+        isPreview: false,
       };
     },
     watch: {},
@@ -92,6 +92,17 @@ export default {
             }).catch(error => {
                 
             });
+        },
+        // failed(id){
+        //     axios.post('/admin/failedpost', {ID: id}).then(res =>{
+        //         successMessage('已否決發文');
+        //     })
+        // },
+        pass(id){
+            axios.post('/admin/passpost', {ID: id}).then(res =>{
+                successMessage('已通過發文');
+            })
+            this.$router.go(0)
         }
     },
     created() {},
