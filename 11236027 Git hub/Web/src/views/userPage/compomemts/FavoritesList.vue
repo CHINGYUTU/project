@@ -39,7 +39,6 @@ export default {
         getFavorites() {
             axios.post('/api/getFavorites', { UserID: JSON.parse(localStorage.getItem('session')).ID}).then(res =>{
                 this.list = res.data;
-
             })
         },
     },

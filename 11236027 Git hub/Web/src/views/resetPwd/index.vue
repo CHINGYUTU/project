@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-center h-screen bg-gradient-to-br from-gray-100 via-blue-100 to-gray-300 dark:from-gray-900 dark:to-gray-700">
+  <div class="flex items-center justify-center h-screen bg-gradient-to-br from-gray-100 via-blue-100 to-gray-300 ">
     <div class="bg-white p-8 rounded-lg shadow-md w-96">
 
       <div class="flex justify-center mb-6">
@@ -55,7 +55,7 @@
             </p>
           </div>
 
-          <button :disabled="!(isFormValid)" type="submit" class="w-full text-white bg-gradient-to-r from-blue-500 to-green-400 hover:from-blue-600 hover:to-green-500 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg">更改</button>
+          <button :disabled="!(isFormValid)" type="submit" class="w-full text-white bg-gradient-to-r from-blue-500 to-green-400 hover:from-blue-600 hover:to-green-500 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg">更改</button>
         </form>
 
     </div>

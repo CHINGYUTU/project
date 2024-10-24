@@ -178,7 +178,7 @@ import { successMessage, warningMessage, errorMessage } from "../../api/messgae"
       handleSubmit() {
         axios.post('/auth/register', {Email: this.email, Password: this.password, UserName: this.username, Role: this.role, Phone: this.phone}).then((res) => {
           this.isEmailRepeat = false;
-          successMessage("註冊成功")
+          successMessage("註冊成功請至email收驗證信")
           this.$router.push({ name: 'login' });
         }).catch(err =>{
           if(err.status === 409){

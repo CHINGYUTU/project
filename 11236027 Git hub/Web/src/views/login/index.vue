@@ -40,12 +40,14 @@
         <div class="mb-4">
           <button
             type="submit"
-            :disabled="!email || !pwd"
+            :disabled="!email || !pwd || isLoader"
             class="w-full text-white bg-gradient-to-r from-blue-500 to-green-400 hover:from-blue-600 hover:to-green-500 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 focus:outline-none  disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg"
           >
             登入
           </button>
         </div>
+
+        
 
         <!-- 其他連結 -->
         <p class="mt-4 text-center text-sm text-gray-600">
@@ -67,10 +69,12 @@ export default {
     return {
       email: "",
       pwd: "",
+      isLoader: false,
     };
   },
   methods: {
     login() {
+      this.isLoader = true;
       axios.post("/auth/login", { Email: this.email, Password: this.pwd })
         .then(res => {
           if (res.status === 200) {
@@ -97,6 +101,7 @@ export default {
             errorMessage("發生錯誤");
           }
         });
+        this.isLoader = false
     }
   }
 };
