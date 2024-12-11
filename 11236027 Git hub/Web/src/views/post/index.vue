@@ -13,7 +13,7 @@
           </div>
           <div class="relative z-0 w-full mb-5 group">
             <select v-model="selectArea" id="citySelect" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-              <option v-for="area in Areas[selectCity]" :key="area" :value="selectArea">
+              <option v-for="area in Areas[selectCity]" :key="area" :value="area">
                 {{ area }}
               </option>
             </select>
@@ -231,7 +231,11 @@ export default {
         },
       };
     },
-    watch: {},
+    watch: {
+      selectCity() {
+        this.selectArea = this.Areas[this.selectCity][0];
+      }
+    },
     computed: {},
     methods: {
       updatePic(data){
@@ -243,7 +247,7 @@ export default {
 
         const formData = {
           id: User.ID,
-          city: Citys[this.selectCity],
+          city: this.Citys[this.selectCity],
           area: this.selectArea,
           address: this.address,
           title: this.title,

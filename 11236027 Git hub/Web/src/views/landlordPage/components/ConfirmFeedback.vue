@@ -1,3 +1,5 @@
+//TODO:未完工
+
 <template>
   <div class="flex items-center justify-center p-4">
     <div class="relative overflow-x-auto">
@@ -5,10 +7,10 @@
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             <th scope="col" class="px-6 py-3">ID</th>
-            <th scope="col" class="px-6 py-3">城市</th>
-            <th scope="col" class="px-6 py-3">地區</th>
-            <th scope="col" class="px-6 py-3">地址</th>
-            <th scope="col" class="px-6 py-3">價格</th>
+            <th scope="col" class="px-6 py-3">房客姓名</th>
+            <th scope="col" class="px-6 py-3">房客電話</th>
+            <th scope="col" class="px-6 py-3">房客Email</th>
+            <th scope="col" class="px-6 py-3">房屋連結</th>
             <th scope="col" class="px-6 py-3">操作</th>
           </tr>
         </thead>
@@ -18,35 +20,29 @@
               {{ data.ID }}
             </th>
             <td class="px-6 py-4">
-              {{ data.City }}
+              {{ data.Name }}
             </td>
             <td class="px-6 py-4">
-              {{ data.Area }}
+              {{ data.Phone }}
             </td>
             <td class="px-6 py-4">
-              {{ data.Address }}
+              {{ data.Email }}
             </td>
-            <td class="px-6 py-4">NT.{{ data.Price }}</td>
+            <td class="px-6 py-4">
+              <router-link :to="{ name: 'housepage', params: { id: data.HouseID } }" class="text-blue-600 text-center">連結</router-link>
+            </td>
             <td class="px-6 py-4">
               <button
-                @click="changeRent(data.ID, data.Rent)"
+                @click="throughFeedBack(data.ID)"
                 class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                v-if="!data.Rent"
               >
-                出租
+                通過
               </button>
               <button
-                @click="changeRent(data.ID, data.Rent)"
+                @click="rejectFeedBack(data.ID)"
                 class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-                v-else
               >
-                空閒
-              </button>
-              <button
-                @click="del(data.ID)"
-                class="text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-              >
-                刪除
+                不通過
               </button>
             </td>
           </tr>
@@ -71,26 +67,34 @@ export default {
   watch: {},
   computed: {},
   methods: {
-    getPosted() {
-      axios.post("/api/getPosted", { ID: JSON.parse(localStorage.getItem("session")).ID }).then((res) => {
-        this.datas = res.data;
-      });
+    getFeedBackCheckList() {
+      axios
+        .post("/api/getFeedBackCheckList", { ID: JSON.parse(localStorage.getItem("session")).ID })
+        .then((res) => {
+          this.datas = res.data;
+          console.log(this.datas);
+        })
+        .catch((error) => {});
     },
-    changeRent(ID, Rent) {
-      axios.post("/api/changeRent", { ID: ID, Rent: !Rent }).then((res) => {
-        this.$router.go(0);
-      });
+    throughFeedBack(id) {
+      axios
+        .post("/api/throughFeedBack", { ID: id })
+        .then((res) => {
+          successMessage("成功");
+        })
+        .catch((error) => {
+          errorMessage("發生錯誤,請聯絡網站管理員");
+        });
+        window.location.reload();
     },
-    del(ID) {
-      axios.post("/api/delpost", { ID: ID }).then((res) => {
-        this.$router.go(0);
-        successMessage("刪除成功");
-      });
+    rejectFeedBack(id) {
+      axios.post("/api/rejectFeedBack", { ID: id });
+      window.location.reload();
     },
   },
   created() {},
   mounted() {
-    this.getPosted();
+    this.getFeedBackCheckList();
   },
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <router-link :to="{ name: 'housepage', params: { id: house.ID } }">
-    <div class="w-[600px] mx-auto bg-white rounded-xl shadow-md overflow-hidden relative"> <!-- 使用固定宽度 w-[600px] -->
+    <div class="w-[380px] md:w-[600px] mx-auto bg-white rounded-xl shadow-md overflow-hidden relative"> <!-- 使用固定宽度 w-[600px] -->
       <div class="md:flex">
         <!-- 左侧图片部分 -->
         <div class="md:shrink-0 relative">
@@ -25,7 +25,7 @@
               <div class="absolute bottom-2 text-slate-500 text-start text-xs">
                 發佈時間: {{ house.ReleaseTime }}
               </div>
-              <div class="absolute bottom-2 right-2 text-lg text-red-500 font-bold">
+              <div class="absolute bottom-2 right-2 text-lg text-red-500 font-bold" :class="{ 'line-through' : house.Rent}">
                 {{ house.Price }} 元/月
               </div>
             </div>

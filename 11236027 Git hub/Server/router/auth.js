@@ -50,13 +50,12 @@ auth.post('/register', async (req, res) => {
 
         // 假設有個 insertUser 函式可以用來新增用戶，這裡需要加密密碼
         const hashedPassword = await bcrypt.hash(Password, 10); // 假設你使用 bcrypt 來加密密碼
-        console.log(Role)
 
-        await db.query('INSERT INTO Users (Email, Password, Name, Role, Phone) VALUES (?, ?, ?, ?)', [
+        const [rows1] = await db.query('INSERT INTO Users (Email, Password, Name, Role, Phone) VALUES (?, ?, ?, ?, ?)', [
             Email, hashedPassword, UserName, Role, Phone
         ]);
 
-        const token = jwt.sign({ userID: rows[0].ID }, SECRET_KEY, { expiresIn: '5m' });
+        const token = jwt.sign({ userID: rows1.insertId }, SECRET_KEY, { expiresIn: '5m' });
         const filePath = path.join(__dirname, '../templates/verify.html');
         let emailTemplate = fs.readFileSync(filePath, 'utf8');
 
@@ -70,7 +69,7 @@ auth.post('/register', async (req, res) => {
             html: emailTemplate,
         });
 
-        res.status(201).send({ message: '註冊成功' }); // 201 為創建的HTTP狀態碼
+        res.status(200).send({ message: '註冊成功' }); // 201 為創建的HTTP狀態碼
 
     } catch (error) {
         console.error(error);

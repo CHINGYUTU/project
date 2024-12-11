@@ -107,12 +107,14 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
+
 export default {
   data() {
     return {
       selectAddress: "",
       selectArea: "不限",
-      selectCity: "Taipei",
+      selectCity: "",
       selectedPrice: "不限",
       selectSize: "不限",
       Citys: {"Taipei":"台北市","NewTaipei":"新北市","Keelung":"基隆市","Taoyuan":"桃園市","HsinchuCity":"新竹市","HsinchuCounty":"新竹縣","Miaoli":"苗栗縣","Taichung":"台中市","Changhua":"彰化縣","Yunlin":"雲林縣","Nantou":"南投縣","ChiayiCounty":"嘉義縣","ChiayiCity":"嘉義市","Tainan":"台南市","Kaohsiung":"高雄市","PingtungCounty":"屏東縣","Yilan":"宜蘭縣","HualienCounty":"花蓮縣","TaitungCounty":"台東縣","Penghu":"澎湖縣","Kinmen":"金門縣","Lienchiang":"連江縣"},
@@ -159,20 +161,57 @@ export default {
     };
   },
   watch: {
-    selectCity: {
-      handler() {
-        this.searchCriteriaEvent();  // 每次 selectData 变更时执行过滤
-      },
-      immediate: true,
-      deep: true
+    // 監聽 selectCity 變化並保存到 Cookie
+    selectCity(newCity) {
+      Cookies.set('city', newCity);  // 創建會話 Cookie
+      this.searchCriteriaEvent();
+    },
+    // 監聽 selectArea 變化並保存到 Cookie
+    selectArea(newArea) {
+      Cookies.set('area', newArea);  // 創建會話 Cookie
+      this.searchCriteriaEvent();
+    },
+    // 監聽 selectedPrice 變化並保存到 Cookie
+    selectedPrice(newPrice) {
+      Cookies.set('price', newPrice);  // 創建會話 Cookie
+      this.searchCriteriaEvent();
+    },
+    // 監聽 selectSize 變化並保存到 Cookie
+    selectSize(newSize) {
+      Cookies.set('size', newSize);  // 創建會話 Cookie
+      this.searchCriteriaEvent();
     }
   },
   methods: {
-    openSelectCity() {
-      this.isSelectCityOpen = true;
-    },
-    closeSelectCity() {
-      this.isSelectCityOpen = false;
+    init() {
+      const savedCity = Cookies.get('city');
+      const savedArea = Cookies.get('area');
+      const savedPrice = Cookies.get('price');
+      const savedSize = Cookies.get('size');
+
+      if (savedCity) {
+        this.selectCity = savedCity;
+      } else {
+        this.selectCity = 'Taipei';  // 默認值
+      }
+
+      if (savedArea && this.areas[this.selectCity].includes(savedArea)) {
+        this.selectArea = savedArea;
+      } else {
+        this.selectArea = '不限';  // 默認區域
+      }
+
+      if (savedPrice && this.priceOptions.includes(savedPrice)) {
+        this.selectedPrice = savedPrice;
+      } else {
+        this.selectedPrice = '不限';  // 默認價格
+      }
+
+      if (savedSize && this.sizeOptions.includes(savedSize)) {
+        this.selectSize = savedSize;
+      } else {
+        this.selectSize = '不限';  // 默認坪數
+      }
     },
     searchCriteriaEvent() {
       this.$emit('searchCriteriaEvent', {
@@ -183,6 +222,9 @@ export default {
         Size: this.selectSize
       });
     }
+  },
+  mounted() {
+    this.init();
   }
 };
 </script>

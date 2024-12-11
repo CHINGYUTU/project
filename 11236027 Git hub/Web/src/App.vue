@@ -9,15 +9,10 @@
 </template>
 
 <script setup>
-import TopBar from './components/TopBar.vue'
-import EndBar from './components/EndBar.vue'
-import Info from './views/home/components/info.vue'
-import { useRoute } from 'vue-router'; // 确保正确导入 useRoute
+import TopBar from "./components/TopBar.vue";
+import { useRoute } from "vue-router"; // 确保正确导入 useRoute
 
 const route = useRoute();
-
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

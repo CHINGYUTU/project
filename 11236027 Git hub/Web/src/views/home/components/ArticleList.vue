@@ -8,9 +8,9 @@
             <span class="sr-only">Loading...</span>
         </div>
         <div v-else>
-            <p v-if="filteredHouseDatas.length == 0">沒有資料</p>
+            <p v-if="paginatedHouseDatas.length == 0">沒有資料</p>
             <div class="grid gap-6 grid-cols-1" v-else>
-                <div v-for="houseData in filteredHouseDatas" :key="houseData.ID" >
+                <div v-for="houseData in paginatedHouseDatas" :key="houseData.ID" >
                     <info :house="houseData" />
                 </div>
             </div>
