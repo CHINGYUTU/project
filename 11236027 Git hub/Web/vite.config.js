@@ -22,7 +22,7 @@ export default defineConfig({
         changeOrigin: true,
       },
       '/pic': {
-        target: 'https://image.11236027.me/api/index.php',
+        target: 'http://image.11236027.me/api/index.php',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/pic/, '')
       }
