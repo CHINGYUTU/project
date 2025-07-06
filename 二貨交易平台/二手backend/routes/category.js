@@ -3,8 +3,8 @@ const router = express.Router();
 const categoryController = require('../controllers/categoryController');
 const verifyToken = require('../middleware/verifyToken');
 
-// 所有請求都需驗證身份
-router.use(verifyToken);
+// 📌 查詢所有分類（所有人可用）
+router.get('/', categoryController.getAllCategories);
 
 // 查詢所有分類（所有人可用）
 router.get('/', categoryController.getAllCategories);
