@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雙北租屋交易網</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* 頂部導航 */
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* 搜索區塊 */
+        .search-bar {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .search-bar input, .search-bar select {
+            padding: 10px;
+            margin: 5px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* 所選城市區域間距 */
+        #area-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* 控制按鈕之間的間距 */
+            justify-content: center; /* 水平居中對齊 */
+        }
+
+        #area-checkboxes label {
+            margin-bottom: 20px; /* 讓每個標籤之間有些垂直間距 */
+        }
+
+        /* 房源列表 */
+        .property-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .property-item {
+            background-color: #fff;
+            padding: 15px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        .property-item img {
+            max-width: 100%;
+            border-radius: 4px;
+        }
+
+        .property-details {
+            margin-top: 10px;
+        }
+
+        .property-price {
+            color: #d9534f;
+            font-weight: bold;
+        }
+
+        /* 頁尾 */
+        .footer {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 頂部導航 -->
+    <div class="navbar">
+        <div class="logo">雙北租屋交易網</div>
+        <div class="nav-links">
+            <a href="#">登入</a>
+            <a href="#">聯絡我們</a>
+        </div>
+    </div>
+
+    <!-- 搜索區塊 -->
+    <div class="search-bar">
+        <h2>搜尋房屋</h2>
+        <!-- 城市選擇 -->
+        <h3>選擇城市:</h3>
+        <div class="filter-group">
+            <select id="city-select">
+                <option></option>
+                <option>台北</option>
+                <option>新北</option>
+            </select>
+        </div>
+    </div>
+    <div align="center">
+        
+        <!-- 動態區域選擇 -->
+        <div class="filter-group">
+            <h4>區域：</h4>
+            <div id="area-checkboxes">
+                <!-- 區域的選項會動態生成 -->
+            </div>
+        </div>
+
+        <!-- 類型選擇 -->
+        <div class="filter-group">
+            <h4>類型：</h4>
+            <label><input type="checkbox" class="filter-option" value="整層住家"> 整層住家</label>
+            <label><input type="checkbox" class="filter-option" value="獨立套房"> 獨立套房</label>
+            <label><input type="checkbox" class="filter-option" value="分租套房"> 分租套房</label>
+            <label><input type="checkbox" class="filter-option" value="雅房"> 雅房</label>
+        </div>
+
+        <!-- 型態選擇 -->
+            <div class="filter-group">
+                <h4>型態：</h4>
+                <label><input type="checkbox" class="filter-option" value="公寓"> 公寓</label>
+                <label><input type="checkbox" class="filter-option" value="透天厝"> 透天厝</label>
+                <label><input type="checkbox" class="filter-option" value="電梯大樓"> 電梯大樓</label>
+                <label><input type="checkbox" class="filter-option" value="別墅"> 別墅</label>
+            </div>
+
+        <!-- 租金選擇 -->
+        <div class="filter-group">
+            <h4>租金：</h4>
+            <label><input type="checkbox" class="filter-option" value="5000以下"> 5000以下</label>
+            <label><input type="checkbox" class="filter-option" value="5000-10000"> 5000-10000</label>
+            <label><input type="checkbox" class="filter-option" value="10000-20000"> 10000-20000</label>
+            <label><input type="checkbox" class="filter-option" value="20000-30000"> 20000-30000</label>
+            <label><input type="checkbox" class="filter-option" value="30000-40000"> 30000-40000</label>
+            <label><input type="checkbox" class="filter-option" value="40000以上"> 40000以上</label>
+        </div>
+        
+        <!-- 格局選擇 -->
+        <div class="filter-group">
+            <h4>格局：</h4>
+            <label><input type="checkbox" class="filter-option" value="1房"> 1房</label>
+            <label><input type="checkbox" class="filter-option" value="2房"> 2房</label>
+            <label><input type="checkbox" class="filter-option" value="3房"> 3房</label>
+            <label><input type="checkbox" class="filter-option" value="4房以上"> 4房以上</label>
+        </div>
+
+        <!-- 衛浴選擇 -->
+        <div class="filter-group">
+            <h4>衛浴：</h4>
+            <label><input type="checkbox" class="filter-option" value="1衛"> 1衛</label>
+            <label><input type="checkbox" class="filter-option" value="2衛"> 2衛</label>
+            <label><input type="checkbox" class="filter-option" value="3衛"> 3衛</label>
+            <label><input type="checkbox" class="filter-option" value="4衛以上"> 4衛以上</label>
+        </div>
+        
+        <!-- 坪數選擇 -->
+        <div class="filter-group">
+            <h4>坪數：</h4>
+            <label><input type="checkbox" class="filter-option" value="10-20坪"> 10-20坪</label>
+            <label><input type="checkbox" class="filter-option" value="20-30坪"> 20-30坪</label>
+            <label><input type="checkbox" class="filter-option" value="30-40坪"> 30-40坪</label>
+            <label><input type="checkbox" class="filter-option" value="40-50坪"> 40-50坪</label>
+            <label><input type="checkbox" class="filter-option" value="50坪以上"> 50坪以上</label>
+        </div>
+
+        <!-- 樓層選擇 -->
+        <div class="filter-group">
+            <h4>樓層：</h4>
+            <label><input type="checkbox" class="filter-option" value="1樓"> 1樓</label>
+            <label><input type="checkbox" class="filter-option" value="2-6樓"> 2-6樓</label>
+            <label><input type="checkbox" class="filter-option" value="6-12樓"> 6-12樓</label>
+            <label><input type="checkbox" class="filter-option" value="12樓以上"> 12樓以上</label>
+        </div>
+
+        <!-- 設備選擇 -->
+        <div class="filter-group">
+            <h4>設備：</h4>
+            <label><input type="checkbox" class="filter-option" value="有床"> 有床</label>
+            <label><input type="checkbox" class="filter-option" value="有冷氣"> 有冷氣</label>
+            <label><input type="checkbox" class="filter-option" value="有洗衣機"> 有洗衣機</label>
+            <label><input type="checkbox" class="filter-option" value="有冰箱"> 有冰箱</label>
+            <label><input type="checkbox" class="filter-option" value="有熱水器"> 有熱水器</label>
+            <label><input type="checkbox" class="filter-option" value="有天然瓦斯"> 有天然瓦斯</label>
+            <label><input type="checkbox" class="filter-option" value="有網路"> 有網路</label>
+        </div>
+
+        <!-- 特色選擇 -->
+        <div class="filter-group">
+            <h4>特色：</h4>
+            <label><input type="checkbox" class="filter-option" value="近捷運"> 近捷運</label>
+            <label><input type="checkbox" class="filter-option" value="可開伙"> 可開伙</label>
+            <label><input type="checkbox" class="filter-option" value="可養寵物"> 可養寵物</label>
+            <label><input type="checkbox" class="filter-option" value="有車位"> 有車位</label>
+            <label><input type="checkbox" class="filter-option" value="有陽台"> 有陽台</label>
+            <label><input type="checkbox" class="filter-option" value="有電梯"> 有電梯</label>
+        </div>
+
+         <!-- 裝潢選擇 -->
+        <div class="filter-group">
+            <h4>裝潢：</h4>
+            <label><input type="checkbox" class="filter-option" value="新裝潢"> 新裝潢</label>
+            <label><input type="checkbox" class="filter-option" value="中等裝潢"> 中等裝潢</label>
+            <label><input type="checkbox" class="filter-option" value="高等裝潢"> 高等裝潢</label>
+        </div>
+
+        <!-- 限制選擇 -->
+        <div class="filter-group">
+            <h4>限制：</h4>
+            <label><input type="checkbox" class="filter-option" value="限女生"> 限女生</label>
+            <label><input type="checkbox" class="filter-option" value="限男生"> 限男生</label>
+            <label><input type="checkbox" class="filter-option" value="排除頂加"> 排除頂加</label>
+        </div>
+
+        <!-- 清空選項按鈕 -->
+        <button class="clear-button" id="clear-filters">
+            <img src="https://img.icons8.com/ios-filled/50/000000/trash.png" width="20" height="20" alt="清空選項">
+            清空選項
+        </button>
+    </div>
+
+<!-- 篩選結果 -->
+<div class="results" id="results">
+    <h3>篩選結果：</h3>
+    <ul id="result-list">
+        <!-- 篩選結果會在這裡顯示 -->
+    </ul>
+</div>
+
+<script>
+    // JavaScript 篩選功能
+    document.addEventListener("DOMContentLoaded", function () {
+        const citySelect = document.getElementById("city-select");
+        const areaCheckboxes = document.getElementById("area-checkboxes");
+        const filterOptions = document.querySelectorAll(".filter-option");
+        const filterAlls = document.querySelectorAll(".filter-all");
+        const resultList = document.getElementById("result-list");
+        const clearFiltersButton = document.getElementById("clear-filters");
+
+         // 城市對應的區域資料
+         const areasByCity = {
+                "台北": ["中正區", "大安區", "信義區", "中山區", "萬華區", "內湖區", "士林區", "文山區", "北投區", "松山區", "大同區", "南港區"],
+                "新北": ["板橋區", "新莊區", "三重區", "永和區", "中和區", "新店區", "土城區", "汐止區", 
+                        "淡水區", "蘆洲區", "樹林區", "林口區", "三峽區", "五股區", "八里區", "三芝區", 
+                        "鶯歌區", "泰山區", "瑞芳區", "深坑區", "萬里區", "金山區", "貢寮區", 
+                        "石門區", "雙溪區", "平溪區", "石碇區", "坪林區", "烏來區"]
+            };
+
+            // 當城市改變時動態生成區域選項
+            citySelect.addEventListener("change", function () {
+                const selectedCity = citySelect.value;
+                generateAreaOptions(selectedCity);
+            });
+
+            // 動態生成區域選項的函數
+            function generateAreaOptions(city) {
+                areaCheckboxes.innerHTML = ""; // 清空區域選項
+                if (areasByCity[city]) {
+                    areasByCity[city].forEach(area => {
+                        const label = document.createElement("label");
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.value = area;
+                        checkbox.classList.add("filter-option", "area");
+                        label.appendChild(checkbox);
+                        label.append(area);
+                        areaCheckboxes.appendChild(label);
+                    });
+                }
+            }
+
+        // 模擬篩選結果的資料 (可以替換為實際的資料來源)
+        const properties = [
+            { id: 1, area: "台北", pattern: "2房", size: "20-30坪" },
+            { id: 2, area: "新北", pattern: "1房", size: "10-20坪" },
+            { id: 4, area: "台北", pattern: "1房", size: "10-20坪" },
+            { id: 5, area: "新北", pattern: "2房", size: "20-30坪" },
+        ];
+
+        // 監控篩選條件
+        filterOptions.forEach(option => {
+            option.addEventListener("change", filterProperties);
+        });
+         
+        // 清空篩選條件
+        clearFiltersButton.addEventListener("click", function () {
+            citySelect.value = ""; // 重置城市選擇
+            areaCheckboxes.innerHTML = ""; // 清空區域選項
+            filterOptions.forEach(option => option.checked = false);
+            resultList.innerHTML = "";  // 清空結果
+        });
+
+        // 篩選結果
+        function filterProperties() {
+            const selectedFilters = Array.from(filterOptions)
+                .filter(option => option.checked)
+                .map(option => option.value);
+
+            // 篩選出符合條件的物件
+            const filteredProperties = properties.filter(property => {
+                return selectedFilters.every(filter => 
+                    property.area === filter || 
+                    property.pattern === filter || 
+                    property.size === filter
+                );
+            });
+
+            // 更新結果清單
+            resultList.innerHTML = filteredProperties.length > 0
+                ? filteredProperties.map(property => `<li>${property.area} - ${property.pattern} - ${property.size}</li>`).join("")
+                : "<li>沒有符合的結果</li>";
+        }
+    });
+</script>
+
+    <!-- 房源展示區塊 -->
+    <div class="property-list">
+        <div class="property-item">
+            <img src="house1.jpg" alt="房屋1">
+            <div class="property-details">
+                <h3>精美公寓</h3>
+                <p>位於台北市，交通方便，環境清幽。</p>
+                <div class="property-price">價格：NT$15,000/月</div>
+            </div>
+        </div>
+        <div class="property-item">
+            <img src="house2.jpg" alt="房屋2">
+            <div class="property-details">
+                <h3>溫馨套房</h3>
+                <p>鄰近捷運，生活機能強，適合單身或小家庭。</p>
+                <div class="property-price">價格：NT$12,000/月</div>
+            </div>
+        </div>
+        <div class="property-item">
+            <img src="house3.jpg" alt="房屋3">
+            <div class="property-details">
+                <h3>現代化住宅</h3>
+                <p>現代設計，鄰近商圈與學區。</p>
+                <div class="property-price">價格：NT$20,000/月</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頁尾 -->
+    <div class="footer">
+        © 2024 房屋交易網 | 聯絡我們：example@example.com
+    </div>
+
+</body>
+</html>
