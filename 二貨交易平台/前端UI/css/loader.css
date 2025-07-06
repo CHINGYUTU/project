@@ -1,0 +1,219 @@
+.loader-container {
+  --color-primary: seagreen;
+  --color-neutral: #fff;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.area {
+  height: 100%;
+}
+.area:nth-of-type(1):hover ~ .loader { transform: rotateX(-20deg) rotateY(20deg); }
+.area:nth-of-type(2):hover ~ .loader { transform: rotateX(-20deg) rotateY(10deg); }
+.area:nth-of-type(3):hover ~ .loader { transform: rotateX(-20deg) rotateY(5deg); }
+.area:nth-of-type(4):hover ~ .loader { transform: rotateX(-20deg) rotateY(-5deg); }
+.area:nth-of-type(5):hover ~ .loader { transform: rotateX(-20deg) rotateY(-10deg); }
+.area:nth-of-type(6):hover ~ .loader { transform: rotateX(-20deg) rotateY(-20deg); }
+.area:nth-of-type(7):hover ~ .loader { transform: rotateX(-10deg) rotateY(20deg); }
+.area:nth-of-type(8):hover ~ .loader { transform: rotateX(-10deg) rotateY(10deg); }
+.area:nth-of-type(9):hover ~ .loader { transform: rotateX(-10deg) rotateY(5deg); }
+.area:nth-of-type(10):hover ~ .loader { transform: rotateX(-10deg) rotateY(-5deg); }
+.area:nth-of-type(11):hover ~ .loader { transform: rotateX(-10deg) rotateY(-10deg); }
+.area:nth-of-type(12):hover ~ .loader { transform: rotateX(-10deg) rotateY(-20deg); }
+.area:nth-of-type(13):hover ~ .loader { transform: rotateX(-5deg) rotateY(20deg); }
+.area:nth-of-type(14):hover ~ .loader { transform: rotateX(-5deg) rotateY(10deg); }
+.area:nth-of-type(15):hover ~ .loader { transform: rotateX(-5deg) rotateY(5deg); }
+.area:nth-of-type(16):hover ~ .loader { transform: rotateX(-5deg) rotateY(-5deg); }
+.area:nth-of-type(17):hover ~ .loader { transform: rotateX(-5deg) rotateY(-10deg); }
+.area:nth-of-type(18):hover ~ .loader { transform: rotateX(-5deg) rotateY(-20deg); }
+.area:nth-of-type(19):hover ~ .loader { transform: rotateX(5deg) rotateY(20deg); }
+.area:nth-of-type(20):hover ~ .loader { transform: rotateX(5deg) rotateY(10deg); }
+.area:nth-of-type(21):hover ~ .loader { transform: rotateX(5deg) rotateY(5deg); }
+.area:nth-of-type(22):hover ~ .loader { transform: rotateX(5deg) rotateY(-5deg); }
+.area:nth-of-type(23):hover ~ .loader { transform: rotateX(5deg) rotateY(-10deg); }
+.area:nth-of-type(24):hover ~ .loader { transform: rotateX(5deg) rotateY(-20deg); }
+.area:nth-of-type(25):hover ~ .loader { transform: rotateX(10deg) rotateY(20deg); }
+.area:nth-of-type(26):hover ~ .loader { transform: rotateX(10deg) rotateY(10deg); }
+.area:nth-of-type(27):hover ~ .loader { transform: rotateX(10deg) rotateY(5deg); }
+.area:nth-of-type(28):hover ~ .loader { transform: rotateX(10deg) rotateY(-5deg); }
+.area:nth-of-type(29):hover ~ .loader { transform: rotateX(10deg) rotateY(-10deg); }
+.area:nth-of-type(30):hover ~ .loader { transform: rotateX(10deg) rotateY(-20deg); }
+.area:nth-of-type(31):hover ~ .loader { transform: rotateX(20deg) rotateY(20deg); }
+.area:nth-of-type(32):hover ~ .loader { transform: rotateX(20deg) rotateY(10deg); }
+.area:nth-of-type(33):hover ~ .loader { transform: rotateX(20deg) rotateY(5deg); }
+.area:nth-of-type(34):hover ~ .loader { transform: rotateX(20deg) rotateY(-5deg); }
+.area:nth-of-type(35):hover ~ .loader { transform: rotateX(20deg) rotateY(-10deg); }
+.area:nth-of-type(36):hover ~ .loader { transform: rotateX(20deg) rotateY(-20deg); }
+
+.loader {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  transition: all 0.15s linear;
+  translate: -50% -50%;
+}
+
+.loader span {
+  position: relative;
+  height: 30px;
+  background-color: var(--color-neutral);
+  border-top: 0.2rem solid var(--color-primary);
+  border-bottom: 0.2rem solid var(--color-primary);
+}
+
+.loader span::before {
+  content: "";
+  position: absolute;
+  top: 0.2rem;
+  width: 100%;
+  height: calc(100% - 0.4rem);
+  background-color: var(--color-primary);
+  clip-path: inset(0 100% 0 0);
+  animation: progress calc(var(--i) * 10ms) linear calc(var(--d) * 10ms) forwards;
+}
+
+.loader > span:nth-of-type(1) {
+  width: 100px;
+  border-left: 0.2rem solid var(--color-primary);
+  border-radius: 10px 0 0 10px;
+}
+.loader > span:nth-of-type(1)::before {
+  left: 0.2rem;
+  width: calc(100% - 0.2rem + 1px);
+  border-radius: 5px 0 0 5px;
+}
+
+.loader > span:nth-of-type(2) {
+  width: 10px;
+}
+.loader > span:nth-of-type(2)::before {
+  left: -1px;
+  width: calc(100% + 2px);
+}
+
+.loader > span:nth-of-type(3) {
+  width: 50px;
+  transform: translateZ(40px);
+}
+.loader > span:nth-of-type(3)::before {
+  left: -1px;
+  width: calc(100% + 2px);
+}
+
+.loader > span:nth-of-type(4) {
+  width: 40px;
+  border-right: 0.2rem solid var(--color-primary);
+  border-radius: 0 10px 10px 0;
+}
+.loader > span:nth-of-type(4)::before {
+  right: 0.2rem;
+  width: calc(100% - 0.2rem + 1px);
+  border-radius: 0 5px 5px 0;
+}
+
+.text {
+  position: absolute;
+  top: -90%;
+  left: 10px;
+  color: var(--color-primary);
+  font-weight: 900;
+  transform: translateZ(-20px);
+}
+
+.groove {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.groove > span {
+  display: inline-block;
+}
+
+.groove > :first-child,
+.groove > :last-child {
+  position: absolute;
+}
+
+.groove:nth-of-type(1) > :nth-child(1) {
+  width: 50px;
+  transform: rotateY(90deg);
+  transform-origin: left;
+}
+.groove:nth-of-type(1) > :nth-child(2) {
+  width: 30px;
+  transform: translateZ(-50px);
+}
+.groove:nth-of-type(1) > :nth-child(3) {
+  width: 50px;
+  transform: rotateY(-90deg) translateX(-50px);
+  transform-origin: left;
+}
+
+.groove:nth-of-type(2) > :nth-child(1) {
+  width: 100px;
+  transform: rotateY(90deg);
+  transform-origin: left;
+}
+.groove:nth-of-type(2) > :nth-child(2) {
+  width: 15px;
+  transform: translateZ(-100px);
+}
+.groove:nth-of-type(2) > :nth-child(3) {
+  width: 140px;
+  transform: rotateY(-90deg) translateX(-100px);
+  transform-origin: left;
+}
+
+.groove:nth-of-type(3) > :nth-child(1) {
+  width: 60px;
+  transform: rotateY(90deg) translateX(-40px);
+  transform-origin: left;
+}
+.groove:nth-of-type(3) > :nth-child(2) {
+  width: 30px;
+  transform: translateZ(-20px);
+}
+.groove:nth-of-type(3) > :nth-child(3) {
+  width: 20px;
+  transform: rotateY(-90deg) translateX(-20px);
+  transform-origin: left;
+}
+
+.btn {
+  position: absolute;
+  top: calc(50% + 5rem);
+  left: 50%;
+  padding: 0.5rem;
+  border: 5px solid var(--color-primary);
+  border-radius: 10px;
+  background: linear-gradient(var(--color-primary), var(--color-primary)) 0 0 / 100% 0 no-repeat;
+  color: var(--color-primary);
+  font-weight: 900;
+  transition: all 0.1s ease-in-out;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-size: 100% 100%;
+  color: var(--color-neutral);
+}
+
+.btn:active {
+  font-size: 0.7em;
+}
+.btn:active ~ .loader span::before,
+.btn:active ~ .loader .groove > span::before {
+  display: none;
+}
+
+@keyframes progress {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
