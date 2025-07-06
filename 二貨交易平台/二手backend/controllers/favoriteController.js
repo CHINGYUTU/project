@@ -60,6 +60,9 @@ exports.getFavorites = async (req, res) => {
        WHERE f.user_id = ?`,
       [userId]
     );
+    if (rows.length === 0) {
+      return res.status(404).json({ message: '暫無收藏商品'});
+    }
 
     res.json({ message: '收藏查詢成功', data: rows });
   } catch (err) {

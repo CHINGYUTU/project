@@ -131,8 +131,12 @@ exports.searchItems = async (req, res) => {
     }
 
     query += ` ORDER BY i.created_at DESC`;
-
+    //查無商品
     const [rows] = await db.query(query, params);
+      if (rows.length === 0) {
+      return res.status(404).json({ message: '查無此商品'});
+    }
+    //查詢成功
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {
     console.error('❌ 查詢商品錯誤:', err);
