@@ -3,10 +3,16 @@ const router = express.Router();
 const orderController = require('../controllers/orderController');
 const verifyToken = require('../middleware/verifyToken');
 
-// ✅ POST /api/order：建立訂單（需登入）
-router.post('/', verifyToken, orderController.createOrder);
+// 購買商品(僅限user)
+router.post('/buy', verifyToken, orderController.purchaseItem);
 
-// ✅ GET /api/order：查詢使用者的所有訂單（需登入）
-router.get('/', verifyToken, orderController.getOrders);
+// 查詢個人訂單(僅限user)
+router.get('/my-orders', verifyToken, orderController.getMyOrders); 
+
+// 管理員查詢所有訂單
+router.get('/all', verifyToken, orderController.getAllOrders);
+
+// ⭐ 新增訂單狀態更新路由
+router.patch('/update-status/:orderId', verifyToken, orderController.updateOrderStatus);
 
 module.exports = router;

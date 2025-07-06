@@ -6,13 +6,15 @@ const crypto = require('crypto'); // 🔐 產生驗證用的 token
 
 // 📌 使用者註冊
 exports.register = async (req, res) => {
-  const { name, email, password, user_type } = req.body;
+  const { name, email, password } = req.body;
 
+  // 限制只能用 @ntub.edu.tw 信箱
   if (!email.endsWith('@ntub.edu.tw')) {
     return res.status(400).json({ message: '只能使用 @ntub.edu.tw 信箱註冊' });
   }
 
   try {
+    // 檢查信箱是否已註冊
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
     if (rows.length > 0) {
       return res.status(400).json({ message: '此信箱已被註冊' });
@@ -22,9 +24,9 @@ exports.register = async (req, res) => {
     const verifyToken = crypto.randomBytes(32).toString('hex');
 
     await db.query(
-      `INSERT INTO users (name, email, password, user_type, points, created_at, is_verified, verify_token)
+      `INSERT INTO users (name, email, password, role, points, created_at, is_verified, verify_token)
        VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)`,
-      [name, email, hashedPassword, user_type, 0, 0, verifyToken]
+      [name, email, hashedPassword, 'user', 0, 0, verifyToken]
     );
 
     await sendVerificationEmail(email, verifyToken);
@@ -34,6 +36,7 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤' });
   }
 };
+
 
 // 📌 信箱驗證
 exports.verifyEmail = async (req, res) => {
@@ -79,7 +82,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, name: user.name, email: user.email, role: user.role }, // role: user 或 admin
       process.env.JWT_SECRET,
       { expiresIn: '2h' }
     );
@@ -90,6 +93,7 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤' });
   }
 };
+
 
 // 📌 忘記密碼：寄出重設連結
 exports.forgotPassword = async (req, res) => {
