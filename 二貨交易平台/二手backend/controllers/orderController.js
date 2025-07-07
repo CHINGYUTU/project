@@ -1,50 +1,6 @@
 const db = require('../db');
 
-// 📌 購買商品（建立訂單）
-exports.purchaseItem = async (req, res) => {
-  const buyerId = req.user.id;
-  const { item_id } = req.body;
-
-  if (req.user.role === 'admin') {
-    return res.status(403).json({ message: '管理員無法購買商品' });
-  }
-
-  const conn = await db.getConnection(); // 🔹 取得資料庫連線
-  await conn.beginTransaction();         // 🔹 開啟交易
-
-  try {
-    // 🔒 鎖定該商品
-    const [items] = await conn.query('SELECT * FROM items WHERE id = ? FOR UPDATE', [item_id]);
-    if (items.length === 0 || items[0].status !== 'available') {
-      await conn.rollback();
-      return res.status(400).json({ message: '商品不存在或已被下單' });
-    }
-
-    const item = items[0];
-
-    // 建立訂單
-    await conn.query(
-      `INSERT INTO orders (item_id, buyer_id, seller_id, status, created_at)
-       VALUES (?, ?, ?, 'pending', NOW())`,
-      [item_id, buyerId, item.user_id]
-    );
-
-    // 更新商品狀態
-    await conn.query('UPDATE items SET status = "reserved" WHERE id = ?', [item_id]);
-
-    await conn.commit(); // ✅ 提交交易
-    res.json({ message: '訂單已建立，等待賣家確認' });
-  } catch (err) {
-    await conn.rollback(); // ❌ 發生錯誤就回滾
-    console.error('❌ 建立訂單錯誤:', err);
-    res.status(500).json({ message: '伺服器錯誤', error: err.message });
-  } finally {
-    conn.release(); // 🔚 釋放連線
-  }
-};
-
-
-// 📌 查詢個人訂單（買家或賣家都能查）
+// 📌 查詢個人訂單
 exports.getMyOrders = async (req, res) => {
   const userId = req.user.id;
 
@@ -54,10 +10,18 @@ exports.getMyOrders = async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT * FROM orders WHERE buyer_id = ? OR seller_id = ? ORDER BY created_at DESC`,
+      `SELECT o.*, 
+              GROUP_CONCAT(i.name SEPARATOR ', ') AS item_names,
+              GROUP_CONCAT(i.price SEPARATOR ', ') AS item_prices
+       FROM orders o
+       JOIN order_items oi ON o.id = oi.order_id
+       JOIN items i ON oi.item_id = i.id
+       WHERE o.buyer_id = ? OR o.seller_id = ?
+       GROUP BY o.id
+       ORDER BY o.created_at DESC`,
       [userId, userId]
     );
-    res.json(rows);
+    res.json({ message: '查詢成功', data: rows });
   } catch (err) {
     console.error('❌ 查詢訂單錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤' });
@@ -72,25 +36,29 @@ exports.getAllOrders = async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT o.*, i.name AS item_name, u.email AS buyer_email
+      `SELECT o.*, 
+              u.email AS buyer_email,
+              GROUP_CONCAT(i.name SEPARATOR ', ') AS item_names,
+              GROUP_CONCAT(i.price SEPARATOR ', ') AS item_prices
        FROM orders o
-       JOIN items i ON o.item_id = i.id
        JOIN users u ON o.buyer_id = u.id
+       JOIN order_items oi ON o.id = oi.order_id
+       JOIN items i ON oi.item_id = i.id
+       GROUP BY o.id
        ORDER BY o.created_at DESC`
     );
-    res.json(rows);
+    res.json({ message: '查詢成功', data: rows });
   } catch (err) {
     console.error('❌ 查詢所有訂單錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤' });
   }
 };
 
-// ✅ 📌 更新訂單狀態
+// 📌 更新訂單狀態
 exports.updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
   const { newStatus } = req.body;
   const userId = req.user.id;
-  const role = req.user.role;
 
   const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
   if (!validStatuses.includes(newStatus)) {
@@ -104,13 +72,10 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     const order = orders[0];
-
-    // 只能由訂單買家或賣家更新
     if (order.buyer_id !== userId && order.seller_id !== userId) {
       return res.status(403).json({ message: '無權限更新此訂單' });
     }
 
-    // 規則範例（可擴充更多邏輯）：
     if (newStatus === 'confirmed' && userId !== order.seller_id) {
       return res.status(403).json({ message: '只有賣家可以確認訂單' });
     }
@@ -122,16 +87,69 @@ exports.updateOrderStatus = async (req, res) => {
     // 更新訂單狀態
     await db.query('UPDATE orders SET status = ? WHERE id = ?', [newStatus, orderId]);
 
-    // ✅ 如果訂單完成或取消，更新商品狀態
+    // 更新商品狀態
     if (newStatus === 'completed') {
-      await db.query('UPDATE items SET status = "sold" WHERE id = ?', [order.item_id]);
+      await db.query(
+        `UPDATE items 
+         SET status = 'sold' 
+         WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
+        [orderId]
+      );
     } else if (newStatus === 'cancelled') {
-      await db.query('UPDATE items SET status = "available" WHERE id = ?', [order.item_id]);
+      await db.query(
+        `UPDATE items 
+         SET status = 'available' 
+         WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
+        [orderId]
+      );
     }
 
     res.json({ message: `訂單狀態已更新為 ${newStatus}` });
   } catch (err) {
     console.error('❌ 更新訂單狀態錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤', error: err.message });
+  }
+};
+
+// 📌 查詢單筆訂單詳情
+exports.getOrderDetail = async (req, res) => {
+  const orderId = req.params.orderId;
+  const userId = req.user.id;
+  const role = req.user.role;
+
+  try {
+    // 查詢訂單主資訊
+    const [orders] = await db.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: '找不到該訂單' });
+    }
+
+    const order = orders[0];
+
+    // 僅限該訂單的買家、賣家或管理員查看
+    if (role !== 'admin' && userId !== order.buyer_id && userId !== order.seller_id) {
+      return res.status(403).json({ message: '無權限查看此訂單' });
+    }
+
+    // 查詢訂單包含的商品
+    const [items] = await db.query(
+      `SELECT i.id, i.name, i.price, i.image_url
+       FROM order_items oi
+       JOIN items i ON oi.item_id = i.id
+       WHERE oi.order_id = ?`,
+      [orderId]
+    );
+
+    res.json({
+      message: '查詢成功',
+      data: {
+        order,
+        items
+      }
+    });
+  } catch (err) {
+    console.error('❌ 查詢訂單詳情錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };

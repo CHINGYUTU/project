@@ -60,7 +60,8 @@ exports.getCartItems = async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT items.* FROM cart_items
+      `SELECT items.*
+       FROM cart_items
        JOIN items ON cart_items.item_id = items.id
        WHERE cart_items.user_id = ? AND items.status = 'available'`,
       [userId]
@@ -72,41 +73,92 @@ exports.getCartItems = async (req, res) => {
   }
 };
 
-// 📌 結帳購物車（建立多筆 pending 訂單）
+// 📌 結帳購物車（依賣家分組建立訂單、建立 order_items、更新商品狀態、清空購物車、total_price）
 exports.checkout = async (req, res) => {
   const userId = req.user.id;
+  const { item_ids } = req.body; // ⬅️ 傳入欲結帳的商品 ID 陣列
+
+  if (!Array.isArray(item_ids) || item_ids.length === 0) {
+    return res.status(400).json({ message: '請提供要結帳的商品 ID 陣列' });
+  }
+
+  const conn = await db.getConnection();
+  await conn.beginTransaction();
 
   try {
-    const [cartItems] = await db.query(
-      `SELECT items.id AS item_id, items.user_id AS seller_id
-       FROM cart_items
-       JOIN items ON cart_items.item_id = items.id
-       WHERE cart_items.user_id = ? AND items.status = 'available'`,
-      [userId]
+    // 查詢指定商品，確認屬於購物車且尚未售出
+    const [cartItems] = await conn.query(
+      `SELECT c.item_id, i.user_id AS seller_id, i.price, i.name
+       FROM cart_items c
+       JOIN items i ON c.item_id = i.id
+       WHERE c.user_id = ? AND c.item_id IN (?) AND i.status = 'available'`,
+      [userId, item_ids]
     );
 
-    if (cartItems.length === 0) {
-      return res.status(400).json({ message: '購物車為空或商品已售出' });
+    if (cartItems.length !== item_ids.length) {
+      await conn.rollback();
+      return res.status(400).json({ message: '部分商品不存在、未在購物車中或已售出' });
     }
 
+    // 分組商品（依據 seller_id）
+    const grouped = {};
     for (const item of cartItems) {
-      // 1. 建立 pending 訂單
-      await db.query(
-        `INSERT INTO orders (item_id, buyer_id, seller_id, status, created_at)
-         VALUES (?, ?, ?, 'pending', NOW())`,
-        [item.item_id, userId, item.seller_id]
+      if (!grouped[item.seller_id]) {
+        grouped[item.seller_id] = [];
+      }
+      grouped[item.seller_id].push(item);
+    }
+
+    const createdOrders = [];
+
+    // 為每位賣家建立訂單
+    for (const sellerId in grouped) {
+      const items = grouped[sellerId];
+      const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+
+      // 建立訂單
+      const [orderResult] = await conn.query(
+        `INSERT INTO orders (buyer_id, seller_id, status, total_price, created_at)
+         VALUES (?, ?, 'pending', ?, NOW())`,
+        [userId, sellerId, totalPrice]
+      );
+      const orderId = orderResult.insertId;
+
+      // 建立 order_items
+      const orderItemValues = items.map(item => [orderId, item.item_id]);
+      await conn.query(
+        `INSERT INTO order_items (order_id, item_id) VALUES ?`,
+        [orderItemValues]
       );
 
-      // 2. 更新商品狀態為 reserved
-      await db.query('UPDATE items SET status = "reserved" WHERE id = ?', [item.item_id]);
+      // 更新商品狀態為 reserved
+      const itemIdList = items.map(item => item.item_id);
+      await conn.query(
+        `UPDATE items SET status = 'reserved' WHERE id IN (?)`,
+        [itemIdList]
+      );
+
+      // 從購物車中移除
+      await conn.query(
+        `DELETE FROM cart_items WHERE user_id = ? AND item_id IN (?)`,
+        [userId, itemIdList]
+      );
+
+      createdOrders.push({
+        order_id: orderId,
+        seller_id: sellerId,
+        total_price: totalPrice,
+        items: items.map(i => ({ id: i.item_id, name: i.name, price: i.price }))
+      });
     }
 
-    // 3. 清空購物車
-    await db.query('DELETE FROM cart_items WHERE user_id = ?', [userId]);
-
-    res.json({ message: '結帳成功，訂單建立中（等待賣家確認）' });
+    await conn.commit();
+    res.json({ message: '部分商品結帳成功', orders: createdOrders });
   } catch (err) {
-    console.error('❌ 結帳錯誤:', err);
+    await conn.rollback();
+    console.error('❌ 部分結帳錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
+  } finally {
+    conn.release();
   }
 };
