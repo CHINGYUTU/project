@@ -2,8 +2,9 @@ const db = require('../db');
 
 // 📌 上架商品
 exports.addItem = async (req, res) => {
-  const { name, description, price, category_id, image_url } = req.body;
+  const { name, description, price, category_id} = req.body;
   const userId = req.user.id;
+  const image_url = req.file ? `/uploads/items/${req.file.filename}` : null;
 
   if (req.user.role === 'admin') {
     return res.status(403).json({ message: '管理員無法上架商品' });

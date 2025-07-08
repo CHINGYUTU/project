@@ -11,6 +11,7 @@ const orderRoutes = require('./routes/order'); // 訂單路由
 const cartRoutes = require('./routes/cart'); // 購物車路由
 const favoriteRoutes = require('./routes/favorite'); // 收藏路由
 const categoryRoutes = require('./routes/category');//分類路由
+const userRoutes = require('./routes/user'); // ⬅️ 使用者個人資料
 
 // 初始化 Express 應用程式
 const app = express();
@@ -28,6 +29,9 @@ app.use('/api/order', orderRoutes); // 訂單
 app.use('/api/cart', cartRoutes); // 購物車
 app.use('/api/favorite', favoriteRoutes); // 收藏
 app.use('/api/category', categoryRoutes);//分類
+app.use('/uploads', express.static('uploads'));//靜態圖片存取
+app.use('/api/user', userRoutes); // 使用者個人功能（大頭貼、密碼修改等）
+
 
 // 測試首頁
 app.get('/', (req, res) => {

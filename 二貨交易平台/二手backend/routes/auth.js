@@ -19,7 +19,4 @@ router.post('/forgot-password', authController.forgotPassword);
 // ✅ POST /reset-password：未登入、使用重設密碼信重設密碼
 router.post('/reset-password', authController.resetPassword);
 
-// ✅ POST /update-password：使用者登入狀態下修改密碼（新密碼不得與舊密碼重複）
-router.post('/update-password', verifyToken, authController.updatePassword);
-
 module.exports = router;

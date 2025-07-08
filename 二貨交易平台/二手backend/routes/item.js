@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const itemController = require('../controllers/itemController');
 const verifyToken = require('../middleware/verifyToken');
+const { uploadItemImage } = require('../middleware/upload');
+
 
 // 🔒 需登入才可使用的功能
-// 📌 上架商品（僅限一般使用者）
-router.post('/add', verifyToken, itemController.addItem);
+// 📌 上架商品（僅限一般使用者且附帶圖片）
+router.post('/add', verifyToken, uploadItemImage.single('image'), itemController.addItem);
 
 // 📌 刪除商品（限賣家本人或管理員）
 router.delete('/:id', verifyToken, itemController.deleteItem);
