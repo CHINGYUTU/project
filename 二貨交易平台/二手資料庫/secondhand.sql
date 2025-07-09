@@ -54,8 +54,6 @@ DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -67,7 +65,7 @@ CREATE TABLE `categories` (
 
 LOCK TABLES `categories` WRITE;
 /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
-INSERT INTO `categories` VALUES (1,'電子產品','2025-07-06 19:20:11','2025-07-06 19:21:39'),(2,'生活用品','2025-07-07 08:18:55','2025-07-07 08:18:55');
+INSERT INTO `categories` VALUES (2,'生活用品'),(1,'電子產品');
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -115,6 +113,7 @@ CREATE TABLE `items` (
   `category_id` int NOT NULL,
   `user_id` int NOT NULL,
   `image_url` text COLLATE utf8mb4_unicode_ci,
+  `location` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '面交地點',
   `status` enum('available','sold','reserved') COLLATE utf8mb4_unicode_ci DEFAULT 'available',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -131,7 +130,7 @@ CREATE TABLE `items` (
 
 LOCK TABLES `items` WRITE;
 /*!40000 ALTER TABLE `items` DISABLE KEYS */;
-INSERT INTO `items` VALUES (1,'iphone15 pro 128G','狀況良好，電池健康度90%',20000.00,1,1,'/uploads/items/1752004579844-589886758.jpg','available','2025-07-08 19:56:19');
+INSERT INTO `items` VALUES (1,'iphone15 pro 128G','狀況良好，電池健康度90%',20000.00,1,1,'/uploads/1752073278782-975207628.webp','圖書館前','available','2025-07-09 14:46:54');
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -328,4 +327,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-09  4:39:58
+-- Dump completed on 2025-07-09 23:22:51
