@@ -88,12 +88,13 @@ exports.checkout = async (req, res) => {
   try {
     // 查詢指定商品，確認屬於購物車且尚未售出
     const [cartItems] = await conn.query(
-      `SELECT c.item_id, i.user_id AS seller_id, i.price, i.name
-       FROM cart_items c
-       JOIN items i ON c.item_id = i.id
-       WHERE c.user_id = ? AND c.item_id IN (?) AND i.status = 'available'`,
+      `SELECT c.item_id, i.user_id AS seller_id, i.price, i.name, i.location
+      FROM cart_items c
+      JOIN items i ON c.item_id = i.id
+      WHERE c.user_id = ? AND c.item_id IN (?) AND i.status = 'available'`,
       [userId, item_ids]
     );
+
 
     if (cartItems.length !== item_ids.length) {
       await conn.rollback();
@@ -125,11 +126,11 @@ exports.checkout = async (req, res) => {
       const orderId = orderResult.insertId;
 
       // 建立 order_items
-      const orderItemValues = items.map(item => [orderId, item.item_id]);
-      await conn.query(
-        `INSERT INTO order_items (order_id, item_id) VALUES ?`,
+     const orderItemValues = items.map(item => [orderId, item.item_id, item.name, item.price, item.location]);
+     await conn.query(
+        `INSERT INTO order_items (order_id, item_id, item_name, price, location) VALUES ?`,
         [orderItemValues]
-      );
+     );
 
       // 更新商品狀態為 reserved
       const itemIdList = items.map(item => item.item_id);
@@ -148,7 +149,7 @@ exports.checkout = async (req, res) => {
         order_id: orderId,
         seller_id: sellerId,
         total_price: totalPrice,
-        items: items.map(i => ({ id: i.item_id, name: i.name, price: i.price }))
+        items: items.map(i => ({ id: i.item_id, name: i.name, price: i.price, location: i.location }))
       });
     }
 

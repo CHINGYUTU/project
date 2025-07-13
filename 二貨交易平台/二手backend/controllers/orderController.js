@@ -11,11 +11,11 @@ exports.getMyOrders = async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT o.*, 
-              GROUP_CONCAT(i.name SEPARATOR ', ') AS item_names,
-              GROUP_CONCAT(i.price SEPARATOR ', ') AS item_prices
+          GROUP_CONCAT(LEFT(oi.item_name, 50) SEPARATOR ', ') AS item_names,
+          GROUP_CONCAT(DISTINCT LEFT(oi.location, 100) SEPARATOR ', ') AS locations,
+          GROUP_CONCAT(oi.price SEPARATOR ', ') AS item_prices
        FROM orders o
        JOIN order_items oi ON o.id = oi.order_id
-       JOIN items i ON oi.item_id = i.id
        WHERE o.buyer_id = ? OR o.seller_id = ?
        GROUP BY o.id
        ORDER BY o.created_at DESC`,
@@ -37,13 +37,15 @@ exports.getAllOrders = async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT o.*, 
-              u.email AS buyer_email,
-              GROUP_CONCAT(i.name SEPARATOR ', ') AS item_names,
-              GROUP_CONCAT(i.price SEPARATOR ', ') AS item_prices
+          u.email AS buyer_email,
+          s.email AS seller_email,
+          GROUP_CONCAT(LEFT(oi.item_name, 50) SEPARATOR ', ') AS item_names,
+          GROUP_CONCAT(DISTINCT LEFT(oi.location, 100) SEPARATOR ', ') AS locations,
+          GROUP_CONCAT(oi.price SEPARATOR ', ') AS item_prices
        FROM orders o
        JOIN users u ON o.buyer_id = u.id
+       JOIN users s ON o.seller_id = s.id
        JOIN order_items oi ON o.id = oi.order_id
-       JOIN items i ON oi.item_id = i.id
        GROUP BY o.id
        ORDER BY o.created_at DESC`
     );
@@ -134,10 +136,9 @@ exports.getOrderDetail = async (req, res) => {
 
     // 查詢訂單包含的商品
     const [items] = await db.query(
-      `SELECT i.id, i.name, i.price, i.image_url
-       FROM order_items oi
-       JOIN items i ON oi.item_id = i.id
-       WHERE oi.order_id = ?`,
+      `SELECT item_name, price, location
+      FROM order_items
+      WHERE order_id = ?`,
       [orderId]
     );
 
