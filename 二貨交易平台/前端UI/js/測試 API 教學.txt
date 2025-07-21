@@ -1,0 +1,229 @@
+前置準備
+
+開啟你的後端伺服器
+node server.js
+→ 出現 ✅ 資料庫連線成功 或 Server is running on port xxxx 表示成功啟動
+
+打開 Postman
+
+測試 API 教學
+
+① 註冊帳號 /api/auth/register（POST）
+開 Postman，左上角選擇 POST
+
+URL 輸入：
+http://localhost:3000/api/auth/register
+點選 Body → 選 raw → 選擇格式為 JSON
+
+輸入以下 JSON 測試資料（記得要用學校 email）：
+
+{
+  "name": "chi",
+  "email": "11236015@ntub.edu.tw",
+  "password": "0526"
+}
+點擊 Send
+
+成功會回傳：
+{
+  "message": "註冊成功，請至信箱完成驗證"
+}
+
+
+② 登入 /api/auth/login（POST）
+新增一個 POST 請求
+
+URL：
+http://localhost:3000/api/auth/login
+Body → raw → JSON 格式：
+{
+  "email": "testouo123@ntub.edu.tw",
+  "password": "123456"
+}
+
+Send → 若未驗證會提示 尚未完成信箱驗證
+
+
+③ 驗證信箱 /api/auth/verify（GET）
+到信箱找到驗證連結，例如：
+http://localhost:3000/api/auth/verify?token=xxxx
+在瀏覽器貼上打開，即可完成驗證 ✅
+
+
+④ 忘記密碼 /api/auth/forgot-password（POST）
+新增一個 POST 請求
+
+URL：
+http://localhost:3000/api/auth/forgot-password
+Body → raw → JSON：
+{
+  "email": "testouo123@ntub.edu.tw"
+}
+成功會回傳：
+{
+  "message": "重設密碼連結已寄出，請至信箱查收"
+}
+
+
+⑤ 重設密碼 /api/auth/reset-password（POST）
+找信箱收到的重設連結，例：
+http://localhost:3000/reset-password?token=xxxxxx
+複製 token（只要那一段字串）
+
+在 Postman 新增 POST 請求：
+http://localhost:3000/api/auth/reset-password
+Body → raw → JSON：
+{
+  "token": "這裡貼上信中 token",
+  "newPassword": "新密碼123"
+}
+Send → 成功會回傳：
+{
+  "message": "密碼重設成功，請重新登入"
+}
+
+
+測試 resetPassword（未登入狀態，從信箱連結來）
+🔁 測試流程：
+先發送 forgot-password 請求：
+
+方法：POST
+
+URL：http://localhost:3000/api/auth/forgot-password
+
+Body → JSON：
+{
+  "email": "你的註冊信箱@ntub.edu.tw"
+}
+到 Gmail 查收信件，裡面有 token 的連結
+
+連結格式大概是：
+http://localhost:3000/api/auth/reset-password?token=xxx
+你要複製那個 token 值（就是那段亂碼）
+
+發送 reset-password 請求：
+
+方法：POST
+
+URL：http://localhost:3000/api/auth/reset-password
+
+Body → JSON：
+{
+  "token": "剛剛信裡複製的 token",
+  "newPassword": "你的新密碼"
+}
+
+
+測試 updatePassword（登入狀態下修改密碼）
+🔁 測試流程：
+先登入取得 JWT token：
+
+方法：POST
+
+URL：http://localhost:3000/api/auth/login
+
+Body → JSON：
+{
+  "email": "你的註冊信箱@ntub.edu.tw",
+  "password": "目前的密碼"
+}
+回傳結果會包含一個 token，例如：
+{
+  "message": "登入成功",
+  "token": "eyJhbGciOiJIUzI1NiIsInR..."
+}
+複製這個 token，並在 Postman 的 Header 加入：
+
+Key	Value
+Authorization	Bearer 你的token
+
+發送 update-password 請求：
+
+方法：POST
+
+URL：http://localhost:3000/api/auth/update-password
+
+Headers：
+Authorization: Bearer <你的JWT>
+Body → JSON：
+{
+  "currentPassword": "目前的密碼",
+  "newPassword": "新的密碼"
+}
+
+
+✅ 二、測試 itemController（商品）
+3️⃣ 上架商品 /api/item/add
+方法：POST
+
+Headers 加入 JWT Token：
+
+makefile
+複製
+編輯
+Authorization: Bearer <你的 token>
+Body JSON：
+
+json
+複製
+編輯
+{
+  "name": "二手滑鼠",
+  "description": "幾乎全新，功能正常",
+  "price": 200,
+  "category": "電子產品",
+  "image_url": "https://example.com/mouse.jpg"
+}
+4️⃣ 查詢所有上架商品 /api/item/available
+方法：GET
+
+5️⃣ 查詢自己上架的商品 /api/item/my-items
+方法：GET
+
+Headers 加入 token
+
+6️⃣ 刪除商品 /api/item/:id
+方法：DELETE
+
+路徑舉例：/api/item/5
+
+Headers 加入 token
+
+✅ 三、購物車功能（如果你已加入）
+7️⃣ 加入購物車 /api/cart/add
+json
+複製
+編輯
+{
+  "item_id": 1
+}
+8️⃣ 查詢購物車 /api/cart/
+方法：GET
+
+Headers：token
+
+9️⃣ 結帳 /api/cart/checkout
+方法：POST
+
+Headers：token
+
+✅ 四、訂單功能 orderController
+🔟 購買單一商品 /api/order/buy
+json
+複製
+編輯
+{
+  "item_id": 1
+}
+1️⃣1️⃣ 查詢自己訂單 /api/order/my-orders
+方法：GET
+
+Headers：token
+
+1️⃣2️⃣ 管理員查看所有訂單 /api/order/all
+方法：GET
+
+Headers：token（必須是 admin）
+
+
+

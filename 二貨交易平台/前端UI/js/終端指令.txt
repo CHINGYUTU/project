@@ -1,0 +1,18 @@
+終端指令
+伺服器啟動:npm start(node 檔名.js)
+伺服器關閉:Ctrl + C(npm restart)
+
+測試gmail
+testouo123@gmail.com
+Testouo198964
+
+使用者1
+11236015@ntub.edu.tw
+920526
+
+重新設定 AUTO_INCREMENT
+
+UPDATE users SET id = 1 WHERE id = 2;
+ALTER TABLE users AUTO_INCREMENT = 2;
+
+https://meet.google.com/nzw-vqit-hfb?authuser=0
