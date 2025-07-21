@@ -38,7 +38,7 @@ exports.register = async (req, res) => {
 };
 
 
-// 📌 信箱驗證
+// 📌 信箱驗證（註冊 or 更改信箱）
 exports.verifyEmail = async (req, res) => {
   const { token } = req.query;
 
@@ -48,10 +48,23 @@ exports.verifyEmail = async (req, res) => {
       return res.status(400).send('驗證連結無效或已過期');
     }
 
-    await db.query(
-      'UPDATE users SET is_verified = 1, verify_token = NULL WHERE id = ?',
-      [rows[0].id]
-    );
+    const user = rows[0];
+
+    // ✅ 若 pending_email 存在，表示是信箱更改
+    if (user.pending_email) {
+      await db.query(
+        `UPDATE users 
+         SET email = ?, pending_email = NULL, verify_token = NULL, is_verified = 1 
+         WHERE id = ?`,
+        [user.pending_email, user.id]
+      );
+    } else {
+      // ✅ 註冊時的驗證
+      await db.query(
+        'UPDATE users SET is_verified = 1, verify_token = NULL WHERE id = ?',
+        [user.id]
+      );
+    }
 
     res.send('✅ 驗證成功，請返回系統登入');
   } catch (err) {
@@ -59,6 +72,7 @@ exports.verifyEmail = async (req, res) => {
     res.status(500).send('伺服器錯誤');
   }
 };
+
 
 // 📌 使用者登入
 exports.login = async (req, res) => {
@@ -73,7 +87,7 @@ exports.login = async (req, res) => {
     const user = rows[0];
 
     if (user.is_verified !== 1) {
-      return res.status(401).json({ message: '尚未完成信箱驗證' });
+      return res.status(401).json({ message: '請先完成信箱驗證' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

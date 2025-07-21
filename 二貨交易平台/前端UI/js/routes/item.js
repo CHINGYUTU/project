@@ -9,6 +9,9 @@ const { uploadItemImage } = require('../middleware/upload');
 // 📌 上架商品（僅限一般使用者且附帶圖片）
 router.post('/add', verifyToken, uploadItemImage.single('image'), itemController.addItem);
 
+//修改商品資訊(僅限賣家)
+router.patch('/:id', verifyToken, uploadItemImage.single('image'), itemController.updateItem);
+
 // 📌 刪除商品（限賣家本人或管理員）
 router.delete('/:id', verifyToken, itemController.deleteItem);
 

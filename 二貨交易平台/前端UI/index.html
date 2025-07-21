@@ -7,7 +7,7 @@
     <meta name="author" content="" />
     <title>二手交易平台</title>
     <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="images/logo.png" />
     <!-- Font Awesome icons (free version)-->
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <!-- Google fonts-->
@@ -15,7 +15,41 @@
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="css/styles.css" rel="stylesheet" />
-    <style>
+    <link rel="stylesheet" href="css/chat.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <style>
+            .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            }
+            .product-card {
+            width: 220px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 2px 2px 8px #ccc;
+            text-align: center;
+            }
+            .product-card img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            }
+            .product-card button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #3085d6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            }
+            .product-card button:hover {
+            background-color: #2563eb;
+            }
         /* 可左右滑動分類按鈕列 */
         .category-scroll {
         display: flex;
@@ -44,10 +78,10 @@
 </head>
 <body id="page-top">
     <!-- Navigation-->
-    <nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+    <nav class="navbar navbar-expand-lg bg-mytheme text-uppercase fixed-top" id="mainNav">
         <div class="container">
             <a href="index.html" class="navbar-brand d-flex align-items-center">
-            <img src="images/logo-w.png" alt="Logo" style="height: 60px;">
+            <img src="images/logo.png" alt="Logo" style="height: 60px;">
             </a>
             <a class="navbar-brand" href="index.html">二貨</a>
             <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,136 +103,104 @@
         </div>
     </nav>
     <!-- Masthead-->
-    <header class="masthead bg-primary text-white text-center">
+    <header class="masthead bg-mycolor text-white text-center">
         <div class="container d-flex align-items-center flex-column">
             <!-- Masthead Heading-->
-            <h1 class="masthead-heading text-uppercase mb-0">二貨交易</h1>
+            <h1 style="color: #000;" class="masthead-heading text-uppercase mb-0">二貨交易</h1>
             <!-- Icon Divider-->
             <div class="divider-custom divider-light">  
                 <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
                 <div class="divider-custom-line"></div>
                 <!-- Masthead Subheading-->
-                <p class="masthead-subheading font-weight-light mb-0">校園二手貨-你用不到我幫你用</p>
+                <p style="color: #000;" class="masthead-subheading font-weight-light mb-0">校園二手貨-你用不到我幫你用</p>
                 <div class="divider-custom-line"></div><div class="divider-custom-icon"><i class="fas fa-star"></i></div>
             </div>
         </div>
-        <div class="container-fluid bg-light py-2 border-bottom">
-<!-- 結構部分 -->
-<div class="container d-flex align-items-center justify-content-between flex-wrap">
+        <div>
+            <!-- 結構部分 -->
+            <div class="container d-flex align-items-center justify-content-between flex-wrap">
 
-<!-- 中：搜尋欄 -->
-<div class="flex-grow-1 mx-3 transparent-search">
-    <input type="text" class="form-control" placeholder="搜尋品牌、型號、關鍵字……">
-</div>
-<!-- 下方分類按鈕 -->
-<div class="w-100 mt-2">
-    <div class="category-scroll">
-        <a href="#all" class="btn btn-light">所有</a>
-        <a href="#fashion" class="btn btn-light">你可能會喜歡</a>
-        <a href="#book" class="btn btn-light">課本</a>
-        <a href="#life" class="btn btn-light">生活用品</a>
-        <a href="#clothing" class="btn btn-light">衣物</a>
-        <a href="#food" class="btn btn-light">食品</a>
-        <a href="#vintage" class="btn btn-light">動漫</a>
-        <a href="#vintage" class="btn btn-light">音樂、電影及相機</a>
-    </div>
-</div>
-<!-- 篩選列 -->
-<div class="d-flex flex-wrap align-items-center mt-2 gap-3">
-  <!-- 預算選單 -->
-  <div class="form-group mb-0">
-    <label for="priceFilter" class="form-label mb-1" style="color:#000;">價格預算</label>
-    <select class="form-select form-select-sm" id="priceFilter">
-      <option value="">不限</option>
-      <option value="0-1000">0 - 1,000</option>
-      <option value="1000-5000">1,000 - 5,000</option>
-      <option value="5000-10000">5,000 - 10,000</option>
-      <option value="10000up">10,000 以上</option>
-    </select>
-  </div>
-
-  <!-- 上架時間 -->
-  <div class="form-group mb-0">
-    <label for="timeFilter" class="form-label mb-1" style="color:#000;">上架時間</label>
-    <select class="form-select form-select-sm" id="timeFilter">
-      <option value="">不限</option>
-      <option value="1">最近 1 天</option>
-      <option value="7">最近 7 天</option>
-      <option value="30">最近 30 天</option>
-    </select>
-  </div>
-</div>
+                <!-- 中：搜尋欄 -->
+                <div class="flex-grow-1 mx-3 transparent-search">
+                    <input type="text" class="form-control" placeholder="搜尋品牌、型號、關鍵字……">
+                </div>
+                <!-- 下方分類按鈕 -->
+                <div class="w-100 mt-2">
+                    <div class="category-scroll">
+                        <a href="#all" class="btn btn-light">所有</a>
+                        <a href="#fashion" class="btn btn-light">你可能會喜歡</a>
+                        <a href="#book" class="btn btn-light">課本</a>
+                        <a href="#life" class="btn btn-light">生活用品</a>
+                        <a href="#clothing" class="btn btn-light">衣物</a>
+                        <a href="#food" class="btn btn-light">食品</a>
+                        <a href="#vintage" class="btn btn-light">動漫</a>
+                        <a href="#vintage" class="btn btn-light">音樂、電影及相機</a>
+                    </div>
+                    &nbsp;
+                </div><br>
+                <!-- 篩選列 -->
+                <table >
+                    <div class="d-flex flex-wrap align-items-center mt-2 gap-3">
+                        <!-- 預算選單 -->
+                            <tr><td></td>
+                                <div class="form-group mb-0">
+                                    <td><label for="priceFilter" class="form-label mb-1" style="color:#000;">價格預算</label></td>
+                                    <td><label for="timeFilter" class="form-label mb-1" style="color:#000;">上架時間</label></td>
+                                    <tr><td style="color: #000;" valign="middle">篩選</td><td><select class="form-select form-select-sm" id="priceFilter">
+                                        <option value="">不限</option>
+                                        <option value="0-1000">0 - 1,000</option>
+                                        <option value="1000-5000">1,000 - 5,000</option>
+                                        <option value="5000-10000">5,000 - 10,000</option>
+                                        <option value="10000up">10,000 以上</option>
+                                    </select></td>
+                                </div>
+                        <td><!-- 上架時間 -->
+                        <div class="form-group mb-0">
+                            <select class="form-select form-select-sm" id="timeFilter">
+                                <option value="">不限</option>
+                                <option value="1">最近 1 天</option>
+                                <option value="7">最近 7 天</option>
+                                <option value="30">最近 30 天</option>
+                            </select>
+                        </div>
+                        </td></tr>
+                    </div>
+                </table>
+            </div>
+        </div>
     </header> 
     <!-- Portfolio Section-->
     <section class="page-section portfolio" id="portfolio">
         <div class="container">
             <!-- Portfolio Section Heading-->
-            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Portfolio</h2>
+            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">商品</h2>
             <!-- Icon Divider-->
             <div class="divider-custom">
                 <div class="divider-custom-line"></div>
                 <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
                 <div class="divider-custom-line"></div>
             </div>
-            <!-- Portfolio Grid Items-->
-            <div class="row justify-content-center">
-                <!-- Portfolio Item 1-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal1">
-                        <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
-                        </div>
-                        <img class="img-fluid" src="assets/img/portfolio/cabin.png" alt="..." />
-                    </div>
-                </div>
-                <!-- Portfolio Item 2-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal2">
-                        <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
-                        </div>
-                        <img class="img-fluid" src="assets/img/portfolio/cake.png" alt="..." />
-                    </div>
-                </div>
-                <!-- Portfolio Item 3-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal3">
-                        <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
-                        </div>
-                        <img class="img-fluid" src="assets/img/portfolio/circus.png" alt="..." />
-                    </div>
-                </div>
-                <!-- Portfolio Item 4-->
-                <div class="col-md-6 col-lg-4 mb-5 mb-lg-0">
-                    <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal4">
-                        <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
-                        </div>
-                        <img class="img-fluid" src="assets/img/portfolio/game.png" alt="..." />
-                    </div>
-                </div>
-                <!-- Portfolio Item 5-->
-                <div class="col-md-6 col-lg-4 mb-5 mb-md-0">
-                    <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal5">
-                        <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
-                        </div>
-                        <img class="img-fluid" src="assets/img/portfolio/safe.png" alt="..." />
-                    </div>
-                </div>
-                <!-- Portfolio Item 6-->
-                <div class="col-md-6 col-lg-4">
-                    <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal6">
-                        <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
-                        </div>
-                        <img class="img-fluid" src="assets/img/portfolio/submarine.png" alt="..." />
-                    </div>
-                </div>
+                <div class="row justify-content-center" id="product-list"></div>
+                  <div class="product-container" id="productContainer"></div>
             </div>
         </div>
     </section>
+    <div id="chatToggleBtn" onclick="toggleChat()" style="display:none">💬</div>
+
+    <!-- 聊天視窗 -->
+    <div id="floatingChat" class="chat-window">
+    <div class="chat-header">
+        <span>聊天室</span>
+        <button onclick="toggleChat()">✖</button>
+    </div>
+    <div class="chat-body" id="chatBox">
+        <div class="text-muted text-center">聊天室尚無訊息</div>
+    </div>
+    <div class="chat-footer">
+        <input type="text" id="chatInput" placeholder="輸入訊息..." />
+        <button onclick="sendMessage()">送出</button>
+    </div>
+    </div>
     <!-- Footer-->
     <footer class="footer text-center">
         <div class="container">
@@ -432,43 +434,166 @@
     <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
     
     <script>
-const user = {
-  isLoggedIn: true,
-  level: 1
-};
+        const user = {
+        isLoggedIn: true,
+        level: 3
+        };
 
-function showMenu() {
-  const menuList = document.getElementById('menuList');
-  menuList.innerHTML = '';
+        function showMenu() {
+        const menuList = document.getElementById('menuList');
+        menuList.innerHTML = '';
 
-  if (user.isLoggedIn && user.level === 2) {
-    menuList.innerHTML += `
-      <li><a class="dropdown-item" href="#buy">買貨</a></li>
-      <li><a class="dropdown-item" href="#sell">賣貨</a></li>
-      <li><a class="dropdown-item" href="#chat">聊天室</a></li>
-      <li><a class="dropdown-item" href="#logout">登出</a></li>
-    `;
-  } else if(user.isLoggedIn && user.level === 3) {
-    menuList.innerHTML += `
-      <li><a class="dropdown-item" href="#manage">管理員</a></li>
-      <li><a class="dropdown-item" href="#chat">聊天室</a></li>
-      <li><a class="dropdown-item" href="#logout">登出</a></li>
-    `;
-  }else{
-    menuList.innerHTML += `
-      <li><a class="dropdown-item" href="login.html">登入/註冊</a></li>
-    `;
-  }
+        if (user.isLoggedIn && user.level === 2) {
+            menuList.innerHTML += `
+            <li><a class="dropdown-item" href="dist/dashboard/profile.html">個人檔案</a></li>
+            <li><a class="dropdown-item" href="dist/elements/point.html">點數兌換</a></li>
+            <li><a class="dropdown-item" href="#templates/logout">登出</a></li>
+            `;
+        } else if(user.isLoggedIn && user.level === 3) {
+            menuList.innerHTML += `
+            <li><a class="dropdown-item" href="templates/admin.html">管理員</a></li>
+            <li><a class="dropdown-item" href="templates/logout">登出</a></li>
+            `;
+        }else{
+            menuList.innerHTML += `
+            <li><a class="dropdown-item" href="templates/login.html">登入/註冊</a></li>
+            `;
+        }
 
-  // 顯示選單
-  menuList.classList.add('show');
-}
+        // 顯示選單
+        menuList.classList.add('show');
+        }
 
-function hideMenu() {
-  const menuList = document.getElementById('menuList');
-  // 隱藏選單
-  menuList.classList.remove('show');
-}
-</script>  
+        function hideMenu() {
+        const menuList = document.getElementById('menuList');
+        // 隱藏選單
+        menuList.classList.remove('show');
+        }
+        </script>
+        <script>
+            // 模擬的商品資料陣列（未來可改為資料庫回傳的 JSON）
+            const products = [
+            {
+                name: "筆電支架",
+                price: 350,
+                image: "https://via.placeholder.com/200x200?text=筆電支架",
+                place: "圖書館一樓交接"
+            },
+            {
+                name: "藍牙耳機",
+                price: 699,
+                image: "https://via.placeholder.com/200x200?text=藍牙耳機",
+                place: "校門口便利商店"
+            },
+            {
+                name: "二手教科書",
+                price: 150,
+                image: "https://via.placeholder.com/200x200?text=教科書",
+                place: "C棟大廳"
+            }
+            ];
+
+            // 動態渲染商品卡片
+            const container = document.getElementById('productContainer');
+            products.forEach((item) => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <h3>${item.name}</h3>
+                <p>價格：$${item.price}</p>
+                <p>地點：${item.place}</p>
+                <button onclick="showPurchasePopup('${item.name}', ${item.price}, '${item.image}', '${item.place}')">購買</button>
+            `;
+            container.appendChild(card);
+            });
+
+            // 彈窗邏輯整合
+            function showPurchasePopup(itemName, price, imagePath, place) {
+            Swal.fire({
+                title: `確認購買「${itemName}」？`,
+                html: `
+                <p>價格：<strong>$${price}</strong></p>
+                <p>交易地點：<strong>${place}</strong></p>
+                `,
+                imageUrl: imagePath,
+                imageWidth: 200,
+                imageHeight: 200,
+                showCancelButton: true,
+                confirmButtonText: '✅ 確認購買',
+                cancelButtonText: '取消',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                Swal.fire({
+                    title: '✅ 已加入購物車！',
+                    text: `「${itemName}」已成功加入購物車。`,
+                    icon: 'success',
+                    confirmButtonText: '知道了',
+                    confirmButtonColor: '#6474E1'
+                });
+
+                // 🔁 若未來接後端可在這裡送出資料
+                // fetch('/api/add-to-cart', {...})
+                }
+            });
+            }
+            function toggleChat() {
+                const chatWindow = document.getElementById('floatingChat');
+                const display = chatWindow.style.display;
+                chatWindow.style.display = display === 'none' || display === '' ? 'flex' : 'none';
+            }
+
+            function sendFloatingMessage() {
+                const input = document.getElementById('chatInput2');
+                const chatContent = document.getElementById('chatContent');
+                const msg = input.value.trim();
+                if (msg !== "") {
+                    const messageBubble = document.createElement('div');
+                    messageBubble.style.textAlign = 'right';
+                    messageBubble.innerHTML = `<span style="background:#3085d6; color:white; padding:6px 10px; border-radius:12px; margin:4px; display:inline-block;">${msg}</span>`;
+                    chatContent.appendChild(messageBubble);
+                    input.value = '';
+                    chatContent.scrollTop = chatContent.scrollHeight;
+                }
+            }
+            // 頁面載入時檢查 level
+            window.addEventListener('DOMContentLoaded', function () {
+                const params = new URLSearchParams(window.location.search);
+                const level = params.get('level');
+                const chatToggleBtn = document.getElementById('chatToggleBtn');
+                const floatingChat = document.getElementById('floatingChat');
+
+                if (level === '2' || level === '3') {
+                chatToggleBtn.style.display = 'flex';
+                } else {
+                chatToggleBtn.style.display = 'none';
+                floatingChat.style.display = 'none';
+                }
+            });
+
+            // 開關聊天室視窗
+            function toggleChat() {
+                const chat = document.getElementById("floatingChat");
+                chat.classList.toggle("active");
+            }
+
+            // 傳送訊息
+            function sendMessage() {
+                const input = document.getElementById("chatInput");
+                const chatBox = document.getElementById("chatBox");
+                const msg = input.value.trim();
+
+                if (msg !== "") {
+                const newMsg = document.createElement("div");
+                newMsg.className = "chat-message user";
+                newMsg.innerHTML = `<div class="bubble">${msg}</div>`;
+                chatBox.appendChild(newMsg);
+                input.value = "";
+                chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }
+            </script>
     </body>
 </html>

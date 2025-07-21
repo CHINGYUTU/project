@@ -42,6 +42,8 @@
   --bs-danger: #dc3545;
   --bs-light: #f8f9fa;
   --bs-dark: #212529;
+  --my-theme-rgb: 117,81,0;
+  --my-theme-opacity: 0.32;
   --bs-primary-rgb: 26, 188, 156;
   --bs-secondary-rgb: 44, 62, 80;
   --bs-success-rgb: 25, 135, 84;
@@ -384,7 +386,9 @@ button,
 [type=button],
 [type=reset],
 [type=submit] {
-  -webkit-appearance: button;
+  appearance: button;          /* 標準屬性 */
+  -webkit-appearance: button;  /* 給 Chrome / Safari */
+  -moz-appearance: button;     /* 給 Firefox */
 }
 button:not(:disabled),
 [type=button]:not(:disabled),
@@ -442,7 +446,9 @@ legend + * {
 
 [type=search] {
   outline-offset: -2px;
+  appearance: textfield;
   -webkit-appearance: textfield;
+  -moz-appearance: textfield;    /* 給 Firefox */
 }
 
 /* rtl:raw:
@@ -463,7 +469,9 @@ legend + * {
 
 ::file-selector-button {
   font: inherit;
+  appearance: textfield;
   -webkit-appearance: button;
+  -moz-appearance: textfield;    /* 給 Firefox */
 }
 
 output {
@@ -3222,8 +3230,8 @@ textarea.form-control-lg {
   --bs-dropdown-padding-y: 0.5rem;
   --bs-dropdown-spacer: 0.125rem;
   --bs-dropdown-font-size: 1rem;
-  --bs-dropdown-color: #212529;
-  --bs-dropdown-bg: #fff;
+  --bs-dropdown-color: #333;
+  --bs-dropdown-bg: #fefae0;
   --bs-dropdown-border-color: var(--bs-border-color-translucent);
   --bs-dropdown-border-radius: 0.5rem;
   --bs-dropdown-border-width: 0.125rem;
@@ -8125,14 +8133,23 @@ textarea.form-control-lg {
   --bs-text-opacity: 1;
 }
 
+.bg-mycolor {
+  background-color: rgba(255, 245, 235, 100);
+
+}
+
 .bg-primary {
   --bs-bg-opacity: 1;
   background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;
 }
 
+.bg-mytheme {
+  background-color: rgba(211,192,159,1) !important;
+}
+
 .bg-secondary {
   --bs-bg-opacity: 1;
-  background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity)) !important;
+  background-color: rgba(var(--bs-secondary), var(--bs-secondary-rgb)) !important;
 }
 
 .bg-success {
@@ -10898,7 +10915,7 @@ html {
   font-weight: 700;
 }
 #mainNav .navbar-brand {
-  color: #fff;
+  color: #000;
 }
 #mainNav .navbar-nav {
   margin-top: 1rem;

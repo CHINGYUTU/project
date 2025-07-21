@@ -2,7 +2,7 @@ const db = require('../db');
 
 // 📌 上架商品
 exports.addItem = async (req, res) => {
-  const { name, description, price, category_id} = req.body;
+  const { name, description, price, category_id, location} = req.body;
   const userId = req.user.id;
   const image_url = req.file ? `/uploads/items/${req.file.filename}` : null;
 
@@ -12,9 +12,9 @@ exports.addItem = async (req, res) => {
 
   try {
     await db.query(
-      `INSERT INTO items (name, description, price, category_id, user_id, image_url, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, 'available', NOW())`,
-      [name, description, price, category_id, userId, image_url]
+      `INSERT INTO items (name, description, price, category_id, user_id, image_url, location, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?,  'available', NOW())`,
+      [name, description, price, category_id, userId, image_url, location]
     );
     res.json({ message: '商品上架成功' });
   } catch (err) {
@@ -22,6 +22,60 @@ exports.addItem = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
+
+// 📌 編輯商品（僅限賣家本人）
+exports.updateItem = async (req, res) => {
+  const itemId = req.params.id;
+  const userId = req.user.id;
+  const { name, description, price, category_id, location } = req.body;
+  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+
+  try {
+    // 取得原本商品資料
+    const [rows] = await db.query('SELECT * FROM items WHERE id = ?', [itemId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: '找不到該商品' });
+    }
+
+    const item = rows[0];
+
+    // 檢查是否為賣家本人
+    if (item.user_id !== userId) {
+      return res.status(403).json({ message: '只能由上架的賣家本人修改' });
+    }
+
+    // 更新資料
+    const updatedFields = {
+      name: name || item.name,
+      description: description || item.description,
+      price: price || item.price,
+      category_id: category_id || item.category_id,
+      location: location || item.location,
+      image_url: image_url || item.image_url
+    };
+
+    await db.query(
+      `UPDATE items
+       SET name = ?, description = ?, price = ?, category_id = ?, location = ?, image_url = ?
+       WHERE id = ?`,
+      [
+        updatedFields.name,
+        updatedFields.description,
+        updatedFields.price,
+        updatedFields.category_id,
+        updatedFields.location,
+        updatedFields.image_url,
+        itemId
+      ]
+    );
+
+    res.json({ message: '商品已成功更新' });
+  } catch (err) {
+    console.error('❌ 編輯商品錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+};
+
 
 // 📌 查詢所有上架中商品（開放給所有使用者）
 exports.getAvailableItems = async (req, res) => {

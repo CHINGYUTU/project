@@ -2,20 +2,21 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+dotenv.config(); // 載入 .env 檔案中的環境變數
 
 // 載入自訂模組
-const db = require('./db'); // 連接資料庫
+const db = require('./db'); // 連接資料庫路由
 const authRoutes = require('./routes/auth'); // 認證相關的路由
 const itemRoutes = require('./routes/item'); // 商品路由
 const orderRoutes = require('./routes/order'); // 訂單路由
 const cartRoutes = require('./routes/cart'); // 購物車路由
 const favoriteRoutes = require('./routes/favorite'); // 收藏路由
 const categoryRoutes = require('./routes/category');//分類路由
-const userRoutes = require('./routes/user'); // ⬅️ 使用者個人資料
+const userRoutes = require('./routes/user'); //  使用者個人資料路由
+const viewHistoryRoutes = require('./routes/viewHistory'); // 瀏覽紀錄路由
 
 // 初始化 Express 應用程式
 const app = express();
-dotenv.config(); // 載入 .env 檔案中的環境變數
 
 // 使用中介層
 app.use(cors()); // 解決 CORS 問題
@@ -31,6 +32,7 @@ app.use('/api/favorite', favoriteRoutes); // 收藏
 app.use('/api/category', categoryRoutes);//分類
 app.use('/uploads', express.static('uploads'));//靜態圖片存取
 app.use('/api/user', userRoutes); // 使用者個人功能（大頭貼、密碼修改等）
+app.use('/api/view-history', viewHistoryRoutes);//瀏覽紀錄
 
 
 // 測試首頁
