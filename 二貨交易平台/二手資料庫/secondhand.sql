@@ -130,7 +130,7 @@ CREATE TABLE `items` (
 
 LOCK TABLES `items` WRITE;
 /*!40000 ALTER TABLE `items` DISABLE KEYS */;
-INSERT INTO `items` VALUES (1,'iphone15 pro 128G','狀況良好，電池健康度90%',20000.00,1,1,'/uploads/1752073278782-975207628.webp','圖書館前','reserved','2025-07-09 14:46:54'),(2,'新多益閱讀測驗','有書寫痕跡',350.00,3,1,NULL,'圖書館前','available','2025-07-18 12:55:27');
+INSERT INTO `items` VALUES (1,'iphone15 pro 128G','狀況良好，電池健康度90%',20000.00,1,1,'/uploads/1752073278782-975207628.webp','圖書館前','sold','2025-07-09 14:46:54'),(2,'新多益閱讀測驗','有書寫痕跡',350.00,3,1,NULL,'圖書館前','available','2025-07-18 12:55:27');
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -228,7 +228,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (1,1,1,'pending','2025-07-10 17:34:15',20000.00);
+INSERT INTO `orders` VALUES (1,1,1,'completed','2025-07-10 17:34:15',20000.00);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -259,6 +259,47 @@ CREATE TABLE `redemptions` (
 LOCK TABLES `redemptions` WRITE;
 /*!40000 ALTER TABLE `redemptions` DISABLE KEYS */;
 /*!40000 ALTER TABLE `redemptions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `reviews`
+--
+
+DROP TABLE IF EXISTS `reviews`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reviews` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `buyer_id` int NOT NULL,
+  `seller_id` int NOT NULL,
+  `order_id` int NOT NULL,
+  `rating` int DEFAULT NULL,
+  `comment` text COLLATE utf8mb4_unicode_ci,
+  `image_url` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `reply` text COLLATE utf8mb4_unicode_ci,
+  `reply_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `order_id` (`order_id`),
+  KEY `buyer_id` (`buyer_id`),
+  KEY `seller_id` (`seller_id`),
+  CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`seller_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `reviews_ibfk_3` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
+  CONSTRAINT `reviews_chk_1` CHECK ((`rating` between 1 and 5))
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `reviews`
+--
+
+LOCK TABLES `reviews` WRITE;
+/*!40000 ALTER TABLE `reviews` DISABLE KEYS */;
+INSERT INTO `reviews` VALUES (1,1,1,1,4,'還不錯','[\"/uploads/reviews/1753206245214-384369778.png\"]','2025-07-22 17:28:53','2025-07-22 17:44:05','謝謝支持!','2025-07-22 17:45:34',0);
+/*!40000 ALTER TABLE `reviews` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -362,4 +403,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19  3:41:07
+-- Dump completed on 2025-07-23  2:26:37
