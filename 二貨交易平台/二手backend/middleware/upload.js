@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs'); // 用來檢查與建立資料夾
 
-// 🟦 共用儲存函數：依照 folder 參數設定對應的存放位置
+// 共用儲存函數：依照 folder 參數設定對應的存放位置
 const createStorage = (folder) => {
   // 確保 uploads/<folder> 資料夾存在，若無則建立
   const fullPath = `uploads/${folder}`;
@@ -23,23 +23,34 @@ const createStorage = (folder) => {
   });
 };
 
-// 🟨 圖片檔案類型過濾器：只允許 jpeg / png / webp
+//驗證副檔名
+const extWhitelist = ['.jpg', '.jpeg', '.png', '.webp'];
+// 圖片檔案類型過濾器：只允許 jpeg / png / webp
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-  if (allowedTypes.includes(file.mimetype)) {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (allowedTypes.includes(file.mimetype) && extWhitelist.includes(ext)) {
     cb(null, true); // 通過驗證
   } else {
     cb(new Error('僅支援 JPEG / PNG / WEBP 格式圖片'), false);
   }
 };
 
-// 🟧 匯出兩組圖片上傳工具
+// 匯出圖片上傳工具
 exports.uploadItemImage = multer({
   storage: createStorage('items'),   // 商品圖片儲存在 uploads/items/
-  fileFilter
+  fileFilter,
+  limits: { fileSize: 3 * 1024 * 1024 } // 限制3MB
 });
 
 exports.uploadAvatar = multer({
   storage: createStorage('avatars'), // 大頭貼儲存在 uploads/avatars/
-  fileFilter
+  fileFilter,
+  limits: { fileSize: 3 * 1024 * 1024 } // 限制3MB
 });
+
+exports.uploadCommentImage = multer({
+  storage: createStorage('comments'), // 評論圖片儲存在 uploads/comments/
+  fileFilter,
+  limits: { fileSize: 3 * 1024 * 1024 } // 限制3MB
+}).array('image'); ;

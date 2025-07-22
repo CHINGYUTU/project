@@ -14,6 +14,8 @@ const favoriteRoutes = require('./routes/favorite'); // 收藏路由
 const categoryRoutes = require('./routes/category');//分類路由
 const userRoutes = require('./routes/user'); //  使用者個人資料路由
 const viewHistoryRoutes = require('./routes/viewHistory'); // 瀏覽紀錄路由
+const reviewRoutes = require('./routes/review'); // 評論路由
+
 
 // 初始化 Express 應用程式
 const app = express();
@@ -33,6 +35,7 @@ app.use('/api/category', categoryRoutes);//分類
 app.use('/uploads', express.static('uploads'));//靜態圖片存取
 app.use('/api/user', userRoutes); // 使用者個人功能（大頭貼、密碼修改等）
 app.use('/api/view-history', viewHistoryRoutes);//瀏覽紀錄
+app.use('/api/review', reviewRoutes);//評論
 
 
 // 測試首頁

@@ -60,7 +60,26 @@ const sendResetPasswordEmail = async (to, token) => {
   }
 };
 
+const sendMail = async ({ to, subject, html }) => {
+  const mailOptions = {
+    from: `"NTUB 二手平台" <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    html
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('✅ 郵件寄送成功');
+  } catch (error) {
+    console.error('❌ 郵件寄送失敗:', error);
+    throw error;
+  }
+};
+
+
 module.exports = {
   sendVerificationEmail,
-  sendResetPasswordEmail
+  sendResetPasswordEmail,
+  sendMail
 };
