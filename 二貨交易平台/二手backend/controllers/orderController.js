@@ -1,4 +1,5 @@
 const db = require('../db');
+const { sendMail } = require('../utils/sendMail');
 
 // 📌 查詢個人訂單
 exports.getMyOrders = async (req, res) => {
@@ -59,11 +60,11 @@ exports.getAllOrders = async (req, res) => {
 // 📌 更新訂單狀態
 exports.updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
-  const { newStatus } = req.body;
+  const { orderStatus } = req.body;
   const userId = req.user.id;
 
   const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
-  if (!validStatuses.includes(newStatus)) {
+  if (!validStatuses.includes(orderStatus)) {
     return res.status(400).json({ message: '不合法的訂單狀態' });
   }
 
@@ -78,35 +79,59 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(403).json({ message: '無權限更新此訂單' });
     }
 
-    if (newStatus === 'confirmed' && userId !== order.seller_id) {
+    if (orderStatus === 'confirmed' && userId !== order.seller_id) {
       return res.status(403).json({ message: '只有賣家可以確認訂單' });
     }
 
-    if (newStatus === 'completed' && userId !== order.buyer_id) {
+    if (orderStatus === 'completed' && userId !== order.buyer_id) {
       return res.status(403).json({ message: '只有買家可以完成訂單' });
     }
 
-    // 更新訂單狀態
-    await db.query('UPDATE orders SET status = ? WHERE id = ?', [newStatus, orderId]);
+    // ✅ 更新訂單狀態
+    await db.query('UPDATE orders SET status = ? WHERE id = ?', [orderStatus, orderId]);
 
-    // 更新商品狀態
-    if (newStatus === 'completed') {
-      await db.query(
-        `UPDATE items 
-         SET status = 'sold' 
-         WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
+    // ✅ 同步更新商品狀態
+    if (orderStatus === 'completed') {
+      await db.query(`
+        UPDATE items 
+        SET status = 'sold' 
+        WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`, 
         [orderId]
       );
-    } else if (newStatus === 'cancelled') {
-      await db.query(
-        `UPDATE items 
-         SET status = 'available' 
-         WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
+
+      // ✅ 查詢買家資訊
+      const [buyerRows] = await db.query(`
+        SELECT u.email, u.name 
+        FROM orders o
+        JOIN users u ON o.buyer_id = u.id
+        WHERE o.id = ?
+      `, [orderId]);
+
+      const buyer = buyerRows[0];
+
+      // ✅ 寄送評論提醒信
+      await sendMail({
+        to: buyer.email,
+        subject: '訂單完成，留下你的評論吧！⭐',
+        html: `
+          <p>親愛的 ${buyer.name}，</p>
+          <p>你已完成訂單（編號 #${orderId}），歡迎你撰寫評論，幫助其他買家了解這位賣家。</p>
+          <p><a href="https://your-frontend.com/review/${orderId}">👉 點我留下評論</a></p>
+          <br><p>感謝你使用二手平台</p>
+        `
+      });
+
+    } else if (orderStatus === 'cancelled') {
+      await db.query(`
+        UPDATE items 
+        SET status = 'available' 
+        WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
         [orderId]
       );
     }
 
-    res.json({ message: `訂單狀態已更新為 ${newStatus}` });
+    res.json({ message: `訂單狀態已更新為 ${orderStatus}` });
+
   } catch (err) {
     console.error('❌ 更新訂單狀態錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
