@@ -1,0 +1,183 @@
+// server.js
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+// 等级配置常量
+const LEVEL_CONFIG = {
+  DAILY_BASE_POINTS: 10,          // 每日基础点数
+  BONUS_MULTIPLIER: [1.0, 1.2, 1.5, 2.0, 2.5, 3.0], // 各等级加成
+  UPGRADE_REQUIREMENTS: [0, 5, 15, 30, 50, 100]     // 升级所需交易次数
+};
+
+// 存储用户数据
+const users = {};
+let globalPoints = 0;
+let isPurchasing = false; // 防止同时购买的锁
+
+app.use(express.static('public'));
+
+// 路由
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+app.get('/page1', (req, res) => {
+  res.sendFile(__dirname + '/public/page1.html');
+});
+
+app.get('/page2', (req, res) => {
+  res.sendFile(__dirname + '/public/page2.html');
+});
+
+// 辅助函数：检查是否同一天
+function isSameDay(date1, date2) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+// Socket.io 连接
+io.on('connection', (socket) => {
+  console.log('新用户连接:', socket.id);
+  
+  // 新用户加入（初始化用户数据）
+  socket.on('join', (username) => {
+    users[socket.id] = {
+      username: username,
+      points: 0,
+      level: 0,
+      levelBonus: LEVEL_CONFIG.BONUS_MULTIPLIER[0], // 初始化加成
+      lastCheckIn: null,
+      purchaseCount: 0
+    };
+    socket.broadcast.emit('userJoined', username);
+    io.emit('updateUsers', users);
+    io.emit('updatePoints', globalPoints);
+  });
+  
+  // 处理聊天消息
+  socket.on('chatMessage', (msg) => {
+    const user = users[socket.id];
+    io.emit('message', {
+      username: user.username,
+      message: msg,
+      timestamp: new Date().toLocaleTimeString()
+    });
+  });
+  
+  // 处理签到请求
+  socket.on('check-in', () => {
+    const user = users[socket.id];
+    if (!user) return;
+
+    const now = new Date();
+
+    // 检查是否已签到
+    if (user.lastCheckIn && isSameDay(user.lastCheckIn, now)) {
+      socket.emit('check-in-error', '今天已经签到过了！');
+      return;
+    }
+
+    // 计算点数 (含等级加成)
+    const earnedPoints = Math.floor(
+      LEVEL_CONFIG.DAILY_BASE_POINTS * user.levelBonus // 使用存储的加成值
+    );
+
+    // 更新用户数据
+    user.points += earnedPoints;
+    globalPoints += earnedPoints;
+    user.lastCheckIn = now;
+
+    // 广播更新
+    io.emit('updateUsers', users);
+    io.emit('updatePoints', globalPoints);
+    socket.emit('check-in-success', {
+      earnedPoints: earnedPoints,
+      totalPoints: user.points,
+      nextLevelReq: LEVEL_CONFIG.UPGRADE_REQUIREMENTS[user.level + 1] - user.purchaseCount
+    });
+  });
+  
+  // 处理购买请求（已修复升级逻辑）
+  socket.on('purchase', () => {
+    const user = users[socket.id];
+    if (!user) return;
+    
+    if (isPurchasing) {
+      socket.emit('purchaseError', '系统正忙，请稍后再试');
+      return;
+    }
+    
+    isPurchasing = true;
+    
+    // 模拟处理购买的延迟
+    setTimeout(() => {
+      try {
+        user.purchaseCount++;
+        const pointsEarned = 10;
+        user.points += pointsEarned;
+        globalPoints += pointsEarned;
+        
+        // 检查升级条件（修复后的逻辑）
+        let leveledUp = false;
+        while (user.level < LEVEL_CONFIG.UPGRADE_REQUIREMENTS.length - 1 &&
+               user.purchaseCount >= LEVEL_CONFIG.UPGRADE_REQUIREMENTS[user.level + 1]) {
+          user.level++;
+          user.levelBonus = LEVEL_CONFIG.BONUS_MULTIPLIER[user.level]; // 更新加成值
+          leveledUp = true;
+        }
+        
+        if (leveledUp) {
+          io.emit('level-up', {
+            username: user.username,
+            newLevel: user.level,
+            newBonus: user.levelBonus
+          });
+        }
+        
+        io.emit('updateUsers', users);
+        io.emit('updatePoints', globalPoints);
+        socket.emit('purchaseComplete', {
+          username: user.username,
+          points: user.points,
+          purchaseCount: user.purchaseCount,
+          currentLevel: user.level // 返回当前等级
+        });
+      } catch (err) {
+        console.error('购买处理错误:', err);
+      } finally {
+        isPurchasing = false;
+      }
+    }, 1000);
+  });
+  
+  // 用户断开连接
+  socket.on('disconnect', () => {
+    const user = users[socket.id];
+    if (user) {
+      socket.broadcast.emit('userLeft', user.username);
+      delete users[socket.id];
+      io.emit('updateUsers', users);
+    }
+    console.log('用户断开连接:', socket.id);
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`
+  ▄︻デ══━ 服务器已启动 ══━︻▄
+  │
+  │ 本地端: http://localhost:${PORT}
+  │ 等级系统: 已启用
+  │ 签到基础点数: ${LEVEL_CONFIG.DAILY_BASE_POINTS}
+  │ 
+  └───────────────────────────`);
+});
