@@ -1,0 +1,68 @@
+/* 浮動按鈕樣式 */
+#chatToggleBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #3085d6;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 1000;
+}
+
+/* 聊天視窗樣式 */
+#floatingChat {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+#floatingChatHeader {
+    background-color: #3085d6;
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+}
+
+#chatContent {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+#chatInputContainer {
+    display: flex;
+    border-top: 1px solid #ddd;
+}
+
+#chatInput2 {
+    border: none;
+    flex: 1;
+    padding: 10px;
+    outline: none;
+}
+
+#chatInputContainer button {
+    border: none;
+    background: #3085d6;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+}

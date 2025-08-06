@@ -11,6 +11,7 @@ module.exports = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('🔐 verifyToken decoded:', decoded);
     req.user = decoded; // ✅ 把解出來的 user 寫進 req.user
     next();
   } catch (err) {

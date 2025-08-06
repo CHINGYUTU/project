@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
+  <!-- [Head] start -->
+
+  <head>
+    <title>個人檔案</title>
+    <!-- [Meta] -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="description"
+      content="Datta Able is trending dashboard template made using Bootstrap 5 design framework. Datta Able is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies."
+    />
+    <meta
+      name="keywords"
+      content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard"
+    />
+    <meta name="author" content="CodedThemes" />
+
+    <!-- [Favicon] icon -->
+    <link rel="icon" href="../assets/images/logo.png" type="image/x-icon" />
+
+     <!-- [Font] Family -->
+     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <!-- [phosphor Icons] https://phosphoricons.com/ -->
+    <link rel="stylesheet" href="../assets/fonts/phosphor/duotone/style.css" />
+    <!-- [Tabler Icons] https://tablericons.com -->
+    <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
+    <!-- [Feather Icons] https://feathericons.com -->
+    <link rel="stylesheet" href="../assets/fonts/feather.css" />
+    <!-- [Font Awesome Icons] https://fontawesome.com/icons -->
+    <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
+    <!-- [Material Icons] https://fonts.google.com/icons -->
+    <link rel="stylesheet" href="../assets/fonts/material.css" />
+    <!-- [Template CSS Files] -->
+    <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <style>
+    .password-checklist li {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+    .progress {
+        height: 8px;
+        margin-top: 8px;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        transition: width 0.5s ease, background-color 0.4s ease;
+        border-radius: 10px;
+    }
+    #strengthText {
+        transition: color 0.4s ease;
+    }
+    </style>
+
+  </head>
+  <!-- [Head] end -->
+  <!-- [Body] Start -->
+
+  <body>
+    <!-- [ Pre-loader ] start -->
+<div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
+  <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
+    <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
+  </div>
+</div>
+<!-- [ Pre-loader ] End -->
+ <!-- [ Sidebar Menu ] start -->
+<nav class="pc-sidebar">
+  <div class="navbar-wrapper">
+    <div class="m-header flex items-center py-4 px-6 h-header-height">
+      <a href="../../index.html" class="b-brand flex items-center gap-3">
+        <!-- ========   Change your logo from here   ============ -->
+        <img id="logo" src="../assets/images/logo.png" alt="Logo" class="logo" width="50">
+        <p class="text-xl sm:text-3xl font-semibold text-slate-900 dark:text-white">二貨</p>
+      </a>
+    </div>
+    <div class="m-header flex items-center py-4 px-6 h-header-height">
+        <!-- ========   換上頭像   ============ -->
+        <img src="../assets/images/3.png" height="50" width="50">
+        <img src="" style="position: absolute;" height="50" width="50">
+        <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
+      </a>
+    </div>
+    <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
+      <ul class="pc-navbar">
+        <li class="pc-item pc-caption">
+          <label>個人檔案</label>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="../elements/edit.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="edit"></i></span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">修改資料</span>
+          </a>
+        </li>
+        <li class="pc-item">
+        <li class="pc-item pc-caption">
+          <label>賣家商場</label>
+          <i data-feather="feather"></i>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="../elements/seller/shop.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="shopping-cart"></i></span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">進入商場</span>
+          </a>
+        </li>
+        <li class="pc-item pc-caption">
+          <label>買家專區</label>
+          <i data-feather="monitor"></i>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="../elements/collect.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="eye"></i></span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">檢視收藏</span>
+          </a>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="../elements/order.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="package"></i></span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">檢視訂單</span>
+          </a>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="../elements/trade.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="briefcase"></i></span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">交易紀錄</span>
+          </a>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="../elements/browse.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="grid"></i></span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">瀏覽紀錄</span>
+          </a>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="../elements/point.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="feather"></i></span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">環保點數</span>
+          </a>
+        </li>
+        <li class="pc-item pc-caption">
+          <label>其他</label>
+          <i data-feather="sidebar"></i>
+        </li>
+        <li class="pc-item">
+          <a href="../../index.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon">
+              <i data-feather="home"></i>
+            </span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">回首頁</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="../../index.html" class="pc-link">
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon">
+              <i data-feather="log-out"></i>
+            </span>
+            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">登出</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- [ Sidebar Menu ] end -->
+ <!-- [ Header Topbar ] start -->
+<header class="pc-header">
+  <div class="header-wrapper flex max-sm:px-[15px] px-[25px] grow"><!-- [Mobile Media Block] start -->
+<!-- [Mobile Media Block end] -->
+<div class="ms-auto">
+  <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
+    <li class="dropdown pc-h-item">
+      <a class="pc-head-link dropdown-toggle me-0" data-pc-toggle="dropdown" href="#" role="button"
+        aria-haspopup="false" aria-expanded="false">
+        <i data-feather="sun"></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
+        <a href="#!" class="dropdown-item" onclick="layout_change('dark')">
+          <i data-feather="moon"></i>
+          <span>深色</span>
+        </a>
+        <a href="#!" class="dropdown-item" onclick="layout_change('light')">
+          <i data-feather="sun"></i>
+          <span>明亮</span>
+        </a>
+      </div>
+    </li>
+  </ul>
+</div></div>
+</header>
+<!-- [ Header ] end -->
+
+
+
+    <!-- [ Main Content ] start -->
+    <div class="pc-container">
+      <div class="pc-content">
+        <!-- [ breadcrumb ] start -->
+        <div class="page-header">
+          <div class="page-block">
+            <div class="page-header-title">
+              <h5 class="mb-0 font-medium">位置</h5>
+            </div>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/index.html">回首頁</a></li>
+              <li class="breadcrumb-item"><a href="/dashboard/profile.html">個人檔案</a></li>
+              <li class="breadcrumb-item" aria-current="page">修改資料</li>
+            </ul>
+          </div>
+        </div>
+    <!-- [ Main Content ] start -->
+    <!-- [ Profile Form ] start -->
+    <div class="row">
+      <div class="col-12 xl:col-8">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">修改個人資料</h5>
+          </div>
+          <div class="card-body">
+            <form id="profileForm">
+              <!-- 姓名 -->
+              <div class="mb-4">
+                <label class="form-label">姓名</label>
+                <input type="text" name="name" id="name" class="form-control" value="">
+              </div>
+
+              <!-- 信箱 -->
+              <div class="mb-4">
+                <label class="form-label">學校信箱 (@ntub.edu.tw)</label>
+                <input type="email" name="email" id="email" class="form-control" value="">
+              </div>
+
+              <!-- 舊密碼驗證 -->
+              <div class="mb-4">
+                <label class="form-label">舊密碼</label>
+                <input type="password" name="old_password" class="form-control" placeholder="請輸入舊密碼">
+              </div>
+
+              <div>
+                <button  id="verifyOldPwdBtn" class="btn btn-primary">驗證密碼</button>
+              </div>
+
+              <!-- 新密碼 -->
+              <div id="newPasswordSection" style="display: none;">
+                <div class="mb-4">
+                  <label class="form-label">新密碼</label>
+                  <input type="password" name="pass" class="form-control" placeholder="請輸入新密碼">
+                  <ul class="password-checklist mt-2">
+                    <li id="lengthCheck">❌ 密碼長度至少 10 碼</li>
+                    <li id="symbolCheck">❌ 至少一個特殊符號（如 !@#）</li>
+                    <li id="upperCheck">❌ 至少一個大寫英文</li>
+                    <li id="lowerCheck">❌ 至少一個小寫英文</li>
+                  </ul>
+                  <div class="progress">
+                    <div id="strengthBar" class="progress-bar" style="width: 0%;"></div>
+                  </div>
+                  <p id="strengthText" class="mt-2">密碼強度：尚未輸入</p>
+                </div>
+              </div>
+
+              <!-- 頭像上傳 -->
+              <div class="mb-4">
+                <label class="form-label">頭像上傳</label>
+                <input type="file" name="avatar" class="form-control">
+              </div>
+
+              <!-- 提交按鈕 -->
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary">儲存修改</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [ Profile Form ] end -->
+  </div>
+</div>
+<!-- [ Main Content ] end -->
+      
+        <!-- [ Main Content ] start -->
+    <!-- [ Main Content ] end -->
+    <footer class="pc-footer">
+      
+    </footer>
+ 
+    <!-- Required Js -->
+    <script src="../assets/js/plugins/simplebar.min.js"></script>
+    <script src="../assets/js/plugins/popper.min.js"></script>
+    <script src="../assets/js/icon/custom-icon.js"></script>
+    <script src="../assets/js/plugins/feather.min.js"></script>
+    <script src="../assets/js/component.js"></script>
+    <script src="../assets/js/theme.js"></script>
+    <script src="../assets/js/script.js"></script>
+
+    <div class="floting-button fixed bottom-[50px] right-[30px] z-[1030]">
+    </div>
+
+    
+    <script>
+      layout_change('false');
+    </script>
+     
+    
+    <script>
+      layout_theme_sidebar_change('dark');
+    </script>
+    
+     
+    <script>
+      change_box_container('false');
+    </script>
+     
+    <script>
+      layout_caption_change('true');
+    </script>
+     
+    <script>
+      layout_rtl_change('false');
+    </script>
+     
+    <script>
+      preset_change('preset-1');
+    </script>
+     
+    <script>
+      main_layout_change('vertical');
+    </script>
+
+    <script src="../../vendor/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../../vendor/animsition/js/animsition.min.js"></script>
+    <script src="../../vendor/bootstrap/js/popper.js"></script>
+    <script src="../../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../vendor/select2/select2.min.js"></script>
+    <script src="../../vendor/daterangepicker/moment.min.js"></script>
+    <script src="../../vendor/daterangepicker/daterangepicker.js"></script>
+    <script src="../../vendor/countdowntime/countdowntime.js"></script>
+    <script src="../js/main.js"></script>
+    
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          const res = await fetch("http://localhost:3000/api/user/profile", {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          if (!res.ok) throw new Error("無法載入使用者資料");
+
+          const data = await res.json();
+          document.getElementById("name").value = data.name || "";
+          document.getElementById("email").value = data.email || "";
+        } catch (err) {
+          console.error("載入資料失敗：", err);
+          alert("無法載入個人資料，請稍後再試");
+        }
+      });
+    </script>
+
+    <!-- 驗證邏輯 -->
+    <script>
+    function validateForm() {
+        return validateEmail() && validatePassword();
+    }
+
+    function validateEmail() {
+        const emailInput = document.getElementById("email").value.trim();
+        const regex = /^[a-zA-Z0-9._%+-]+@ntub\.edu\.tw$/;
+        if (!regex.test(emailInput)) {
+        alert("請輸入 ntub.edu.tw 的學校信箱！");
+        return false;
+        }
+        return true;
+    }
+
+    function validatePassword() {
+        const password = document.querySelector('input[name="pass"]').value;
+
+        if (password.length < 10) {
+        alert("密碼長度必須至少為 10 碼");
+        return false;
+        }
+
+        let conditionsMet = 0;
+        if (/[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]/.test(password)) conditionsMet++;
+        if (/[A-Z]/.test(password)) conditionsMet++;
+        if (/[a-z]/.test(password)) conditionsMet++;
+
+        if (conditionsMet < 2) {
+        alert("密碼需至少包含下列三項中的任意兩項：\n1. 特殊符號\n2. 大寫字母\n3. 小寫字母");
+        return false;
+        }
+
+        return true;
+    }
+
+    // 即時更新：條件列表與強度條
+    document.addEventListener("DOMContentLoaded", () => {
+        const passwordInput = document.querySelector('input[name="pass"]');
+        passwordInput.addEventListener("input", () => {
+        updateChecklist();
+        updateStrengthMeter();
+        });
+    });
+
+    function updateChecklist() {
+        const password = document.querySelector('input[name="pass"]').value;
+
+        const lengthValid = password.length >= 10;
+        const symbolValid = /[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]/.test(password);
+        const upperValid = /[A-Z]/.test(password);
+        const lowerValid = /[a-z]/.test(password);
+
+        document.getElementById('lengthCheck').innerHTML = (lengthValid ? "✅" : "❌") + " 密碼長度至少 10 碼";
+        document.getElementById('symbolCheck').innerHTML = (symbolValid ? "✅" : "❌") + " 至少一個特殊符號（如 !@#）";
+        document.getElementById('upperCheck').innerHTML = (upperValid ? "✅" : "❌") + " 至少一個大寫英文";
+        document.getElementById('lowerCheck').innerHTML = (lowerValid ? "✅" : "❌") + " 至少一個小寫英文";
+    }
+
+    function updateStrengthMeter() {
+        const password = document.querySelector('input[name="pass"]').value;
+        const bar = document.getElementById("strengthBar");
+        const text = document.getElementById("strengthText");
+
+        let score = 0;
+        if (password.length >= 10) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+
+        switch (score) {
+        case 0:
+            bar.style.width = "0%";
+            bar.style.backgroundColor = "#ccc";
+            text.textContent = "密碼強度：尚未輸入";
+            text.style.color = "#6c757d";
+            break;
+        case 1:
+        case 2:
+            bar.style.width = "40%";
+            bar.style.backgroundColor = "#dc3545"; // 紅
+            text.textContent = "密碼強度：弱";
+            text.style.color = "#dc3545";
+            break;
+        case 3:
+            bar.style.width = "70%";
+            bar.style.backgroundColor = "#ffc107"; // 橘
+            text.textContent = "密碼強度：中";
+            text.style.color = "#ffc107";
+            break;
+        case 4:
+        case 5:
+            bar.style.width = "100%";
+            bar.style.backgroundColor = "#28a745"; // 綠
+            text.textContent = "密碼強度：強";
+            text.style.color = "#28a745";
+            break;
+        }
+    }
+    </script>
+    
+  <script>
+    const logo = document.getElementById("logo");
+    function updateLogo() {
+      const isDark = document.documentElement.getAttribute("data-pc-theme") === "dark";
+      logo.src = isDark ? "../assets/images/logo-w.png" : "../assets/images/logo.png";
+    }
+
+    // 初始設定一次
+    updateLogo();
+
+    // 監聽深色模式切換
+    const darkModeObserver = new MutationObserver(updateLogo);
+    darkModeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-pc-theme"]
+    });
+  </script>
+  <script>
+    document.getElementById("verifyOldPwdBtn").addEventListener("click", async () => {
+      const oldPassword = document.getElementById("old_password").value.trim();
+
+      if (!oldPassword) {
+        alert("請先輸入舊密碼");
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:3000/api/user/verify-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ oldPassword }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        alert("✅ 舊密碼驗證成功！");
+        document.getElementById("newPasswordSection").style.display = "block";
+        document.getElementById("verifyOldPwdBtn").disabled = true;
+        document.getElementById("old_password").readOnly = true;
+      } catch (err) {
+        alert("❌ 舊密碼錯誤：" + err.message);
+      }
+    });
+    </script>
+  <script>
+    document.getElementById("profileForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const name = document.querySelector('input[name="name"]').value.trim();
+      const email = document.querySelector('input[name="email"]').value.trim();
+      const oldPassword = document.querySelector('input[name="old_password"]').value;
+      const newPassword = document.querySelector('input[name="pass"]').value;
+      const avatarFile = document.querySelector('input[name="avatar"]').files[0];
+
+
+       // ✅ 若新密碼欄有開啟 → 要驗證密碼格式
+      if (document.getElementById("newPasswordSection").style.display !== "none") {
+        if (!validateForm()) return;
+      }
+      try {
+        // 1️⃣ 修改個人資料（名稱與信箱）
+        const profileRes = await fetch("http://localhost:3000/api/user/profile", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // 視你登入方式
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            oldPassword // ✅ 傳給後端做驗證
+          }),
+        });
+
+        const profileData = await profileRes.json();
+        if (!profileRes.ok) throw new Error(profileData.message || "名稱/信箱更新失敗");
+        alert(profileData.message);
+
+        // 2️⃣ 修改密碼
+        const passwordRes = await fetch("http://localhost:3000/api/user/change-password", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            oldPassword,
+            newPassword,
+          }),
+        });
+
+        const passwordData = await passwordRes.json();
+        if (!passwordRes.ok) throw new Error(passwordData.message || "密碼更新失敗");
+        alert(passwordData.message);
+
+        // 3️⃣ 上傳頭像
+        if (avatarFile) {
+          const formData = new FormData();
+          formData.append("avatar", avatarFile);
+
+          const avatarRes = await fetch("http://localhost:3000/api/user/avatar", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: formData,
+          });
+
+          const avatarData = await avatarRes.json();
+          if (!avatarRes.ok) throw new Error(avatarData.message || "頭像上傳失敗");
+          alert("頭像已更新");
+        }
+
+        alert("所有資料已成功更新！");
+      } catch (err) {
+        console.error("❌ 更新失敗:", err);
+        alert("更新失敗：" + err.message);
+      }
+    });
+    </script>
+  </body>
+  <!-- [Body] end -->
+</html>

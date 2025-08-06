@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 
 // 寄驗證信（註冊 or 更換信箱）
 const sendVerificationEmail = async (to, token) => {
-  const verifyLink = `http://localhost:3000/api/auth/verify?token=${token}`;
+  const verifyLink = `http://localhost:3000/api/auth/verify?token=${token}&type=register`;
 
   const mailOptions = {
     from: `"NTUB 二手平台" <${process.env.EMAIL_USER}>`,
@@ -37,7 +37,7 @@ const sendVerificationEmail = async (to, token) => {
 
 
 const sendResetPasswordEmail = async (to, token) => {
-  const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+  const resetLink = `http://localhost:3000/reset-password.html?token=${token}`;
 
   const mailOptions = {
     from: `"NTUB 二手平台" <${process.env.EMAIL_USER}>`,

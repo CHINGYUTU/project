@@ -133,6 +133,7 @@ exports.forgotPassword = async (req, res) => {
     console.error('❌ 忘記密碼錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤' });
   }
+  
 };
 
 // 📌 重設密碼：點擊信件後輸入新密碼

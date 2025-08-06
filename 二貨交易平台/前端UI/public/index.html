@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>二手交易平台</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="images/logo.png" />
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/chat.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <style>
+            .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            }
+            .product-card {
+            width: 220px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 2px 2px 8px #ccc;
+            text-align: center;
+            }
+            .product-card img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            }
+            .product-card button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #3085d6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            }
+            .product-card button:hover {
+            background-color: #2563eb;
+            }
+        /* 可左右滑動分類按鈕列 */
+        .category-scroll {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        scroll-snap-type: x mandatory;
+        }
+
+        .category-scroll a {
+        flex-shrink: 0;
+        scroll-snap-align: start;
+        margin-right: 0.5rem;
+        }
+
+        /* 自訂 scrollbar 樣式 */
+        .category-scroll::-webkit-scrollbar {
+        height: 6px;
+        }
+
+        .category-scroll::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+        }
+        
+    </style>
+</head>
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg bg-mytheme text-uppercase fixed-top" id="mainNav">
+        <div class="container">
+            <a href="index.html" class="navbar-brand d-flex align-items-center">
+            <img src="images/logo.png" alt="Logo" style="height: 60px;">
+            </a>
+            <a class="navbar-brand" href="index.html">二貨</a>
+            <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown" id="menuWrapper" onmouseenter="showMenu()" onmouseleave="hideMenu()">
+                        <a class="nav-link dropdown-toggle py-3 px-0 px-lg-3 rounded" href="#" role="button">
+                            Menu
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" id="menuList">
+                            <!-- JS 動態填入 -->
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Masthead-->
+    <header class="masthead bg-mycolor text-white text-center">
+        <div class="container d-flex align-items-center flex-column">
+            <!-- Masthead Heading-->
+            <h1 style="color: #000;" class="masthead-heading text-uppercase mb-0">二貨交易</h1>
+            <!-- Icon Divider-->
+            <div class="divider-custom divider-light">  
+                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                <div class="divider-custom-line"></div>
+                <!-- Masthead Subheading-->
+                <p style="color: #000;" class="masthead-subheading font-weight-light mb-0">校園二手貨-你用不到我幫你用</p>
+                <div class="divider-custom-line"></div><div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+            </div>
+        </div>
+        <div>
+            <!-- 結構部分 -->
+            <div class="container d-flex align-items-center justify-content-between flex-wrap">
+
+                <!-- 中：搜尋欄 -->
+                <div class="flex-grow-1 mx-3 transparent-search">
+                    <input type="text" class="form-control" placeholder="搜尋品牌、型號、關鍵字……">
+                </div>
+                <!-- 下方分類按鈕 -->
+                <div class="w-100 mt-2">
+                    <div class="category-scroll">
+                        <a href="#all" class="btn btn-light">所有</a>
+                        <a href="#fashion" class="btn btn-light">你可能會喜歡</a>
+                        <a href="#book" class="btn btn-light">課本</a>
+                        <a href="#life" class="btn btn-light">生活用品</a>
+                        <a href="#clothing" class="btn btn-light">衣物</a>
+                        <a href="#food" class="btn btn-light">食品</a>
+                        <a href="#vintage" class="btn btn-light">動漫</a>
+                        <a href="#vintage" class="btn btn-light">音樂、電影及相機</a>
+                    </div>
+                    &nbsp;
+                </div><br>
+                <!-- 篩選列 -->
+                <table >
+                    <div class="d-flex flex-wrap align-items-center mt-2 gap-3">
+                        <!-- 預算選單 -->
+                            <tr><td></td>
+                                <div class="form-group mb-0">
+                                    <td><label for="priceFilter" class="form-label mb-1" style="color:#000;">價格預算</label></td>
+                                    <td><label for="timeFilter" class="form-label mb-1" style="color:#000;">上架時間</label></td>
+                                    <tr><td style="color: #000;" valign="middle">篩選</td><td><select class="form-select form-select-sm" id="priceFilter">
+                                        <option value="">不限</option>
+                                        <option value="0-1000">0 - 1,000</option>
+                                        <option value="1000-5000">1,000 - 5,000</option>
+                                        <option value="5000-10000">5,000 - 10,000</option>
+                                        <option value="10000up">10,000 以上</option>
+                                    </select></td>
+                                </div>
+                        <td><!-- 上架時間 -->
+                        <div class="form-group mb-0">
+                            <select class="form-select form-select-sm" id="timeFilter">
+                                <option value="">不限</option>
+                                <option value="1">最近 1 天</option>
+                                <option value="7">最近 7 天</option>
+                                <option value="30">最近 30 天</option>
+                            </select>
+                        </div>
+                        </td></tr>
+                    </div>
+                </table>
+            </div>
+        </div>
+    </header> 
+    <!-- Portfolio Section-->
+    <section class="page-section portfolio" id="portfolio">
+        <div class="container">
+            <!-- Portfolio Section Heading-->
+            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">商品</h2>
+            <!-- Icon Divider-->
+            <div class="divider-custom">
+                <div class="divider-custom-line"></div>
+                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                <div class="divider-custom-line"></div>
+            </div>
+                <div class="row justify-content-center" id="product-list"></div>
+                  <div class="product-container" id="productContainer"></div>
+            </div>
+        </div>
+    </section>
+    <div id="chatToggleBtn" onclick="toggleChat()" style="display:none">💬</div>
+
+    <!-- 聊天視窗 -->
+    <div id="floatingChat" class="chat-window">
+    <div class="chat-header">
+        <span>聊天室</span>
+        <button onclick="toggleChat()">✖</button>
+    </div>
+    <div class="chat-body" id="chatBox">
+        <div class="text-muted text-center">聊天室尚無訊息</div>
+    </div>
+    <div class="chat-footer">
+        <input type="text" id="chatInput" placeholder="輸入訊息..." />
+        <button onclick="sendMessage()">送出</button>
+    </div>
+    </div>
+    <!-- Footer-->
+    <footer class="footer text-center">
+        <div class="container">
+            <div class="row">
+                <!-- Footer Location-->
+                <div class="col-lg-4 mb-5 mb-lg-0">
+                    <h4 class="text-uppercase mb-4">Location</h4>
+                    <p class="lead mb-0">
+                        NTUB
+                        <br />
+                        1234
+                    </p>
+                </div>
+                <!-- Footer Social Icons-->
+                <div class="col-lg-4 mb-5 mb-lg-0">
+                    <h4 class="text-uppercase mb-4">聯絡我們
+                    </h4>
+                    <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-facebook-f"></i></a>
+                    <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-twitter"></i></a>
+                    <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-linkedin-in"></i></a>
+                    <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-dribbble"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Copyright Section-->
+    <div class="copyright py-4 text-center text-white">
+        <div class="container"><small>Copyright &copy; Your Website 2023</small></div>
+    </div>
+    <!-- Portfolio Modals-->
+    <!-- Portfolio Modal 1-->
+    <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" aria-labelledby="portfolioModal1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body text-center pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <!-- Portfolio Modal - Title-->
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Log Cabin</h2>
+                                <!-- Icon Divider-->
+                                <div class="divider-custom">
+                                    <div class="divider-custom-line"></div>
+                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                    <div class="divider-custom-line"></div>
+                                </div>
+                                <!-- Portfolio Modal - Image-->
+                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." />
+                                <!-- Portfolio Modal - Text-->
+                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                <button class="btn btn-primary" data-bs-dismiss="modal">
+                                    <i class="fas fa-xmark fa-fw"></i>
+                                    Close Window
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Portfolio Modal 2-->
+    <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" aria-labelledby="portfolioModal2" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body text-center pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <!-- Portfolio Modal - Title-->
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Tasty Cake</h2>
+                                <!-- Icon Divider-->
+                                <div class="divider-custom">
+                                    <div class="divider-custom-line"></div>
+                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                    <div class="divider-custom-line"></div>
+                                </div>
+                                <!-- Portfolio Modal - Image-->
+                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cake.png" alt="..." />
+                                <!-- Portfolio Modal - Text-->
+                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                <button class="btn btn-primary" data-bs-dismiss="modal">
+                                    <i class="fas fa-xmark fa-fw"></i>
+                                    Close Window
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Portfolio Modal 3-->
+    <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" aria-labelledby="portfolioModal3" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body text-center pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <!-- Portfolio Modal - Title-->
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Circus Tent</h2>
+                                <!-- Icon Divider-->
+                                <div class="divider-custom">
+                                    <div class="divider-custom-line"></div>
+                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                    <div class="divider-custom-line"></div>
+                                </div>
+                                <!-- Portfolio Modal - Image-->
+                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/circus.png" alt="..." />
+                                <!-- Portfolio Modal - Text-->
+                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                <button class="btn btn-primary" data-bs-dismiss="modal">
+                                    <i class="fas fa-xmark fa-fw"></i>
+                                    Close Window
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Portfolio Modal 4-->
+    <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" aria-labelledby="portfolioModal4" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body text-center pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <!-- Portfolio Modal - Title-->
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Controller</h2>
+                                <!-- Icon Divider-->
+                                <div class="divider-custom">
+                                    <div class="divider-custom-line"></div>
+                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                    <div class="divider-custom-line"></div>
+                                </div>
+                                <!-- Portfolio Modal - Image-->
+                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/game.png" alt="..." />
+                                <!-- Portfolio Modal - Text-->
+                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                <button class="btn btn-primary" data-bs-dismiss="modal">
+                                    <i class="fas fa-xmark fa-fw"></i>
+                                    Close Window
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Portfolio Modal 5-->
+    <div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" aria-labelledby="portfolioModal5" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body text-center pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <!-- Portfolio Modal - Title-->
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Locked Safe</h2>
+                                <!-- Icon Divider-->
+                                <div class="divider-custom">
+                                    <div class="divider-custom-line"></div>
+                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                    <div class="divider-custom-line"></div>
+                                </div>
+                                <!-- Portfolio Modal - Image-->
+                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/safe.png" alt="..." />
+                                <!-- Portfolio Modal - Text-->
+                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                <button class="btn btn-primary" data-bs-dismiss="modal">
+                                    <i class="fas fa-xmark fa-fw"></i>
+                                    Close Window
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Portfolio Modal 6-->
+    <div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" aria-labelledby="portfolioModal6" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                <div class="modal-body text-center pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <!-- Portfolio Modal - Title-->
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Submarine</h2>
+                                <!-- Icon Divider-->
+                                <div class="divider-custom">
+                                    <div class="divider-custom-line"></div>
+                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+                                    <div class="divider-custom-line"></div>
+                                </div>
+                                <!-- Portfolio Modal - Image-->
+                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/submarine.png" alt="..." />
+                                <!-- Portfolio Modal - Text-->
+                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                <button class="btn btn-primary" data-bs-dismiss="modal">
+                                    <i class="fas fa-xmark fa-fw"></i>
+                                    Close Window
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+    <!-- * *                               SB Forms JS                               * *-->
+    <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
+    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
+        <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const menuRefresh = urlParams.get('menu');
+            if (menuRefresh === 'refresh') {
+                showMenu(); // 強制執行
+            }
+            });
+            function showMenu() {
+            const menuList = document.getElementById('menuList');
+            menuList.innerHTML = '';
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                // 未登入，顯示訪客選單
+                menuList.innerHTML = `
+                <li><a class="dropdown-item" href="/login.html">登入/註冊</a></li>
+                `;
+            } else {
+                try {
+                const decoded = jwt_decode(token);
+                const role = decoded.role;
+
+                if (role === 'user') {
+                // 一般用戶
+                menuList.innerHTML = `
+                    <li><a class="dropdown-item" href="dist/dashboard/profile.html">個人檔案</a></li>
+                    <li><a class="dropdown-item" href="dist/elements/point.html">點數兌換</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="logout()">登出</a></li>
+                `;
+                } else if (role === 'admin') {
+                // 管理員
+                menuList.innerHTML = `
+                    <li><a class="dropdown-item" href="/admin.html">管理員後台</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="logout()">登出</a></li>
+                `;
+                } else {
+                // 其他預設當訪客
+                menuList.innerHTML = `
+                    <li><a class="dropdown-item" href="../public/login.html">登入/註冊</a></li>
+                `;
+                }
+                } catch (e) {
+                console.error('JWT 解碼失敗:', e);
+                menuList.innerHTML = `
+                    <li><a class="dropdown-item" href="../public/login.html">登入/註冊</a></li>
+                `;
+                }
+            }
+            menuList.classList.add('show');
+            }
+
+            // 登出功能
+            function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/index.html';
+            }
+
+            // 在頁面載入時顯示 menu
+            document.getElementById('menuWrapper').addEventListener('mouseenter', showMenu);
+            document.getElementById('menuWrapper').addEventListener('mouseleave', () => {
+            document.getElementById('menuList').classList.remove('show');
+            });
+        </script>
+        <script>
+            // 模擬的商品資料陣列（未來可改為資料庫回傳的 JSON）
+            const products = [
+            {
+                name: "筆電支架",
+                price: 350,
+                image: "",
+                place: "圖書館一樓交接"
+            },
+            {
+                name: "藍牙耳機",
+                price: 699,
+                image: "",
+                place: "校門口便利商店"
+            },
+            {
+                name: "二手教科書",
+                price: 150,
+                image: "",
+                place: "C棟大廳"
+            }
+            ];
+
+            // 動態渲染商品卡片
+            const container = document.getElementById('productContainer');
+            products.forEach((item) => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <h3>${item.name}</h3>
+                <p>價格：$${item.price}</p>
+                <p>地點：${item.place}</p>
+                <button onclick="showPurchasePopup('${item.name}', ${item.price}, '${item.image}', '${item.place}')">購買</button>
+            `;
+            container.appendChild(card);
+            });
+
+            // 彈窗邏輯整合
+            function showPurchasePopup(itemName, price, imagePath, place) {
+            Swal.fire({
+                title: `確認購買「${itemName}」？`,
+                html: `
+                <p>價格：<strong>$${price}</strong></p>
+                <p>交易地點：<strong>${place}</strong></p>
+                `,
+                imageUrl: imagePath,
+                imageWidth: 200,
+                imageHeight: 200,
+                showCancelButton: true,
+                confirmButtonText: '✅ 確認購買',
+                cancelButtonText: '取消',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                Swal.fire({
+                    title: '✅ 已加入購物車！',
+                    text: `「${itemName}」已成功加入購物車。`,
+                    icon: 'success',
+                    confirmButtonText: '知道了',
+                    confirmButtonColor: '#6474E1'
+                });
+
+                // 🔁 若未來接後端可在這裡送出資料
+                // fetch('/api/add-to-cart', {...})
+                }
+            });
+            }
+
+            function sendFloatingMessage() {
+                const chatContent = document.getElementById('chatContent');
+                const msg = input.value.trim();
+                if (msg !== "") {
+                    const messageBubble = document.createElement('div');
+                    messageBubble.style.textAlign = 'right';
+                    messageBubble.innerHTML = `<span style="background:#3085d6; color:white; padding:6px 10px; border-radius:12px; margin:4px; display:inline-block;">${msg}</span>`;
+                    chatContent.appendChild(messageBubble);
+                    input.value = '';
+                    chatContent.scrollTop = chatContent.scrollHeight;
+                }
+            }
+            // 頁面載入時檢查 role
+            window.addEventListener('DOMContentLoaded', function () {
+                const params = new URLSearchParams(window.location.search);
+                const role = params.get('role');
+                const chatToggleBtn = document.getElementById('chatToggleBtn');
+                const floatingChat = document.getElementById('floatingChat');
+
+                if (role === '2' || role === '3') {
+                chatToggleBtn.style.display = 'flex';
+                } else {
+                chatToggleBtn.style.display = 'none';
+                floatingChat.style.display = 'none';
+                }
+            });
+
+            // 開關聊天室視窗
+            function toggleChat() {
+                const chat = document.getElementById("floatingChat");
+                chat.classList.toggle("active");
+            }
+
+            // 傳送訊息
+            function sendMessage() {
+                const input = document.getElementById("chatInput");
+                const chatBox = document.getElementById("chatBox");
+                const msg = input.value.trim();
+
+                if (msg !== "") {
+                const newMsg = document.createElement("div");
+                newMsg.className = "chat-message user";
+                newMsg.innerHTML = `<div class="bubble">${msg}</div>`;
+                chatBox.appendChild(newMsg);
+                input.value = "";
+                chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }
+            </script>
+    </body>
+</html>

@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>登出</title>
+        <meta charset="UTF-8">
+    </head>
+    <script>
+        // 登出按鈕點擊事件
+        function handleLogout() {
+        fetch('/logout', {
+            method: 'GET',
+            credentials: 'include'  // 確保 cookie 會附帶
+        })
+            .then(res => {
+            if (res.redirected) {
+                // 登出後被導向（如果後端用 res.redirect）
+                window.location.href = res.url;
+            } else {
+                window.location.href = '/index.html';
+            }
+            });
+        }
+    </script>
+</html>
