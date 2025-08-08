@@ -226,21 +226,21 @@
                 <label class="form-label">姓名</label>
                 <input type="text" name="name" id="name" class="form-control" value="">
               </div>
-
               <!-- 信箱 -->
               <div class="mb-4">
                 <label class="form-label">學校信箱 (@ntub.edu.tw)</label>
                 <input type="email" name="email" id="email" class="form-control" value="">
               </div>
+              
+              <div>
+                <button id="updateProfileBtn" type="button" class="btn btn-primary">修改姓名/信箱</button>
+              </div>
+              <br>
 
               <!-- 舊密碼驗證 -->
               <div class="mb-4">
-                <label class="form-label">舊密碼</label>
-                <input type="password" name="old_password" class="form-control" placeholder="請輸入舊密碼">
-              </div>
-
-              <div>
-                <button  id="verifyOldPwdBtn" class="btn btn-primary">驗證密碼</button>
+                <input type="password" name="old_password" id="old_password" class="form-control" placeholder="請輸入舊密碼">
+                <button type="button" class="btn btn-primary" id="verifyOldPasswordBtn">驗證舊密碼</button>
               </div>
 
               <!-- 新密碼 -->
@@ -259,17 +259,18 @@
                   </div>
                   <p id="strengthText" class="mt-2">密碼強度：尚未輸入</p>
                 </div>
+                <button id="changePasswordBtn" type="button" class="btn btn-primary">修改密碼</button>
               </div>
 
               <!-- 頭像上傳 -->
               <div class="mb-4">
                 <label class="form-label">頭像上傳</label>
-                <input type="file" name="avatar" class="form-control">
+                <input type="file" name="avatar" class="form-control" id="avatarInput" />
               </div>
 
               <!-- 提交按鈕 -->
-              <div class="text-end">
-                <button type="submit" class="btn btn-primary">儲存修改</button>
+              <div>
+                <button id="changeAvatarBtn" type="button" class="btn btn-primary">更新頭像</button>
               </div>
             </form>
           </div>
@@ -483,112 +484,149 @@
     });
   </script>
   <script>
-    document.getElementById("verifyOldPwdBtn").addEventListener("click", async () => {
-      const oldPassword = document.getElementById("old_password").value.trim();
+    const API_BASE = "http://localhost:3000/api/user";
+    //修改名稱和email
+      document.getElementById('updateProfileBtn').addEventListener('click', async () => {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
 
-      if (!oldPassword) {
-        alert("請先輸入舊密碼");
-        return;
+      if (!name || !email) {
+          alert('姓名與信箱不能為空');
+          return;
       }
 
       try {
-        const res = await fetch("http://localhost:3000/api/user/verify-password", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ oldPassword }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-
-        alert("✅ 舊密碼驗證成功！");
-        document.getElementById("newPasswordSection").style.display = "block";
-        document.getElementById("verifyOldPwdBtn").disabled = true;
-        document.getElementById("old_password").readOnly = true;
-      } catch (err) {
-        alert("❌ 舊密碼錯誤：" + err.message);
-      }
-    });
-    </script>
-  <script>
-    document.getElementById("profileForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const name = document.querySelector('input[name="name"]').value.trim();
-      const email = document.querySelector('input[name="email"]').value.trim();
-      const oldPassword = document.querySelector('input[name="old_password"]').value;
-      const newPassword = document.querySelector('input[name="pass"]').value;
-      const avatarFile = document.querySelector('input[name="avatar"]').files[0];
-
-
-       // ✅ 若新密碼欄有開啟 → 要驗證密碼格式
-      if (document.getElementById("newPasswordSection").style.display !== "none") {
-        if (!validateForm()) return;
-      }
-      try {
-        // 1️⃣ 修改個人資料（名稱與信箱）
-        const profileRes = await fetch("http://localhost:3000/api/user/profile", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // 視你登入方式
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            oldPassword // ✅ 傳給後端做驗證
-          }),
-        });
-
-        const profileData = await profileRes.json();
-        if (!profileRes.ok) throw new Error(profileData.message || "名稱/信箱更新失敗");
-        alert(profileData.message);
-
-        // 2️⃣ 修改密碼
-        const passwordRes = await fetch("http://localhost:3000/api/user/change-password", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            oldPassword,
-            newPassword,
-          }),
-        });
-
-        const passwordData = await passwordRes.json();
-        if (!passwordRes.ok) throw new Error(passwordData.message || "密碼更新失敗");
-        alert(passwordData.message);
-
-        // 3️⃣ 上傳頭像
-        if (avatarFile) {
-          const formData = new FormData();
-          formData.append("avatar", avatarFile);
-
-          const avatarRes = await fetch("http://localhost:3000/api/user/avatar", {
-            method: "PATCH",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: formData,
+          const res = await fetch('/api/user/profile', {
+              method: 'PATCH',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`
+              },
+              body: JSON.stringify({ name, email })
           });
 
-          const avatarData = await avatarRes.json();
-          if (!avatarRes.ok) throw new Error(avatarData.message || "頭像上傳失敗");
-          alert("頭像已更新");
-        }
-
-        alert("所有資料已成功更新！");
+          const data = await res.json();
+          if (data.success) {
+              alert('資料更新成功');
+          } else {
+              alert(data.message || '更新失敗');
+          }
       } catch (err) {
-        console.error("❌ 更新失敗:", err);
-        alert("更新失敗：" + err.message);
+          console.error(err);
+          alert('伺服器錯誤');
       }
+  });
+
+    // ======================= 舊密碼驗證 =======================
+    document.getElementById("verifyOldPasswordBtn").addEventListener("click", async () => {
+        const oldPassword = document.getElementById("old_password").value.trim();
+        const data = await res.json();
+        console.log("後端回傳資料：", data);
+        if (!oldPassword) return alert("請輸入舊密碼");
+
+        try {
+            const res = await fetch(`${API_BASE}/verify-password`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: JSON.stringify({ oldPassword })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert("舊密碼正確，請輸入新密碼");
+                document.getElementById("newPasswordSection").style.display = "block";
+            } else {
+                alert(data.message || "舊密碼錯誤");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("伺服器錯誤，請稍後再試");
+        }
     });
-    </script>
+    
+    // ======================= 新密碼驗證 & 修改 =======================
+    function validatePassword() {
+        const pass = document.querySelector('input[name="pass"]').value;
+        const pass2 = document.querySelector('input[name="pass2"]').value;
+
+        if (pass.length < 6) {
+            alert("密碼長度至少 6 位數");
+            return false;
+        }
+        if (pass !== pass2) {
+            alert("兩次輸入的密碼不一致");
+            return false;
+        }
+        return true;
+    }
+
+    document.getElementById("changePasswordBtn").addEventListener("click", async () => {
+        if (!validatePassword()) return;
+
+        const oldPassword = document.getElementById("old_password").value.trim();
+        const newPassword = document.querySelector('input[name="pass"]').value;
+
+        try {
+            const res = await fetch(`${API_BASE}/change-password`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: JSON.stringify({ oldPassword, newPassword }),
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert("密碼修改成功，請重新登入");
+                localStorage.removeItem("token");
+                window.location.href = "/login.html";
+            } else {
+                alert(data.message || "密碼修改失敗");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("伺服器錯誤，請稍後再試");
+        }
+    });
+
+    // ======================= 頭像修改 =======================
+    document.getElementById("changeAvatarBtn").addEventListener("click", () => {
+        document.getElementById("avatarInput").click();
+    });
+
+    document.getElementById("avatarInput").addEventListener("change", async function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        try {
+            const res = await fetch(`${API_BASE}/avatar`, {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: formData
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert("頭像更新成功！");
+                document.getElementById("avatar").src = data.avatarUrl;
+            } else {
+                alert(data.message || "頭像更新失敗");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("伺服器錯誤，請稍後再試");
+        }
+    });
+  </script>
   </body>
   <!-- [Body] end -->
 </html>

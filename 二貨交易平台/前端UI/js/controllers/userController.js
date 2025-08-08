@@ -68,12 +68,6 @@ exports.updateProfile = async (req, res) => {
         return res.status(404).json({ message: '找不到使用者' });
       }
 
-      // 🔐 檢查 oldPassword
-      const valid = await bcrypt.compare(oldPassword || '', users[0].password);
-      if (!valid) {
-        return res.status(400).json({ message: '舊密碼錯誤，無法修改信箱' });
-      }
-
       // ✅ 密碼正確才會進行信箱變更流程
       const verifyToken = crypto.randomBytes(32).toString('hex');
 
@@ -160,12 +154,14 @@ exports.changePassword = async (req, res) => {
 // 📌 上傳大頭貼
 exports.updateAvatar = async (req, res) => {
   const userId = req.user.id;
-
+  const multer = require('multer');
+  const upload = multer({ dest: 'uploads/avatars/' });
+  router.patch('/avatar', authMiddleware, upload.single('avatar'), userController.updateAvatar);
   if (!req.file) {
     return res.status(400).json({ message: '請提供圖片檔案' });
   }
 
-  const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+  const avatarUrl = `${process.env.BASE_URL}/uploads/avatars/${req.file.filename}`;
 
   try {
     await db.query('UPDATE users SET avatar_url = ? WHERE id = ?', [avatarUrl, userId]);
