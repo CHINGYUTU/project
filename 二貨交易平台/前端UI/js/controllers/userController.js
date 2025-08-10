@@ -106,10 +106,10 @@ exports.verifyPassword = async (req, res) => {
 
     const valid = await bcrypt.compare(oldPassword, users[0].password);
     if (!valid) {
-      return res.status(400).json({ message: '舊密碼錯誤' });
+      return res.status(400).json({ success: false, message: '舊密碼錯誤' });
     }
 
-    res.json({ message: '舊密碼驗證成功' });
+    res.json({ success: true, message: '舊密碼驗證成功' });
   } catch (err) {
     console.error('❌ 驗證密碼錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤' });
@@ -138,13 +138,13 @@ exports.changePassword = async (req, res) => {
 
     const isSame = await bcrypt.compare(newPassword, users[0].password);
     if (isSame) {
-      return res.status(400).json({ message: '新密碼不得與舊密碼相同' });
+      return res.status(400).json({ success: false, message: '新密碼不得與舊密碼相同' });
     }
 
     const hashed = await bcrypt.hash(newPassword, 10);
     await db.query('UPDATE users SET password = ? WHERE id = ?', [hashed, userId]);
 
-    res.json({ message: '密碼修改成功' });
+    res.json({ success: true, message: '密碼修改成功' });
   } catch (err) {
     console.error('❌ 密碼修改錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤' });
@@ -152,11 +152,10 @@ exports.changePassword = async (req, res) => {
 };
 
 // 📌 上傳大頭貼
+// userController.js
 exports.updateAvatar = async (req, res) => {
   const userId = req.user.id;
-  const multer = require('multer');
-  const upload = multer({ dest: 'uploads/avatars/' });
-  router.patch('/avatar', authMiddleware, upload.single('avatar'), userController.updateAvatar);
+
   if (!req.file) {
     return res.status(400).json({ message: '請提供圖片檔案' });
   }
@@ -165,9 +164,10 @@ exports.updateAvatar = async (req, res) => {
 
   try {
     await db.query('UPDATE users SET avatar_url = ? WHERE id = ?', [avatarUrl, userId]);
-    res.json({ message: '大頭貼更新成功', avatar_url: avatarUrl });
+    res.json({ success: true, message: '大頭貼更新成功', avatarUrl });
   } catch (err) {
     console.error('❌ 上傳大頭貼錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
+
