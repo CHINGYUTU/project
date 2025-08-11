@@ -91,24 +91,32 @@ exports.updateProfile = async (req, res) => {
 
 // 📌 驗證舊密碼
 exports.verifyPassword = async (req, res) => {
+  console.log('🔐 verifyPassword 請求進入');
   const userId = req.user.id;
   const { oldPassword } = req.body;
+  console.log('收到的 oldPassword:', oldPassword);
 
   if (!oldPassword) {
+    console.log('❌ 缺少舊密碼');
     return res.status(400).json({ message: '請提供舊密碼' });
   }
 
   try {
+    console.log('查詢使用者密碼...');
     const [users] = await db.query('SELECT password FROM users WHERE id = ?', [userId]);
     if (users.length === 0) {
+      console.log('❌ 找不到使用者');
       return res.status(404).json({ message: '找不到使用者' });
     }
 
+    console.log('開始比對密碼...');
     const valid = await bcrypt.compare(oldPassword, users[0].password);
     if (!valid) {
+      console.log('❌ 密碼比對失敗');
       return res.status(400).json({ success: false, message: '舊密碼錯誤' });
     }
 
+    console.log('✅ 密碼驗證成功');
     res.json({ success: true, message: '舊密碼驗證成功' });
   } catch (err) {
     console.error('❌ 驗證密碼錯誤:', err);
@@ -152,7 +160,6 @@ exports.changePassword = async (req, res) => {
 };
 
 // 📌 上傳大頭貼
-// userController.js
 exports.updateAvatar = async (req, res) => {
   const userId = req.user.id;
 
