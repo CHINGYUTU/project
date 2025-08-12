@@ -34,7 +34,7 @@ app.use('/api/order', orderRoutes); // 訂單
 app.use('/api/cart', cartRoutes); // 購物車
 app.use('/api/favorite', favoriteRoutes); // 收藏
 app.use('/api/category', categoryRoutes);//分類
-app.use('/uploads', express.static('uploads'));//靜態圖片存取
+app.use('/avatars', express.static(path.join(__dirname, 'uploads', 'avatars')));//靜態圖片存取
 app.use('/api/user', userRoutes); // 使用者個人功能（大頭貼、密碼修改等）
 app.use('/api/view-history', viewHistoryRoutes);//瀏覽紀錄
 app.use('/logout', logoutRoute);//登出

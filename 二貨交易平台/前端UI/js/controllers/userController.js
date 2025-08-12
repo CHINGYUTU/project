@@ -164,17 +164,26 @@ exports.updateAvatar = async (req, res) => {
   const userId = req.user.id;
 
   if (!req.file) {
-    return res.status(400).json({ message: '請提供圖片檔案' });
+    return res.status(400).json({ success: false, message: '請提供圖片檔案' });
   }
 
-  const avatarUrl = `${process.env.BASE_URL}/uploads/avatars/${req.file.filename}`;
+  // ✅ 保持相对路径
+  const avatarPath = `/avatars/${req.file.filename}`;
 
   try {
-    await db.query('UPDATE users SET avatar_url = ? WHERE id = ?', [avatarUrl, userId]);
-    res.json({ success: true, message: '大頭貼更新成功', avatarUrl });
+    // 打印调试信息（确认文件实际保存位置）
+    console.log('📌 文件已保存到:', req.file.path);
+    console.log('🌐 可访问URL:', `http://${req.get('host')}${avatarPath}`);
+
+    await db.query('UPDATE users SET avatar_url = ? WHERE id = ?', [avatarPath, userId]);
+    
+    res.json({ 
+      success: true, 
+      message: '大頭貼更新成功',
+      avatarUrl: avatarPath
+    });
   } catch (err) {
-    console.error('❌ 上傳大頭貼錯誤:', err);
-    res.status(500).json({ message: '伺服器錯誤', error: err.message });
+    console.error('❌ 上傳錯誤:', err.stack); // 打印完整错误栈
+    res.status(500).json({ success: false, message: '伺服器錯誤' });
   }
 };
-

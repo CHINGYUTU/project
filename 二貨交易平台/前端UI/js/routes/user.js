@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/avatars/' });
 const verifyToken = require('../middleware/verifyToken');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
