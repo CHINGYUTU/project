@@ -19,7 +19,7 @@
     <meta name="author" content="CodedThemes" />
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
+    <link href="../assets/images/logo.png" rel="icon" type="image/x-icon"><!-- [Font] Family -->
 
      <!-- [Font] Family -->
      <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -35,6 +35,49 @@
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <style>
+	   .password-checklist li {
+	       font-size: 15px;
+	       margin-bottom: 4px;
+	   }
+	   .progress {
+	       height: 8px;
+	       margin-top: 8px;
+	       background-color: #e0e0e0;
+	       border-radius: 10px;
+	       overflow: hidden;
+	   }
+	   .progress-bar {
+	       transition: width 0.5s ease, background-color 0.4s ease;
+	       border-radius: 10px;
+	   }
+	   #strengthText {
+	       transition: color 0.4s ease;
+	   }
+		/* 確保圖片容器保持正方形 */
+		.avatar-container {
+            width: 50px;
+            height: 50px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0; /* 灰色邊框 */
+            flex-shrink: 0; /* 防止壓縮 */
+        }
+		/* 預覽大頭貼 */
+		.avatar-preview-image {
+			max-width: 100px;
+			max-height: 100px;
+			border: 1px dashed #ccc;
+			margin-top: 5px;
+		}
+		/* 圖片樣式 */
+		 #avatar-display {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+	</style>
 
   </head>
   <!-- [Head] end -->
@@ -48,104 +91,65 @@
   </div>
 </div>
 <!-- [ Pre-loader ] End -->
- <!-- [ Sidebar Menu ] start -->
 <nav class="pc-sidebar">
-  <div class="navbar-wrapper">
-    <div class="m-header flex items-center py-4 px-6 h-header-height">
-      <a href="../../index.html" class="b-brand flex items-center gap-3">
-        <!-- ========   Change your logo from here   ============ -->
-        <img id="logo" src="../assets/images/logo.png" alt="Logo" class="logo" width="50">
-        <p class="text-xl sm:text-3xl font-semibold text-slate-900 dark:text-white">二貨</p>
-      </a>
-    </div>
-    <div class="m-header flex items-center py-4 px-6 h-header-height">
-        <!-- ========   換上頭像   ============ -->
-        <img src="../assets/images/3.png" height="50" width="50">
-        <img src="" style="position: absolute;" height="50" width="50">
-        <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
-      </a>
-    </div>
-    <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
-      <ul class="pc-navbar">
-        <li class="pc-item pc-caption">
-          <label>個人檔案</label>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="../elements/edit.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="edit"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">修改資料</span>
-          </a>
-        </li>
-        <li class="pc-item">
-        <li class="pc-item pc-caption">
-          <label>賣家商場</label>
-          <i data-feather="feather"></i>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="../elements/seller/shop.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="shopping-cart"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">進入商場</span>
-          </a>
-        </li>
-        <li class="pc-item pc-caption">
-          <label>買家專區</label>
-          <i data-feather="monitor"></i>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="../elements/collect.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="eye"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">檢視收藏</span>
-          </a>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="../elements/order.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="package"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">檢視訂單</span>
-          </a>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="../elements/trade.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="briefcase"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">交易紀錄</span>
-          </a>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="../elements/browse.html" class="pc-link"">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="grid"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">瀏覽紀錄</span>
-          </a>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="../elements/point.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="feather"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">環保點數</span>
-          </a>
-        </li>
-        <li class="pc-item pc-caption">
-          <label>其他</label>
-          <i data-feather="sidebar"></i>
-        </li>
-        <li class="pc-item">
-          <a href="../../index.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon">
-              <i data-feather="home"></i>
-            </span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">回首頁</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a href="../../index.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon">
-              <i data-feather="log-out"></i>
-            </span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">登出</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-<!-- [ Sidebar Menu ] end -->
+		<div class="navbar-wrapper">
+			<div class="m-header flex items-center py-4 px-6 h-header-height">
+				<a class="b-brand flex items-center gap-3" href="../../index.html"><!-- ========   Change your logo from here   ============ -->
+				 <img alt="Logo" class="logo" id="logo" src="../assets/images/logo.png" width="50">
+				<p class="text-xl sm:text-3xl font-semibold text-slate-900 dark:text-white">二貨</p></a>
+			</div>
+
+			<!-- 頭像顯示區域 -->
+      <div class="m-header flex items-center py-4 px-6 h-header-height">
+          <!-- 頭像容器 - 添加加載狀態處理 -->
+          <div class="avatar-container relative w-12 h-12 rounded-full overflow-hidden">
+              <img id="avatar-display" 
+                  src="../assets/images/3.png"
+                  class="w-full h-full object-cover"
+                  onerror="this.src='../assets/images/3.png'">
+              <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
+          </div>
+          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
+      </div>
+
+			<div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
+				<ul class="pc-navbar">
+					<li class="pc-item pc-caption"><label>個人檔案</label></li>
+					<li class="pc-item pc-hasmenu">
+						<a class="pc-link" href="../elements/edit.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="edit"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">修改資料</span></a>
+					</li>
+					<li class="pc-item"></li>
+					<li class="pc-item pc-caption"><label>賣家商場</label> <i data-feather="feather"></i></li>
+					<li class="pc-item pc-hasmenu">
+						<a class="pc-link" href="../elements/seller/shop.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="shopping-cart"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">進入商場</span></a>
+					</li>
+					<li class="pc-item pc-caption"><label>買家專區</label> <i data-feather="monitor"></i></li>
+					<li class="pc-item pc-hasmenu">
+						<a class="pc-link" href="../elements/collect.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="eye"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">檢視收藏</span></a>
+					</li>
+					<li class="pc-item pc-hasmenu">
+						<a class="pc-link" href="../elements/order.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="package"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">檢視訂單</span></a>
+					</li>
+					<li class="pc-item pc-hasmenu">
+						<a class="pc-link" href="../elements/trade.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="briefcase"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">交易紀錄</span></a>
+					</li>
+					<li class="pc-item pc-hasmenu">
+						<a class="pc-link" href="../elements/browse.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="grid"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">瀏覽紀錄</span></a>
+					</li>
+					<li class="pc-item pc-hasmenu">
+						<a class="pc-link" href="../elements/point.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="feather"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">環保點數</span></a>
+					</li>
+					<li class="pc-item pc-caption"><label>其他</label> <i data-feather="sidebar"></i></li>
+					<li class="pc-item">
+						<a class="pc-link" href="../../index.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="home"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">回首頁</span></a>
+					</li>
+					<li class="pc-item">
+						<a class="pc-link" href="../../index.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="log-out"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">登出</span></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav><!-- [ Sidebar Menu ] end -->
  <!-- [ Header Topbar ] start -->
 <header class="pc-header">
   <div class="header-wrapper flex max-sm:px-[15px] px-[25px] grow"><!-- [Mobile Media Block] start -->
@@ -330,6 +334,44 @@
     <script src="../assets/js/script.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    // ======================= 頭像獲取與顯示 =======================
+    document.addEventListener("DOMContentLoaded", async function() {
+        const avatarElement = document.getElementById("avatar-display");
+        const defaultAvatar = "../assets/images/3.png"; // 預設頭像路徑
+        
+        try {
+            // 1. 先檢查本地緩存
+            const cachedAvatar = localStorage.getItem("userAvatar");
+            if (cachedAvatar) {
+                avatarElement.src = cachedAvatar;
+                return; // 如果有緩存就直接使用
+            }
+            
+            // 2. 從API獲取頭像URL
+            const response = await fetch(`${API_BASE}/user/avatar`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.avatarUrl) {
+                    // 添加時間戳避免緩存問題
+                    const avatarUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
+                    avatarElement.src = avatarUrl;
+                    localStorage.setItem("userAvatar", avatarUrl); // 緩存到本地
+                }
+            } else {
+                throw new Error("獲取頭像失敗");
+            }
+        } catch (error) {
+            console.error("頭像加載錯誤:", error);
+            avatarElement.src = defaultAvatar; // 失敗時使用預設頭像
+        }
+    });
+    </script>
 
   <script>
     function showPurchasePopup(itemName, price, imagePath, place) {

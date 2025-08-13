@@ -35,6 +35,49 @@
     <link rel="stylesheet" href="../../assets/fonts/material.css" />
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="../../assets/css/style.css" id="main-style-link" />
+    <style>
+	   .password-checklist li {
+	       font-size: 15px;
+	       margin-bottom: 4px;
+	   }
+	   .progress {
+	       height: 8px;
+	       margin-top: 8px;
+	       background-color: #e0e0e0;
+	       border-radius: 10px;
+	       overflow: hidden;
+	   }
+	   .progress-bar {
+	       transition: width 0.5s ease, background-color 0.4s ease;
+	       border-radius: 10px;
+	   }
+	   #strengthText {
+	       transition: color 0.4s ease;
+	   }
+		/* 確保圖片容器保持正方形 */
+		.avatar-container {
+            width: 50px;
+            height: 50px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0; /* 灰色邊框 */
+            flex-shrink: 0; /* 防止壓縮 */
+        }
+		/* 預覽大頭貼 */
+		.avatar-preview-image {
+			max-width: 100px;
+			max-height: 100px;
+			border: 1px dashed #ccc;
+			margin-top: 5px;
+		}
+		/* 圖片樣式 */
+		 #avatar-display {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+	</style>
 
   </head>
   <!-- [Head] end -->
@@ -50,21 +93,25 @@
 <!-- [ Pre-loader ] End -->
  <!-- [ Sidebar Menu ] start -->
 <nav class="pc-sidebar">
-  <div class="navbar-wrapper">
-    <div class="m-header flex items-center py-4 px-6 h-header-height">
-      <a href="../../../index.html" class="b-brand flex items-center gap-3">
-        <!-- ========   Change your logo from here   ============ -->
-        <img src="../../assets/images/logo.png" height="50" width="50">
-        <p class="text-xl sm:text-3xl font-semibold text-slate-900 dark:text-white">二貨</p>
-      </a>
-    </div>
-    <div class="m-header flex items-center py-4 px-6 h-header-height">
-        <!-- ========   換上頭像   ============ -->
-        <img src="../../assets/images/3.png" height="50" width="50">
-        <img src="" style="position: absolute;" height="50" width="50">
-        <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
-      </a>
-    </div>
+		<div class="navbar-wrapper">
+			<div class="m-header flex items-center py-4 px-6 h-header-height">
+				<a class="b-brand flex items-center gap-3" href="../../../index.html"><!-- ========   Change your logo from here   ============ -->
+				 <img alt="Logo" class="logo" id="logo" src="../assets/images/logo.png" width="50">
+				<p class="text-xl sm:text-3xl font-semibold text-slate-900 dark:text-white">二貨</p></a>
+			</div>
+
+			<!-- 頭像顯示區域 -->
+      <div class="m-header flex items-center py-4 px-6 h-header-height">
+          <!-- 頭像容器 - 添加加載狀態處理 -->
+          <div class="avatar-container relative w-12 h-12 rounded-full overflow-hidden">
+              <img id="avatar-display" 
+                  src="../assets/images/3.png"
+                  class="w-full h-full object-cover"
+                  onerror="this.src='../assets/images/3.png'">
+              <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
+          </div>
+          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
+      </div>
     <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
       <ul class="pc-navbar">
         <li class="pc-item pc-caption">
@@ -186,7 +233,7 @@
             </div>
             <ul class="breadcrumb">
               <li class="breadcrumb-item"><a href="../../../index.html">回首頁</a></li>
-              <li class="breadcrumb-item"><a href="../../dashboard/profile.html">個人檔案</a></li>
+              <li class="breadcrumb-item"><a href="../../elements/profile.html">個人檔案</a></li>
               <li class="breadcrumb-item"><a href="../../elements/seller/shop.html">賣家專區</a></li>
               <li class="breadcrumb-item">取消交易訂單</li>
             </ul>
@@ -317,6 +364,44 @@
     <script src="../../assets/js/script.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    // ======================= 頭像獲取與顯示 =======================
+    document.addEventListener("DOMContentLoaded", async function() {
+        const avatarElement = document.getElementById("avatar-display");
+        const defaultAvatar = "../assets/images/3.png"; // 預設頭像路徑
+        
+        try {
+            // 1. 先檢查本地緩存
+            const cachedAvatar = localStorage.getItem("userAvatar");
+            if (cachedAvatar) {
+                avatarElement.src = cachedAvatar;
+                return; // 如果有緩存就直接使用
+            }
+            
+            // 2. 從API獲取頭像URL
+            const response = await fetch(`${API_BASE}/user/avatar`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.avatarUrl) {
+                    // 添加時間戳避免緩存問題
+                    const avatarUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
+                    avatarElement.src = avatarUrl;
+                    localStorage.setItem("userAvatar", avatarUrl); // 緩存到本地
+                }
+            } else {
+                throw new Error("獲取頭像失敗");
+            }
+        } catch (error) {
+            console.error("頭像加載錯誤:", error);
+            avatarElement.src = defaultAvatar; // 失敗時使用預設頭像
+        }
+    });
+    </script>
 
   <script>
     function showPurchasePopup(itemName, price, imagePath, place) {
