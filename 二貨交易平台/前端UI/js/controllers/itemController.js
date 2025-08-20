@@ -1,10 +1,10 @@
 const db = require('../db');
 
-// 📌 上架商品
+// 📌 上架商品（初始狀態：pending，待管理員審核）
 exports.addItem = async (req, res) => {
-  const { name, description, price, category_id, location} = req.body;
+  const { name, description, price, category_id, location } = req.body;
   const userId = req.user.id;
-  const image_url = req.file ? `/uploads/${req.file.filename}` : null; // 統一使用根目錄路徑
+  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
 
   if (req.user.role === 'admin') {
     return res.status(403).json({ message: '管理員無法上架商品' });
@@ -13,52 +13,48 @@ exports.addItem = async (req, res) => {
   try {
     await db.query(
       `INSERT INTO items (name, description, price, category_id, user_id, image_url, location, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?,  'available', NOW())`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`,  // ⚠️ 改成 pending
       [name, description, price, category_id, userId, image_url, location]
     );
-    res.json({ message: '商品上架成功' });
+    res.json({ message: '商品上架成功，待管理員審核' });
   } catch (err) {
     console.error('❌ 商品上架錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
 
-// 📌 編輯商品（僅限賣家本人）
+// 📌 編輯商品（僅限賣家本人，若重新上傳則重新進入 pending 狀態）
 exports.updateItem = async (req, res) => {
-
   const itemId = req.params.id;
   const userId = req.user.id;
   const { name, description, price, category_id, location } = req.body;
-  const existingImage = rows[0].image_url;
-  const image_url = req.file ? `/uploads/${req.file.filename}` : existingImage;
 
   try {
-    // 取得原本商品資料
     const [rows] = await db.query('SELECT * FROM items WHERE id = ?', [itemId]);
     if (rows.length === 0) {
       return res.status(404).json({ message: '找不到該商品' });
     }
 
     const item = rows[0];
-
-    // 檢查是否為賣家本人
     if (item.user_id !== userId) {
       return res.status(403).json({ message: '只能由上架的賣家本人修改' });
     }
 
-    // 更新資料
+    const existingImage = item.image_url;
+    const image_url = req.file ? `/uploads/${req.file.filename}` : existingImage;
+
     const updatedFields = {
       name: name || item.name,
       description: description || item.description,
       price: price || item.price,
       category_id: category_id || item.category_id,
       location: location || item.location,
-      image_url: image_url || item.image_url
+      image_url: image_url || item.image_url,
     };
 
     await db.query(
       `UPDATE items
-       SET name = ?, description = ?, price = ?, category_id = ?, location = ?, image_url = ?
+       SET name = ?, description = ?, price = ?, category_id = ?, location = ?, image_url = ?, status = 'pending'
        WHERE id = ?`,
       [
         updatedFields.name,
@@ -67,17 +63,16 @@ exports.updateItem = async (req, res) => {
         updatedFields.category_id,
         updatedFields.location,
         updatedFields.image_url,
-        itemId
+        itemId,
       ]
     );
 
-    res.json({ message: '商品已成功更新' });
+    res.json({ message: '商品已更新，待管理員重新審核' });
   } catch (err) {
     console.error('❌ 編輯商品錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤' });
   }
 };
-
 
 // 📌 查詢所有上架中商品（開放給所有使用者）
 exports.getAvailableItems = async (req, res) => {
@@ -96,7 +91,7 @@ exports.getAvailableItems = async (req, res) => {
   }
 };
 
-// 📌 賣家查看自己上架的商品
+// 📌 賣家查看自己上架的商品（可看到 pending 與 available）
 exports.getMyItems = async (req, res) => {
   const userId = req.user.id;
 
@@ -112,8 +107,8 @@ exports.getMyItems = async (req, res) => {
         location, status
       FROM items
       WHERE user_id = ?
-    `, [userId]
-    );
+    `, [userId]);
+
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {
     console.error('❌ 查詢個人商品錯誤:', err);
@@ -121,7 +116,7 @@ exports.getMyItems = async (req, res) => {
   }
 };
 
-// 📌 管理員審查所有商品
+// 📌 管理員審查所有商品（包含 pending, available, sold）
 exports.getAllItems = async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({ message: '只有管理員可以查看所有商品' });
@@ -137,6 +132,39 @@ exports.getAllItems = async (req, res) => {
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {
     console.error('❌ 查詢所有商品錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+};
+
+// 📌 管理員審核商品（通過/拒絕）
+exports.reviewItem = async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: '只有管理員可以審核商品' });
+  }
+
+  const itemId = req.params.id;
+  const { action } = req.body; // "approve" 或 "reject"
+
+  try {
+    const [rows] = await db.query('SELECT * FROM items WHERE id = ?', [itemId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: '找不到該商品' });
+    }
+
+    let newStatus;
+    if (action === 'approve') {
+      newStatus = 'available';
+    } else if (action === 'reject') {
+      newStatus = 'rejected';
+    } else {
+      return res.status(400).json({ message: '無效的審核動作' });
+    }
+
+    await db.query(`UPDATE items SET status = ? WHERE id = ?`, [newStatus, itemId]);
+
+    res.json({ message: `商品已${action === 'approve' ? '審核通過' : '拒絕上架'}` });
+  } catch (err) {
+    console.error('❌ 商品審核錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤' });
   }
 };
@@ -166,7 +194,7 @@ exports.deleteItem = async (req, res) => {
   }
 };
 
-// 📌 根據分類與關鍵字查詢商品
+// 📌 根據分類與關鍵字查詢商品（僅 available）
 exports.searchItems = async (req, res) => {
   const { category, keyword } = req.query;
 
@@ -189,12 +217,12 @@ exports.searchItems = async (req, res) => {
     }
 
     query += ` ORDER BY i.created_at DESC`;
-    //查無商品
+
     const [rows] = await db.query(query, params);
-      if (rows.length === 0) {
-      return res.status(404).json({ message: '查無此商品'});
+    if (rows.length === 0) {
+      return res.status(404).json({ message: '查無此商品' });
     }
-    //查詢成功
+
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {
     console.error('❌ 查詢商品錯誤:', err);
