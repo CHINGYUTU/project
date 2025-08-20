@@ -114,14 +114,14 @@ CREATE TABLE `items` (
   `user_id` int NOT NULL,
   `image_url` text COLLATE utf8mb4_unicode_ci,
   `location` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '面交地點',
-  `status` enum('available','sold','reserved') COLLATE utf8mb4_unicode_ci DEFAULT 'available',
+  `status` enum('pending','available','sold','reserved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `fk_seller_idx` (`user_id`),
   KEY `fk_category` (`category_id`),
   CONSTRAINT `fk_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
   CONSTRAINT `fk_item_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -130,7 +130,7 @@ CREATE TABLE `items` (
 
 LOCK TABLES `items` WRITE;
 /*!40000 ALTER TABLE `items` DISABLE KEYS */;
-INSERT INTO `items` VALUES (1,'iphone15 pro 128G','狀況良好，電池健康度90%',20000.00,1,1,'/uploads/1752073278782-975207628.webp','圖書館前','sold','2025-07-09 14:46:54'),(2,'新多益閱讀測驗','有書寫痕跡',350.00,3,1,NULL,'圖書館前','available','2025-07-18 12:55:27');
+INSERT INTO `items` VALUES (3,'小電吹風','使用一年',300.00,1,1,NULL,'廁所','available','2025-08-15 14:10:31');
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,7 +196,6 @@ CREATE TABLE `order_items` (
 
 LOCK TABLES `order_items` WRITE;
 /*!40000 ALTER TABLE `order_items` DISABLE KEYS */;
-INSERT INTO `order_items` VALUES (1,1,1,'iphone15 pro 128G','圖書館前',20000.00);
 /*!40000 ALTER TABLE `order_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -228,7 +227,6 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (1,1,1,'completed','2025-07-10 17:34:15',20000.00);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -298,7 +296,6 @@ CREATE TABLE `reviews` (
 
 LOCK TABLES `reviews` WRITE;
 /*!40000 ALTER TABLE `reviews` DISABLE KEYS */;
-INSERT INTO `reviews` VALUES (1,1,1,1,4,'還不錯','[\"/uploads/reviews/1753206245214-384369778.png\"]','2025-07-22 17:28:53','2025-07-22 17:44:05','謝謝支持!','2025-07-22 17:45:34',0);
 /*!40000 ALTER TABLE `reviews` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -360,7 +357,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'kai','11236015@ntub.edu.tw','$2b$10$CIUI9j6zOfBq3INfFBIxre23MTK6YDS0r6m08bNNi5YwlLu9/CkPG','user',0,'2025-07-07 14:18:10',1,NULL,NULL,NULL,'/uploads/avatars/1752006032995-930973652.webp',NULL);
+INSERT INTO `users` VALUES (1,'chi','11236015@ntub.edu.tw','$2b$10$Tlb4oUUk/fKkP6x9whtEMu.3m/cDB2CymqRSeFF5FXuB8BziHjEXC','user',0,'2025-08-08 15:21:33',1,NULL,NULL,NULL,'/avatars/1755018035651-508880746.png',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -390,7 +387,6 @@ CREATE TABLE `view_history` (
 
 LOCK TABLES `view_history` WRITE;
 /*!40000 ALTER TABLE `view_history` DISABLE KEYS */;
-INSERT INTO `view_history` VALUES (5,1,1,'2025-07-18 19:02:19'),(6,1,2,'2025-07-18 19:29:17');
 /*!40000 ALTER TABLE `view_history` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -403,4 +399,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-23  2:34:27
+-- Dump completed on 2025-08-20 22:10:00
