@@ -1,28 +1,27 @@
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
   <!-- [Head] start -->
-
   <head>
-    <title>個人檔案</title>
+    <title>個人檔案 - 檢視收藏</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
       name="description"
-      content="Datta Able is trending dashboard template made using Bootstrap 5 design framework. Datta Able is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies."
+      content="二貨 - 校園二手交易平台"
     />
     <meta
       name="keywords"
-      content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard"
+      content="二手交易, 校園, 環保, 買賣"
     />
-    <meta name="author" content="CodedThemes" />
+    <meta name="author" content="二貨團隊" />
 
     <!-- [Favicon] icon -->
-    <link href="../assets/images/logo.png" rel="icon" type="image/x-icon"><!-- [Font] Family -->
+    <link href="../assets/images/logo.png" rel="icon" type="image/x-icon">
 
-     <!-- [Font] Family -->
-     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <!-- [Font] Family -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <!-- [phosphor Icons] https://phosphoricons.com/ -->
     <link rel="stylesheet" href="../assets/fonts/phosphor/duotone/style.css" />
     <!-- [Tabler Icons] https://tablericons.com -->
@@ -33,65 +32,161 @@
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <!-- [Material Icons] https://fonts.google.com/icons -->
     <link rel="stylesheet" href="../assets/fonts/material.css" />
+    <!-- [Bootstrap Icons] -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
     <style>
-	   .password-checklist li {
-	       font-size: 15px;
-	       margin-bottom: 4px;
-	   }
-	   .progress {
-	       height: 8px;
-	       margin-top: 8px;
-	       background-color: #e0e0e0;
-	       border-radius: 10px;
-	       overflow: hidden;
-	   }
-	   .progress-bar {
-	       transition: width 0.5s ease, background-color 0.4s ease;
-	       border-radius: 10px;
-	   }
-	   #strengthText {
-	       transition: color 0.4s ease;
-	   }
-		/* 確保圖片容器保持正方形 */
-		.avatar-container {
-            width: 50px;
-            height: 50px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0; /* 灰色邊框 */
-            flex-shrink: 0; /* 防止壓縮 */
-        }
-		/* 預覽大頭貼 */
-		.avatar-preview-image {
-			max-width: 100px;
-			max-height: 100px;
-			border: 1px dashed #ccc;
-			margin-top: 5px;
-		}
-		/* 圖片樣式 */
-		 #avatar-display {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-	</style>
-
+      /* 確保圖片容器保持正方形 */
+		  .avatar-container {
+          width: 50px;
+          height: 50px;
+          overflow: hidden;
+          border: 1px solid #e2e8f0; /* 灰色邊框 */
+          flex-shrink: 0; /* 防止壓縮 */
+      }
+		  /* 預覽大頭貼 */
+      .avatar-preview-image {
+          max-width: 100px;
+          max-height: 100px;
+          border: 1px dashed #ccc;
+          margin-top: 5px;
+      }
+		  /* 圖片樣式 */
+      #avatar-display {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+      }
+      /* 收藏按鈕樣式 */
+      .favorite-btn {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          background: rgba(255, 255, 255, 0.9);
+          border: none;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 10;
+          transition: all 0.3s ease;
+      }
+      .favorite-btn:hover {
+          background: rgba(255, 255, 255, 1);
+          transform: scale(1.1);
+      }
+      .favorite-btn i {
+          font-size: 18px;
+          color: #ccc; /* 預設灰色空心 */
+      }
+      .favorite-btn.favorited i {
+          color: #dc3545; /* 收藏後紅色實心 */
+      }
+      
+      /* 商品卡片樣式優化 */
+      .product-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: 100%;
+      }
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+      .product-image {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+      }
+      .product-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .product-description {
+        color: #6c757d;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+      .product-price {
+        font-weight: bold;
+        color: #dc3545;
+        font-size: 1.2rem;
+      }
+      .product-location {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+      }
+      .product-category {
+        font-size: 0.8rem;
+        background-color: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+      }
+      
+      /* 加載動畫 */
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #6474E1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* 空狀態樣式 */
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+      }
+      .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #dee2e6;
+      }
+    </style>
   </head>
   <!-- [Head] end -->
+  
   <!-- [Body] Start -->
-
-<body>
-	<!-- [ Pre-loader ] start -->
-	<div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
-		<div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
-			<div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
-		</div>
-	</div><!-- [ Pre-loader ] End -->
-	<nav class="pc-sidebar">
-		<div class="navbar-wrapper">
+  <body>
+    <!-- [ Pre-loader ] start -->
+    <div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
+      <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
+        <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
+      </div>
+    </div>
+    <!-- [ Pre-loader ] End -->
+    
+    <!-- 側邊欄導航 -->
+    <nav class="pc-sidebar">
+      <div class="navbar-wrapper">
 			<div class="m-header flex items-center py-4 px-6 h-header-height">
 				<a class="b-brand flex items-center gap-3" href="../../index.html"><!-- ========   Change your logo from here   ============ -->
 				 <img alt="Logo" class="logo" id="logo" src="../assets/images/logo.png" width="50">
@@ -148,56 +243,54 @@
 				</ul>
 			</div>
 		</div>
-	</nav><!-- [ Sidebar Menu ] end -->
-<!-- [ Sidebar Menu ] end -->
- <!-- [ Header Topbar ] start -->
-<header class="pc-header">
-  <div class="header-wrapper flex max-sm:px-[15px] px-[25px] grow"><!-- [Mobile Media Block] start -->
-<div class="me-auto pc-mob-drp">
-  <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
-    <!-- ======= Menu collapse Icon ===== -->
-    <li class="pc-h-item pc-sidebar-collapse max-lg:hidden lg:inline-flex">
-      <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="sidebar-hide">
-        <i data-feather="menu"></i>
-      </a>
-    </li>
-    <li class="pc-h-item pc-sidebar-popup lg:hidden">
-      <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="mobile-collapse">
-        <i data-feather="menu"></i>
-      </a>
-    </li>
-  </ul>
-</div>
-<!-- [Mobile Media Block end] -->
-<div class="ms-auto">
-  <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
-    <li class="dropdown pc-h-item">
-      <a class="pc-head-link dropdown-toggle me-0" data-pc-toggle="dropdown" href="#" role="button"
-        aria-haspopup="false" aria-expanded="false">
-        <i data-feather="sun"></i>
-      </a>
-      <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
-        <a href="#!" class="dropdown-item" onclick="layout_change('dark')">
-          <i data-feather="moon"></i>
-          <span>深色</span>
-        </a>
-        <a href="#!" class="dropdown-item" onclick="layout_change('light')">
-          <i data-feather="sun"></i>
-          <span>明亮</span>
-        </a>
+    </nav>
+    
+    <!-- 頂部導航欄 -->
+    <header class="pc-header">
+      <div class="header-wrapper flex max-sm:px-[15px] px-[25px] grow"><!-- [Mobile Media Block] start -->
+        <div class="me-auto pc-mob-drp">
+          <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
+            <!-- ======= Menu collapse Icon ===== -->
+            <li class="pc-h-item pc-sidebar-collapse max-lg:hidden lg:inline-flex">
+              <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="sidebar-hide">
+                <i data-feather="menu"></i>
+              </a>
+            </li>
+            <li class="pc-h-item pc-sidebar-popup lg:hidden">
+              <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="mobile-collapse">
+                <i data-feather="menu"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- [Mobile Media Block end] -->
+        <div class="ms-auto">
+          <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
+            <li class="dropdown pc-h-item">
+              <a class="pc-head-link dropdown-toggle me-0" data-pc-toggle="dropdown" href="#" role="button"
+                aria-haspopup="false" aria-expanded="false">
+                <i data-feather="sun"></i>
+              </a>
+              <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
+                <a href="#!" class="dropdown-item" onclick="layout_change('dark')">
+                  <i data-feather="moon"></i>
+                  <span>深色</span>
+                </a>
+                <a href="#!" class="dropdown-item" onclick="layout_change('light')">
+                  <i data-feather="sun"></i>
+                  <span>明亮</span>
+                </a>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-    </li>
-  </ul>
-</div></div>
-</header>
-<!-- [ Header ] end -->
-
-
+    </header>
 
     <!-- [ Main Content ] start -->
     <div class="pc-container">
       <div class="pc-content">
-        <!-- [ breadcrumb ] start -->
+        <!-- 麵包屑導航 -->
         <div class="page-header">
           <div class="page-block">
             <div class="page-header-title">
@@ -212,83 +305,35 @@
         </div>
         <!-- [ breadcrumb ] end -->
 
-        
         <div>
           <h3>檢視收藏</h3>
+          <p class="text-muted">您收藏的商品將會顯示在這裡</p>
         </div>
-        <!-- [ Main Content ] start -->
-        <div class="grid grid-cols-12 gap-x-6">
-          <div class="col-span-12 xl:col-span-4 md:col-span-6">
-            <div class="card">
-              <img src="../assets/images/3.png" style="display: block; margin: 0 auto; padding-top: 20px;" height="250px" width="250px">
-              <div class="card-header !pb-0 !border-b-0">
-                <h4>商品名稱</h4>
-                <p>商品標題</p>
-                <p>交易地點</p>
-              </div>
-              <div class="card-body">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    $ 249
-                  </h3>
-                  <button onclick="showPurchasePopup('商品名稱', 249, '../assets/images/3.png', '台北市 中正區')"
-                          style="float: left; font-size: 18pt; color: white; border-radius: 12px; height: 30pt; width: 50pt; background-color: rgba(100, 100, 225, 100);">
-                    購買
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-12 xl:col-span-4 md:col-span-6">
-            <div class="card">
-              <img src="../assets/images/3.png" style="display: block; margin: 0 auto; padding-top: 20px;" height="250px" width="250px">
-              <div class="card-header !pb-0 !border-b-0">
-                <h4>商品名稱</h4>
-                <p>商品標題</p>
-                <p>交易地點</p>
-              </div>
-              <div class="card-body">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    $ 1500
-                  </h3>
-                  <button onclick="showPurchasePopup('商品名稱', 249, '../assets/images/3.png', '台北市 中正區')"
-                          style="float: left; font-size: 18pt; color: white; border-radius: 12px; height: 30pt; width: 50pt; background-color: rgba(100, 100, 225, 100);">
-                    購買
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-12 xl:col-span-4 md:col-span-6">
-            <div class="card">
-              <img src="../assets/images/3.png" style="display: block; margin: 0 auto; padding-top: 20px;" height="250px" width="250px">
-              <div class="card-header !pb-0 !border-b-0">
-                <h4>商品名稱</h4>
-                <p>商品標題</p>
-                <p>交易地點</p>
-              </div>
-              <div class="card-body">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    $ 57
-                  </h3>
-                  <button onclick="showPurchasePopup('商品名稱', 249, '../assets/images/3.png', '台北市 中正區')"
-                          style="float: left; font-size: 18pt; color: white; border-radius: 12px; height: 30pt; width: 50pt; background-color: rgba(100, 100, 225, 100);">
-                    購買
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+        
+        <!-- 商品加載狀態 -->
+        <div class="loading-spinner" id="loadingSpinner">
+          <div class="spinner"></div>
         </div>
-        <!-- [ Main Content ] end -->
+        
+        <!-- 空狀態 -->
+        <div class="empty-state d-none" id="emptyState">
+          <i class="bi bi-heart"></i>
+          <h4>尚未收藏任何商品</h4>
+          <p>開始瀏覽商品並將喜歡的加入收藏吧！</p>
+          <a href="../../index.html" class="btn btn-primary mt-3">去逛逛</a>
+        </div>
+        
+        <!-- 商品列表 -->
+        <div class="grid grid-cols-12 gap-6 mt-4" id="favoritesContainer">
+          <!-- 商品卡片將在這裡動態生成 -->
+        </div>
       </div>
     </div>
     <!-- [ Main Content ] end -->
+    
     <footer class="pc-footer">
     </footer>
- 
+
     <!-- Required Js -->
     <script src="../assets/js/plugins/simplebar.min.js"></script>
     <script src="../assets/js/plugins/popper.min.js"></script>
@@ -297,130 +342,316 @@
     <script src="../assets/js/component.js"></script>
     <script src="../assets/js/theme.js"></script>
     <script src="../assets/js/script.js"></script>
-
-    <div class="floting-button fixed bottom-[50px] right-[30px] z-[1030]">
-    </div>
-
-    
-    <script>
-      layout_change('false');
-    </script>
-     
-    
-    <script>
-      layout_theme_sidebar_change('dark');
-    </script>
-    
-     
-    <script>
-      change_box_container('false');
-    </script>
-     
-    <script>
-      layout_caption_change('true');
-    </script>
-     
-    <script>
-      layout_rtl_change('false');
-    </script>
-     
-    <script>
-      preset_change('preset-1');
-    </script>
-     
-    <script>
-      main_layout_change('vertical');
-    </script>
-    <script src="../assets/js/script.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-    // ======================= 頭像獲取與顯示 =======================
-    document.addEventListener("DOMContentLoaded", async function() {
-        const avatarElement = document.getElementById("avatar-display");
-        const defaultAvatar = "../assets/images/3.png"; // 預設頭像路徑
+      // API基礎URL
+      const API_BASE = 'http://localhost:3000';
+      
+      // 分類名稱映射
+      const CATEGORY_MAPPING = {
+        1: '電子產品',
+        2: '生活用品',
+        3: '書籍',
+        4: '運動用品',
+        5: '服飾',
+        6: '周邊'
+      };
+      
+      // 全局變量
+      let favoriteItems = [];
+      
+      // 頁面載入時執行
+      document.addEventListener('DOMContentLoaded', function() {
+        loadFavoriteItems();
         
-        try {
-            // 1. 先檢查本地緩存
-            const cachedAvatar = localStorage.getItem("userAvatar");
-            if (cachedAvatar) {
-                avatarElement.src = cachedAvatar;
-                return; // 如果有緩存就直接使用
-            }
-            
-            // 2. 從API獲取頭像URL
-            const response = await fetch(`${API_BASE}/user/avatar`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem("token")}`
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.avatarUrl) {
-                    // 添加時間戳避免緩存問題
-                    const avatarUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
-                    avatarElement.src = avatarUrl;
-                    localStorage.setItem("userAvatar", avatarUrl); // 緩存到本地
-                }
-            } else {
-                throw new Error("獲取頭像失敗");
-            }
-        } catch (error) {
-            console.error("頭像加載錯誤:", error);
-            avatarElement.src = defaultAvatar; // 失敗時使用預設頭像
-        }
-    });
-    </script>
-
-  <script>
-    function showPurchasePopup(itemName, price, imagePath, place) {
-      Swal.fire({
-        title: `確認購買「${itemName}」？`,
-        html: `
-          <p>價格：$${price}</p>
-          <p>交易地點：${place}</p>
-        `,
-        imageUrl: imagePath,
-        imageWidth: 200,
-        imageHeight: 200,
-        showCancelButton: true,
-        confirmButtonText: '確認購買',
-        cancelButtonText: '取消',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: '✅ 已加入購物車！',
-            text: `${itemName} 已成功加入購物車。`,
-            icon: 'success',
-            confirmButtonText: '知道了',
-            confirmButtonColor: '#6474E1'
-          });
+        // 初始化Feather圖標
+        if (typeof feather !== 'undefined') {
+          feather.replace();
         }
       });
-    }
-  </script>
-  
-  <script>
-    const logo = document.getElementById("logo");
-    function updateLogo() {
-      const isDark = document.documentElement.getAttribute("data-pc-theme") === "dark";
-      logo.src = isDark ? "../assets/images/logo-w.png" : "../assets/images/logo.png";
-    }
+      
+      // 顯示加載狀態
+      function showLoading(show) {
+        const spinner = document.getElementById('loadingSpinner');
+        const container = document.getElementById('favoritesContainer');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (show) {
+          spinner.classList.remove('d-none');
+          container.classList.add('d-none');
+          emptyState.classList.add('d-none'); // 確保加載時隱藏空狀態
+        } else {
+          spinner.classList.add('d-none');
+        }
+      }
+      
+      // 顯示空狀態
+      function showEmptyState() {
+        const container = document.getElementById('favoritesContainer');
+        const emptyState = document.getElementById('emptyState');
+        
+        container.classList.add('d-none');
+        emptyState.classList.remove('d-none'); // 顯示空狀態
+      }
+      
+      // 顯示商品列表
+      function showItems() {
+        const container = document.getElementById('favoritesContainer');
+        const emptyState = document.getElementById('emptyState');
+        
+        container.classList.remove('d-none');
+        emptyState.classList.add('d-none'); // 隱藏空狀態
+      }
+      
+      // 從API獲取收藏商品
+      async function loadFavoriteItems() {
+        try {
+          showLoading(true);
+          
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('請先登入');
+          }
+          
+          const response = await fetch(`${API_BASE}/api/favorite/list`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('無法獲取收藏列表');
+          }
+          
+          const result = await response.json();
+          
+          if (result.data && result.data.length > 0) {
+            favoriteItems = result.data;
+            renderFavoriteItems();
+            showItems(); // 显示商品列表，隐藏空状态
+          } else {
+            showEmptyState(); // 显示空状态，隐藏商品列表
+          }
+          
+          showLoading(false);
+        } catch (error) {
+          console.error('獲取收藏商品失敗:', error);
+          showLoading(false);
+          Swal.fire('錯誤', '無法載入收藏商品，請稍後再試', 'error');
+        }
+      }
+      
+      // 渲染收藏商品
+      function renderFavoriteItems() {
+        const container = document.getElementById('favoritesContainer');
+        container.innerHTML = '';
+        
+        favoriteItems.forEach(item => {
+          const col = document.createElement('div');
+          col.className = 'col-span-12 md:col-span-6 lg:col-span-4';
+          
+          // 處理圖片URL
+          let imageUrl = '../assets/images/3.png'; // 預設圖片
+          if (item.image_url) {
+            if (item.image_url.startsWith('http')) {
+              imageUrl = item.image_url;
+            } else if (item.image_url.startsWith('/')) {
+              imageUrl = `${API_BASE}${item.image_url}`;
+            } else {
+              imageUrl = `${API_BASE}/${item.image_url}`;
+            }
+          }
+          
+          col.innerHTML = `
+            <div class="card product-card">
+              <div class="relative">
+                <!-- 收藏按鈕 -->
+                <button class="favorite-btn favorited" onclick="toggleFavorite(${item.id}, this)">
+                  <i class="bi bi-heart-fill"></i>
+                </button>
+                
+                <!-- 商品圖片 -->
+                <img src="${imageUrl}" alt="${item.name}" class="product-image" 
+                     onerror="this.src='../assets/images/3.png'">
+              </div>
+              
+              <div class="card-body">
+                <!-- 商品分類 -->
+                <span class="product-category">${CATEGORY_MAPPING[item.category_id] || '未分類'}</span>
+                
+                <!-- 商品名稱 -->
+                <h5 class="product-title">${item.name}</h5>
+                
+                <!-- 商品描述 -->
+                ${item.description ? `<p class="product-description">${item.description}</p>` : ''}
+                
+                <!-- 交易地點 -->
+                <p class="product-location">
+                  <i class="bi bi-geo-alt"></i> ${item.location || '未指定地點'}
+                </p>
+                
+                <div class="flex items-center justify-between mt-3">
+                  <!-- 商品價格 -->
+                  <span class="product-price">$${item.price}</span>
+                  
+                  <!-- 購買按鈕 -->
+                  <button class="btn btn-primary" 
+                          onclick="showPurchasePopup(${item.id}, '${escapeHtml(item.name)}', ${item.price}, '${escapeHtml(imageUrl)}', '${escapeHtml(item.location)}')">
+                    <i class="bi bi-cart-plus me-1"></i> 購買
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          container.appendChild(col);
+        });
+      }
+      
+      // 切換收藏狀態
+      async function toggleFavorite(itemId, button) {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            Swal.fire('請先登入', '需要登入才能管理收藏', 'warning');
+            return;
+          }
+          
+          // 這裡假設取消收藏的API端點
+          const response = await fetch(`${API_BASE}/api/favorite/remove/${itemId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            // 從本地列表中移除
+            favoriteItems = favoriteItems.filter(item => item.id !== itemId);
+            
+            // 更新UI
+            if (favoriteItems.length === 0) {
+              showEmptyState(); // 如果沒有收藏商品，顯示空狀態
+            } else {
+              renderFavoriteItems();
+              showItems(); // 如果有收藏商品，顯示商品列表
+            }
+            
+            Swal.fire('成功', '已從收藏中移除', 'success');
+          } else {
+            throw new Error('取消收藏失敗');
+          }
+        } catch (error) {
+          console.error('取消收藏失敗:', error);
+          Swal.fire('錯誤', '取消收藏失敗，請稍後再試', 'error');
+        }
+      }
 
-    // 初始設定一次
-    updateLogo();
-
-    // 監聽深色模式切換
-    const darkModeObserver = new MutationObserver(updateLogo);
-    darkModeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-pc-theme"]
-    });
-  </script>
+      // ======================= 頭像獲取與顯示 =======================
+      document.addEventListener("DOMContentLoaded", async function() {
+          const avatarElement = document.getElementById("avatar-display");
+          const defaultAvatar = "../assets/images/3.png"; // 預設頭像路徑
+          
+          try {
+              // 1. 先檢查本地緩存
+              const cachedAvatar = localStorage.getItem("userAvatar");
+              if (cachedAvatar) {
+                  avatarElement.src = cachedAvatar;
+                  return; // 如果有緩存就直接使用
+              }
+              
+              // 2. 從API獲取頭像URL
+              const response = await fetch(`${API_BASE}/user/avatar`, {
+                  headers: {
+                      'Authorization': `Bearer ${localStorage.getItem("token")}`
+                  }
+              });
+              
+              if (response.ok) {
+                  const data = await response.json();
+                  if (data.avatarUrl) {
+                      // 添加時間戳避免緩存問題
+                      const avatarUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
+                      avatarElement.src = avatarUrl;
+                      localStorage.setItem("userAvatar", avatarUrl); // 緩存到本地
+                  }
+              } else {
+                  throw new Error("獲取頭像失敗");
+              }
+          } catch (error) {
+              console.error("頭像加載錯誤:", error);
+              avatarElement.src = defaultAvatar; // 失敗時使用預設頭像
+          }
+      });
+      
+      // 顯示購買確認彈窗
+      function showPurchasePopup(itemId, itemName, price, imageUrl, location) {
+        Swal.fire({
+          title: `確認購買「${itemName}」？`,
+          html: `
+            <div class="text-start">
+              <p><strong>價格：</strong>$${price}</p>
+              <p><strong>交易地點：</strong>${location}</p>
+              <img src="${imageUrl}" alt="${itemName}" 
+                   style="max-width: 100%; border-radius: 8px; margin-top: 10px;"
+                   onerror="this.src='../assets/images/3.png'">
+            </div>
+          `,
+          showCancelButton: true,
+          confirmButtonText: '確認購買',
+          cancelButtonText: '取消',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          showLoaderOnConfirm: true,
+          preConfirm: async () => {
+            try {
+              // 這裡替換為實際的購買API調用
+              const token = localStorage.getItem('token');
+              const response = await fetch(`${API_BASE}/api/purchase`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ item_id: itemId })
+              });
+              
+              if (!response.ok) {
+                throw new Error(response.statusText);
+              }
+              
+              return await response.json();
+            } catch (error) {
+              Swal.showValidationMessage(`購買失敗: ${error.message}`);
+              return false;
+            }
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: '✅ 購買成功！',
+              text: `「${itemName}」已成功購買。`,
+              icon: 'success',
+              confirmButtonText: '知道了',
+              confirmButtonColor: '#6474E1'
+            });
+          }
+        });
+      }
+      
+      // HTML跳脫函數
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+    </script>
   </body>
   <!-- [Body] end -->
 </html>

@@ -95,15 +95,26 @@
     #strengthText {
         transition: color 0.4s ease;
     }
-    /* 圖片預覽樣式 */
-    #imagePreview {
-      max-width: 300px;
-      max-height: 300px;
+    /* 商品圖片預覽樣式 */
+    #product-preview-container {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    #product-image-preview {
+      max-width: 200px;
+      max-height: 200px;
       object-fit: contain;
       border: 1px solid #e2e8f0;
       border-radius: 0.5rem;
-      margin-top: 1rem;
-      display: none; /* 初始隱藏 */
+      padding: 5px;
+      background-color: #f8fafc;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* 上傳按鈕樣式 */
+    #uploadProductBtn {
+      transition: all 0.3s ease;
     }
     </style>
 
@@ -262,14 +273,13 @@
           </div>
           <div class="card-body">
             <form id="itemForm" method="post" enctype="multipart/form-data">
-              <!-- 商品照片上傳 -->
+              <!-- 商品照片上傳區塊 -->
               <div class="mb-4">
                 <label class="form-label">上傳商品照片</label>
-                <input type="file" id="imageUpload" name="image" class="form-control" accept="image/*">
-                <!-- 添加預覽容器 -->
-                <div class="mt-3">
-                  <img id="imagePreview" src="" alt="商品預覽" class="max-w-[300px] max-h-[300px] hidden border rounded">
+                <div id="product-preview-container" style="display: none;">
+                  <img id="product-image-preview" alt="商品預覽">
                 </div>
+                <input type="file" id="productImageInput" class="form-control" accept="image/*">
               </div>
               <!-- 商品名稱 -->
               <div class="mb-4">
@@ -280,7 +290,7 @@
               <!-- 商品標題 -->
               <div class="mb-4">
                 <label class="form-label">商品描述</label>
-                <input type="text" name="title" class="form-control" placeholder="請輸入商品描述(選填)">
+                <input type="text" name="description" class="form-control" placeholder="請輸入商品描述(選填)">
               </div>
               <!-- 價格 -->
               <div class="mb-4">
@@ -378,120 +388,182 @@
     <script src="../../../vendor/countdowntime/countdowntime.js"></script>
     <script src="../../js/main.js"></script>
     <script>
-    // ======================= 頭像獲取與顯示 =======================
-    document.addEventListener("DOMContentLoaded", async function() {
-        const avatarElement = document.getElementById("avatar-display");
-        const defaultAvatar = "../assets/images/3.png"; // 預設頭像路徑
-        
-        try {
-            // 1. 先檢查本地緩存
-            const cachedAvatar = localStorage.getItem("userAvatar");
-            if (cachedAvatar) {
-                avatarElement.src = cachedAvatar;
-                return; // 如果有緩存就直接使用
-            }
-            
-            // 2. 從API獲取頭像URL
-            const response = await fetch(`${API_BASE}/user/avatar`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem("token")}`
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.avatarUrl) {
-                    // 添加時間戳避免緩存問題
-                    const avatarUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
-                    avatarElement.src = avatarUrl;
-                    localStorage.setItem("userAvatar", avatarUrl); // 緩存到本地
-                }
-            } else {
-                throw new Error("獲取頭像失敗");
-            }
-        } catch (error) {
-            console.error("頭像加載錯誤:", error);
-            avatarElement.src = defaultAvatar; // 失敗時使用預設頭像
-        }
-    });
-    </script>
-
-    <script>
-    document.getElementById('itemForm').addEventListener('submit', async function (e) {
-    e.preventDefault(); // 阻止預設送出
-
-    // 提交前先隱藏預覽圖
-    const preview = document.getElementById('imagePreview');
-    preview.style.display = 'none';
-    
-    const form = e.target;
-    const formData = new FormData(form);
-
-    try {
-      const response = await fetch('http://localhost:3000/api/item/add', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        body: formData
+      // ======================= 頭像獲取與顯示 =======================
+      document.addEventListener("DOMContentLoaded", async function() {
+          // 配置常數
+          const API_BASE = 'http://localhost:3000/api'; // 統一基礎路徑
+          const avatarElement = document.getElementById("avatar-display");
+          const defaultAvatar = "../assets/images/3.png"; // 預設頭像路徑
+          
+          try {
+              // 1. 先檢查本地緩存
+              const cachedAvatar = localStorage.getItem("userAvatar");
+              if (cachedAvatar) {
+                  avatarElement.src = cachedAvatar;
+                  return; // 如果有緩存就直接使用
+              }
+              
+              // 2. 從API獲取頭像URL
+              const response = await fetch(`${API_BASE}/user/avatar`, {
+                  headers: {
+                      'Authorization': `Bearer ${localStorage.getItem("token")}`
+                  }
+              });
+              
+              if (response.ok) {
+                  const data = await response.json();
+                  if (data.avatarUrl) {
+                      // 添加時間戳避免緩存問題
+                      const avatarUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
+                      avatarElement.src = avatarUrl;
+                      localStorage.setItem("userAvatar", avatarUrl); // 緩存到本地
+                  }
+              } else {
+                  throw new Error("獲取頭像失敗");
+              }
+          } catch (error) {
+              console.error("頭像加載錯誤:", error);
+              avatarElement.src = defaultAvatar; // 失敗時使用預設頭像
+          }
       });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert('✅ 商品上架成功！');
-        form.reset();
-        // 確保預覽圖保持隱藏狀態
-        preview.src = '';
-      } else {
-        alert('❌ 上架失敗：' + (result.message || '未知錯誤'));
-        // 如果失敗，可以選擇重新顯示預覽圖
-        if (formData.get('image')) {
-          preview.style.display = 'block';
-        }
-      }
-
-    } catch (error) {
-      console.error('發生錯誤:', error);
-      alert('❗ 發生錯誤，請稍後再試。');
-      // 錯誤時也重新顯示預覽圖
-      if (formData.get('image')) {
-        preview.style.display = 'block';
-      }
-    }
-  });
-    //===========圖片預覽==============
-    document.getElementById('imageUpload').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      const preview = document.getElementById('imagePreview');
       
-      if (file) {
-        // 檢查是否為圖片
-        if (!file.type.match('image.*')) {
-          alert('請選擇圖片文件');
-          e.target.value = ''; // 清空選擇
-          preview.style.display = 'none';
-          return;
-        }
+      // ======================= 整合商品上傳模組 =======================
+      document.addEventListener("DOMContentLoaded", function() {
+        // 配置常數
+        const API_BASE = 'http://localhost:3000/api'; // 修正API基礎路徑
+        const MAX_IMAGE_SIZE_MB = 5;
         
-        // 創建文件閱讀器
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-        }
-        
-        reader.readAsDataURL(file);
-      } else {
-        preview.style.display = 'none';
-      }
-    });
+        // DOM 元素
+        const elements = {
+          form: document.getElementById("itemForm"),
+          imageInput: document.getElementById("productImageInput"),
+          preview: document.getElementById("product-image-preview"),
+          previewContainer: document.getElementById("product-preview-container"),
+          submitBtn: document.querySelector("#itemForm button[type='submit']")
+        };
 
-    // 表單提交處理（保持您原有的代碼不變）
-    document.getElementById('itemForm').addEventListener('submit', async function (e) {
-      // 您原有的提交代碼...
-    });
+        // 狀態管理
+        let state = {
+          selectedFile: null,
+          isSubmitting: false
+        };
+
+        // 初始化
+        function init() {
+          if (!elements.form || !elements.imageInput) {
+            console.error("無法找到必要的表單元素");
+            return;
+          }
+          setupEventListeners();
+        }
+
+        // 事件監聽
+        function setupEventListeners() {
+          elements.imageInput.addEventListener("change", handleFileSelect);
+          elements.form.addEventListener("submit", handleFormSubmit);
+        }
+
+        // 檔案選擇處理
+        function handleFileSelect(e) {
+          const file = e.target.files[0];
+          if (file && validateImageFile(file)) {
+            state.selectedFile = file;
+            previewImage(file);
+            elements.previewContainer.style.display = "block";
+          } else {
+            resetImage();
+          }
+        }
+
+        // 圖片驗證
+        function validateImageFile(file) {
+          const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+          
+          if (!allowedTypes.includes(file.type)) {
+            alert(`只允許上傳 ${allowedTypes.join(', ')} 格式的圖片`);
+            return false;
+          }
+
+          if (file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024) {
+            alert(`圖片大小超過 ${MAX_IMAGE_SIZE_MB}MB 限制`);
+            return false;
+          }
+
+          return true;
+        }
+
+        // 圖片預覽
+        function previewImage(file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            elements.preview.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // 表單提交處理
+        async function handleFormSubmit(e) {
+          e.preventDefault();
+          
+          // 檢查是否已選擇圖片
+          if (!state.selectedFile) {
+            alert("請選擇商品圖片");
+            return;
+          }
+
+          try {
+            setSubmitState(true);
+            
+            const formData = new FormData(elements.form);
+            formData.append("image", state.selectedFile);
+
+            const response = await fetch(`${API_BASE}/item/add`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              },
+              body: formData
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.message || "提交失敗");
+
+            alert("商品上架成功！");
+            resetForm();
+
+          } catch (error) {
+            alert(`提交失敗: ${error.message}`);
+            console.error("提交錯誤:", error);
+          } finally {
+            setSubmitState(false);
+          }
+        }
+
+        // 輔助函數
+        function resetForm() {
+          elements.form.reset();
+          resetImage();
+        }
+
+        function resetImage() {
+          elements.preview.src = "";
+          elements.previewContainer.style.display = "none";
+          elements.imageInput.value = "";
+          state.selectedFile = null;
+        }
+
+        function setSubmitState(isSubmitting) {
+          state.isSubmitting = isSubmitting;
+          if (elements.submitBtn) {
+            elements.submitBtn.disabled = isSubmitting;
+            elements.submitBtn.textContent = isSubmitting ? "上傳中..." : "送出";
+          }
+        }
+
+        // 初始化
+        init();
+      });
     </script>
   </body>
   <!-- [Body] end -->

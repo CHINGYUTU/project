@@ -16,7 +16,7 @@ router.patch('/:id', verifyToken, uploadItemImage.single('image'), itemControlle
 router.delete('/:id', verifyToken, itemController.deleteItem);
 
 // 📌 查詢個人上架商品（限一般使用者）
-router.get('/my-items', verifyToken, itemController.getMyItems);
+router.get('/item', verifyToken, itemController.getMyItems);
 
 // 📌 查詢所有商品（僅限管理員）
 router.get('/all', verifyToken, itemController.getAllItems);

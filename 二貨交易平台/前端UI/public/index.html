@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -10,70 +10,168 @@
     <link rel="icon" type="image/x-icon" href="images/logo.png" />
     <!-- Font Awesome icons (free version)-->
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Google fonts-->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="css/styles.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/chat.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <style>
-            .product-container {
+    <style>
+        /* 保持原有的樣式不變 */
+        .product-container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             padding: 20px;
-            }
-            .product-card {
-            width: 220px;
+            justify-content: center;
+        }
+        .product-card {
+            width: 280px;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 2px 2px 8px #ccc;
-            text-align: center;
-            }
-            .product-card img {
-            width: 200px;
-            height: 200px;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            background: white;
+            position: relative;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .product-card img {
+            width: 100%;
+            height: 180px;
             object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .product-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #333;
+            height: 40px;
+            overflow: hidden;
+        }
+        .product-card .description {
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            height: 40px;
+            overflow: hidden;
+        }
+        .product-card .price {
+            font-weight: bold;
+            color: #d32f2f;
+            font-size: 1.1rem;
+        }
+        .product-card .seller {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .product-card .location {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .product-card .date {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .product-card .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            padding: 3px 8px;
             border-radius: 4px;
-            }
-            .product-card button {
+        }
+        .product-card .btn-buy {
+            width: 100%;
             margin-top: 10px;
-            padding: 8px 16px;
-            background-color: #3085d6;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            }
-            .product-card button:hover {
-            background-color: #2563eb;
-            }
+        }
         /* 可左右滑動分類按鈕列 */
         .category-scroll {
-        display: flex;
-        overflow-x: auto;
-        white-space: nowrap;
-        scroll-snap-type: x mandatory;
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            scroll-snap-type: x mandatory;
+            padding: 10px 0;
         }
-
         .category-scroll a {
-        flex-shrink: 0;
-        scroll-snap-align: start;
-        margin-right: 0.5rem;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            margin-right: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s;
         }
-
+        .category-scroll a:hover, .category-scroll a.active {
+            background: #3085d6;
+            color: white;
+        }
         /* 自訂 scrollbar 樣式 */
         .category-scroll::-webkit-scrollbar {
-        height: 6px;
+            height: 6px;
         }
-
         .category-scroll::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
         }
-        
+        .transparent-search {
+            background: rgba(255,255,255,0.8);
+            border-radius: 50px;
+            padding: 5px 15px;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        .loading-spinner i {
+            font-size: 2rem;
+            color: #3085d6;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* 收藏按鈕樣式 */
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        .favorite-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+        .favorite-btn i {
+            font-size: 18px;
+            color: #ccc; /* 預設灰色空心 */
+        }
+        .favorite-btn.favorited i {
+            color: #dc3545; /* 收藏後紅色實心 */
+        }
     </style>
 </head>
 <body id="page-top">
@@ -81,7 +179,7 @@
     <nav class="navbar navbar-expand-lg bg-mytheme text-uppercase fixed-top" id="mainNav">
         <div class="container">
             <a href="index.html" class="navbar-brand d-flex align-items-center">
-            <img src="images/logo.png" alt="Logo" style="height: 60px;">
+                <img src="images/logo.png" alt="Logo" style="height: 60px;">
             </a>
             <a class="navbar-brand" href="index.html">二貨</a>
             <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -122,50 +220,45 @@
 
                 <!-- 中：搜尋欄 -->
                 <div class="flex-grow-1 mx-3 transparent-search">
-                    <input type="text" class="form-control" placeholder="搜尋品牌、型號、關鍵字……">
+                    <input type="text" class="form-control border-0 bg-transparent" placeholder="搜尋品牌、型號、關鍵字……" id="searchInput">
                 </div>
-                <!-- 下方分類按鈕 -->
+                <!-- 下方分類按鈕 - 已按您的要求調整分類 -->
                 <div class="w-100 mt-2">
                     <div class="category-scroll">
-                        <a href="#all" class="btn btn-light">所有</a>
-                        <a href="#fashion" class="btn btn-light">你可能會喜歡</a>
-                        <a href="#book" class="btn btn-light">課本</a>
-                        <a href="#life" class="btn btn-light">生活用品</a>
-                        <a href="#clothing" class="btn btn-light">衣物</a>
-                        <a href="#food" class="btn btn-light">食品</a>
-                        <a href="#vintage" class="btn btn-light">動漫</a>
-                        <a href="#vintage" class="btn btn-light">音樂、電影及相機</a>
+                        <a href="#" class="active" data-category="all">所有商品</a>
+                        <a href="#" data-category="1">電子產品</a>
+                        <a href="#" data-category="2">生活用品</a>
+                        <a href="#" data-category="3">書籍</a>
+                        <a href="#" data-category="4">運動用品</a>
+                        <a href="#" data-category="5">服飾</a>
+                        <a href="#" data-category="6">周邊</a>
                     </div>
-                    &nbsp;
-                </div><br>
+                </div>
                 <!-- 篩選列 -->
-                <table >
-                    <div class="d-flex flex-wrap align-items-center mt-2 gap-3">
-                        <!-- 預算選單 -->
-                            <tr><td></td>
-                                <div class="form-group mb-0">
-                                    <td><label for="priceFilter" class="form-label mb-1" style="color:#000;">價格預算</label></td>
-                                    <td><label for="timeFilter" class="form-label mb-1" style="color:#000;">上架時間</label></td>
-                                    <tr><td style="color: #000;" valign="middle">篩選</td><td><select class="form-select form-select-sm" id="priceFilter">
-                                        <option value="">不限</option>
-                                        <option value="0-1000">0 - 1,000</option>
-                                        <option value="1000-5000">1,000 - 5,000</option>
-                                        <option value="5000-10000">5,000 - 10,000</option>
-                                        <option value="10000up">10,000 以上</option>
-                                    </select></td>
-                                </div>
-                        <td><!-- 上架時間 -->
-                        <div class="form-group mb-0">
-                            <select class="form-select form-select-sm" id="timeFilter">
-                                <option value="">不限</option>
-                                <option value="1">最近 1 天</option>
-                                <option value="7">最近 7 天</option>
-                                <option value="30">最近 30 天</option>
-                            </select>
-                        </div>
-                        </td></tr>
+                <div class="d-flex flex-wrap align-items-center mt-2 gap-3 w-100">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2" style="color: #000;">篩選</span>
+                        <select class="form-select form-select-sm" id="priceFilter" style="width: 150px;">
+                            <option value="">價格範圍</option>
+                            <option value="0-500">0 - 500元</option>
+                            <option value="500-1000">500 - 1,000元</option>
+                            <option value="1000-2000">1,000 - 2,000元</option>
+                            <option value="2000-5000">2,000 - 5,000元</option>
+                            <option value="5000-">5,000元以上</option>
+                        </select>
                     </div>
-                </table>
+                    <select class="form-select form-select-sm" id="timeFilter" style="width: 150px;">
+                        <option value="">上架時間</option>
+                        <option value="1">最近 1 天</option>
+                        <option value="7">最近 7 天</option>
+                        <option value="30">最近 30 天</option>
+                    </select>
+                    <select class="form-select form-select-sm" id="sortFilter" style="width: 150px;">
+                        <option value="newest">最新上架</option>
+                        <option value="price_asc">價格: 低到高</option>
+                        <option value="price_desc">價格: 高到低</option>
+                    </select>
+                </div>
             </div>
         </div>
     </header> 
@@ -173,34 +266,29 @@
     <section class="page-section portfolio" id="portfolio">
         <div class="container">
             <!-- Portfolio Section Heading-->
-            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">商品</h2>
+            <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">商品列表</h2>
             <!-- Icon Divider-->
             <div class="divider-custom">
                 <div class="divider-custom-line"></div>
                 <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
                 <div class="divider-custom-line"></div>
             </div>
-                <div class="row justify-content-center" id="product-list"></div>
-                  <div class="product-container" id="productContainer"></div>
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <i class="fas fa-spinner"></i>
+                <p>載入商品中...</p>
+            </div>
+            <!-- Product Container -->
+            <div class="product-container" id="productContainer"></div>
+            <!-- No Products Message -->
+            <div class="text-center py-5" id="noProducts" style="display: none;">
+                <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
+                <h4 class="text-muted">目前沒有符合條件的商品</h4>
+                <p class="text-muted">請嘗試調整篩選條件或稍後再試</p>
             </div>
         </div>
     </section>
-    <div id="chatToggleBtn" onclick="toggleChat()" style="display:none">💬</div>
 
-    <!-- 聊天視窗 -->
-    <div id="floatingChat" class="chat-window">
-    <div class="chat-header">
-        <span>聊天室</span>
-        <button onclick="toggleChat()">✖</button>
-    </div>
-    <div class="chat-body" id="chatBox">
-        <div class="text-muted text-center">聊天室尚無訊息</div>
-    </div>
-    <div class="chat-footer">
-        <input type="text" id="chatInput" placeholder="輸入訊息..." />
-        <button onclick="sendMessage()">送出</button>
-    </div>
-    </div>
     <!-- Footer-->
     <footer class="footer text-center">
         <div class="container">
@@ -216,8 +304,7 @@
                 </div>
                 <!-- Footer Social Icons-->
                 <div class="col-lg-4 mb-5 mb-lg-0">
-                    <h4 class="text-uppercase mb-4">聯絡我們
-                    </h4>
+                    <h4 class="text-uppercase mb-4">聯絡我們</h4>
                     <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-facebook-f"></i></a>
                     <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-twitter"></i></a>
                     <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-linkedin-in"></i></a>
@@ -230,217 +317,466 @@
     <div class="copyright py-4 text-center text-white">
         <div class="container"><small>Copyright &copy; Your Website 2023</small></div>
     </div>
-    <!-- Portfolio Modals-->
-    <!-- Portfolio Modal 1-->
-    <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" aria-labelledby="portfolioModal1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
-                <div class="modal-body text-center pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Log Cabin</h2>
-                                <!-- Icon Divider-->
-                                <div class="divider-custom">
-                                    <div class="divider-custom-line"></div>
-                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                    <div class="divider-custom-line"></div>
-                                </div>
-                                <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cabin.png" alt="..." />
-                                <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-                                <button class="btn btn-primary" data-bs-dismiss="modal">
-                                    <i class="fas fa-xmark fa-fw"></i>
-                                    Close Window
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Portfolio Modal 2-->
-    <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" aria-labelledby="portfolioModal2" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
-                <div class="modal-body text-center pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Tasty Cake</h2>
-                                <!-- Icon Divider-->
-                                <div class="divider-custom">
-                                    <div class="divider-custom-line"></div>
-                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                    <div class="divider-custom-line"></div>
-                                </div>
-                                <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/cake.png" alt="..." />
-                                <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-                                <button class="btn btn-primary" data-bs-dismiss="modal">
-                                    <i class="fas fa-xmark fa-fw"></i>
-                                    Close Window
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Portfolio Modal 3-->
-    <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" aria-labelledby="portfolioModal3" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
-                <div class="modal-body text-center pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Circus Tent</h2>
-                                <!-- Icon Divider-->
-                                <div class="divider-custom">
-                                    <div class="divider-custom-line"></div>
-                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                    <div class="divider-custom-line"></div>
-                                </div>
-                                <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/circus.png" alt="..." />
-                                <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-                                <button class="btn btn-primary" data-bs-dismiss="modal">
-                                    <i class="fas fa-xmark fa-fw"></i>
-                                    Close Window
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Portfolio Modal 4-->
-    <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" aria-labelledby="portfolioModal4" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
-                <div class="modal-body text-center pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Controller</h2>
-                                <!-- Icon Divider-->
-                                <div class="divider-custom">
-                                    <div class="divider-custom-line"></div>
-                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                    <div class="divider-custom-line"></div>
-                                </div>
-                                <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/game.png" alt="..." />
-                                <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-                                <button class="btn btn-primary" data-bs-dismiss="modal">
-                                    <i class="fas fa-xmark fa-fw"></i>
-                                    Close Window
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Portfolio Modal 5-->
-    <div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" aria-labelledby="portfolioModal5" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
-                <div class="modal-body text-center pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Locked Safe</h2>
-                                <!-- Icon Divider-->
-                                <div class="divider-custom">
-                                    <div class="divider-custom-line"></div>
-                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                    <div class="divider-custom-line"></div>
-                                </div>
-                                <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/safe.png" alt="..." />
-                                <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-                                <button class="btn btn-primary" data-bs-dismiss="modal">
-                                    <i class="fas fa-xmark fa-fw"></i>
-                                    Close Window
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Portfolio Modal 6-->
-    <div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" aria-labelledby="portfolioModal6" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header border-0"><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
-                <div class="modal-body text-center pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <!-- Portfolio Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Submarine</h2>
-                                <!-- Icon Divider-->
-                                <div class="divider-custom">
-                                    <div class="divider-custom-line"></div>
-                                    <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                                    <div class="divider-custom-line"></div>
-                                </div>
-                                <!-- Portfolio Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/portfolio/submarine.png" alt="..." />
-                                <!-- Portfolio Modal - Text-->
-                                <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
-                                <button class="btn btn-primary" data-bs-dismiss="modal">
-                                    <i class="fas fa-xmark fa-fw"></i>
-                                    Close Window
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Core theme JS-->
-    <script src="js/scripts.js"></script>
-    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-    <!-- * *                               SB Forms JS                               * *-->
-    <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
-    <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-        <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-        <script>
-            window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const menuRefresh = urlParams.get('menu');
-            if (menuRefresh === 'refresh') {
-                showMenu(); // 強制執行
+    <!-- JWT Decode -->
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script>
+        // 全域變數儲存商品資料
+        let allProducts = [];
+        let currentDisplayedProducts = [];
+        let userFavorites = new Set(); // 儲存使用者收藏的商品ID
+
+        // 分類名稱映射
+        const categoryNames = {
+            1: '電子產品',
+            2: '生活用品',
+            3: '書籍',
+            4: '運動用品',
+            5: '服飾',
+            6: '周邊'
+        };
+
+        // API基礎URL
+        const API_BASE = 'http://localhost:3000';
+
+        // 頁面載入時執行
+        window.addEventListener('DOMContentLoaded', () => {
+            showMenu();
+            fetchProducts();
+            setupEventListeners();
+        });
+
+        // ======================= 收藏功能相關API =======================
+
+        /**
+         * 獲取使用者收藏列表
+         */
+        async function fetchUserFavorites() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.log('使用者未登入，無法獲取收藏列表');
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE}/api/favorite/my-favorites`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    // 將收藏的商品ID存入Set中以便快速查找
+                    if (result.data && Array.isArray(result.data)) {
+                        userFavorites = new Set(result.data.map(fav => fav.item_id));
+                        console.log('使用者收藏列表:', userFavorites);
+                    }
+                } else {
+                    console.error('獲取收藏列表失敗:', response.status);
+                }
+            } catch (error) {
+                console.error('獲取收藏列表失敗:', error);
             }
+        }
+
+        /**
+         * 添加收藏
+         * @param {number} itemId - 商品ID
+         */
+        async function addToFavorites(itemId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    Swal.fire('請先登入', '需要登入才能收藏商品', 'warning');
+                    return false;
+                }
+                
+                const response = await fetch(`${API_BASE}/api/favorite/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ item_id: itemId })
+                });
+                
+                if (response.ok) {
+                    userFavorites.add(itemId); // 新增到本地收藏集合
+                    return true;
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || '收藏失敗');
+                }
+            } catch (error) {
+                console.error('新增收藏失敗:', error);
+                Swal.fire('錯誤', error.message, 'error');
+                return false;
+            }
+        }
+
+        /**
+         * 取消收藏
+         * @param {number} itemId - 商品ID
+         */
+        async function removeFromFavorites(itemId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return false;
+                
+                const response = await fetch(`${API_BASE}/api/favorite/remove/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    userFavorites.delete(itemId); // 從本地收藏集合移除
+                    return true;
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || '取消收藏失敗');
+                }
+            } catch (error) {
+                console.error('取消收藏失敗:', error);
+                Swal.fire('錯誤', error.message, 'error');
+                return false;
+            }
+        }
+
+        /**
+         * 切換收藏狀態
+         * @param {number} itemId - 商品ID
+         * @param {HTMLElement} button - 收藏按鈕元素
+         */
+        async function toggleFavorite(itemId, button) {
+            const isCurrentlyFavorited = userFavorites.has(itemId);
+            
+            let success = false;
+            if (isCurrentlyFavorited) {
+                success = await removeFromFavorites(itemId);
+            } else {
+                success = await addToFavorites(itemId);
+            }
+            
+            if (success) {
+                // 更新按鈕樣式
+                button.classList.toggle('favorited');
+                button.querySelector('i').className = isCurrentlyFavorited ? 
+                    'bi bi-heart' : 'bi bi-heart-fill';
+            }
+        }
+
+        // ======================= 商品功能相關 =======================
+
+        // 設定事件監聽器
+        function setupEventListeners() {
+            // 分類按鈕點擊事件
+            document.querySelectorAll('.category-scroll a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // 移除所有active類
+                    document.querySelectorAll('.category-scroll a').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    // 新增active類到當前點擊的按鈕
+                    this.classList.add('active');
+                    // 過濾商品
+                    filterProducts();
+                });
             });
-            function showMenu() {
+
+            // 價格篩選事件
+            document.getElementById('priceFilter').addEventListener('change', filterProducts);
+
+            // 時間篩選事件
+            document.getElementById('timeFilter').addEventListener('change', filterProducts);
+
+            // 排序篩選事件
+            document.getElementById('sortFilter').addEventListener('change', filterProducts);
+
+            // 搜尋輸入事件
+            document.getElementById('searchInput').addEventListener('input', debounce(filterProducts, 300));
+        }
+
+        // 防抖函數
+        function debounce(func, wait) {
+            let timeout;
+            return function() {
+                const context = this, args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    func.apply(context, args);
+                }, wait);
+            };
+        }
+
+        // 從API獲取商品資料
+        async function fetchProducts() {
+            try {
+                showLoading(true);
+                
+                // 先獲取使用者收藏列表
+                await fetchUserFavorites();
+                
+                const response = await fetch(`${API_BASE}/api/item/available`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP錯誤! 狀態碼: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('API 返回資料:', result);
+                
+                // 從 result.data 獲取商品陣列
+                if (!result.data || !Array.isArray(result.data)) {
+                    throw new Error('API 返回的資料格式不正確，缺少 data 陣列');
+                }
+                
+                allProducts = result.data;
+                currentDisplayedProducts = [...result.data];
+                renderProducts(result.data);
+                showLoading(false);
+            } catch (error) {
+                console.error('獲取商品失敗:', error);
+                showLoading(false);
+                document.getElementById('productContainer').innerHTML = `
+                    <div class="col-12 text-center my-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <p class="text-danger">無法載入商品，請稍後再試</p>
+                        <p class="text-muted small">${error.message}</p>
+                        <button class="btn btn-outline-primary" onclick="fetchProducts()">重新載入</button>
+                    </div>
+                `;
+            }
+        }
+
+        // 顯示/隱藏載入動畫
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        // 過濾商品函數
+        function filterProducts() {
+            let filtered = [...allProducts];
+            
+            // 獲取當前選中的分類
+            const activeCategory = document.querySelector('.category-scroll a.active')?.dataset.category;
+            
+            // 分類篩選 (根據 category_id)
+            if (activeCategory && activeCategory !== 'all') {
+                filtered = filtered.filter(item => item.category_id == activeCategory);
+            }
+            
+            // 價格篩選
+            const priceFilter = document.getElementById('priceFilter').value;
+            if (priceFilter) {
+                const [min, max] = priceFilter.split('-').map(part => part === '' ? null : Number(part));
+                if (min !== null && max !== null) {
+                    filtered = filtered.filter(item => {
+                        const price = parseFloat(item.price);
+                        return price >= min && price <= max;
+                    });
+                } else if (min !== null && max === null) {
+                    filtered = filtered.filter(item => parseFloat(item.price) >= min);
+                } else if (min === null && max !== null) {
+                    filtered = filtered.filter(item => parseFloat(item.price) <= max);
+                }
+            }
+            
+            // 時間篩選
+            const timeFilter = document.getElementById('timeFilter').value;
+            if (timeFilter) {
+                const days = parseInt(timeFilter);
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - days);
+                
+                filtered = filtered.filter(item => {
+                    const itemDate = new Date(item.created_at);
+                    return itemDate >= cutoffDate;
+                });
+            }
+            
+            // 搜尋篩選
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) || 
+                    (item.description && item.description.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            // 排序
+            const sortFilter = document.getElementById('sortFilter').value;
+            switch(sortFilter) {
+                case 'price_asc':
+                    filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+                    break;
+                case 'price_desc':
+                    filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+                    break;
+                case 'newest':
+                default:
+                    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    break;
+            }
+            
+            currentDisplayedProducts = filtered;
+            renderProducts(filtered);
+        }
+
+        // 渲染商品到頁面
+        function renderProducts(products) {
+            const container = document.getElementById('productContainer');
+            const noProductsMsg = document.getElementById('noProducts');
+            
+            container.innerHTML = '';
+            
+            if (!products || !Array.isArray(products) || products.length === 0) {
+                noProductsMsg.style.display = 'block';
+                return;
+            }
+            
+            noProductsMsg.style.display = 'none';
+            
+            // Base64 編碼的透明佔位圖
+            const defaultProductImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+            
+            products.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = 'product-card position-relative';
+                
+                // 格式化日期
+                const createdAt = new Date(item.created_at);
+                const formattedDate = `${createdAt.getFullYear()}/${(createdAt.getMonth()+1).toString().padStart(2, '0')}/${createdAt.getDate().toString().padStart(2, '0')}`;
+                
+                // 狀態標籤
+                let statusBadge = '';
+                if (item.status === 'available') {
+                    statusBadge = '<span class="status-badge bg-success">可購買</span>';
+                } else if (item.status === 'reserved') {
+                    statusBadge = '<span class="status-badge bg-warning text-dark">預訂中</span>';
+                } else {
+                    statusBadge = '<span class="status-badge bg-secondary">已售出</span>';
+                }
+                
+                // 處理圖片路徑
+                let imageUrl = defaultProductImage;
+                if (item.image_url) {
+                    if (item.image_url.startsWith('http')) {
+                        imageUrl = item.image_url;
+                    } else if (item.image_url.startsWith('/')) {
+                        imageUrl = `${API_BASE}${item.image_url}`;
+                    } else {
+                        imageUrl = `${API_BASE}/${item.image_url}`;
+                    }
+                }
+                
+                // 檢查是否已收藏
+                const isFavorited = userFavorites.has(item.id);
+                
+                card.innerHTML = `
+                    ${statusBadge}
+                    <!-- 收藏按鈕 -->
+                    <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" 
+                            onclick="toggleFavorite(${item.id}, this)">
+                        <i class="bi ${isFavorited ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                    </button>
+                    
+                    <img src="${imageUrl}" alt="${item.name}" 
+                        onerror="this.src='${defaultProductImage}'">
+                    <h3>${item.name}</h3>
+                    <p class="text-muted small">${categoryNames[item.category_id] || `分類${item.category_id}`}</p>
+                    <p class="description">${item.description || '暫無描述'}</p>
+                    <p class="price">$${item.price}</p>
+                    <p class="seller"><i class="bi bi-person"></i> 賣家ID: ${item.user_id}</p>
+                    <p class="location"><i class="bi bi-geo-alt"></i> ${item.location}</p>
+                    <p class="date"><i class="bi bi-clock"></i> ${formattedDate}</p>
+                    <button class="btn btn-primary btn-buy" 
+                            onclick="showPurchasePopup(${item.id}, '${escapeHtml(item.name)}', ${item.price}, 
+                            '${escapeHtml(imageUrl)}', '${escapeHtml(item.location)}', ${item.user_id})">
+                        <i class="bi bi-cart-plus"></i> 購買
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // HTML 跳脫函數
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // 顯示購買彈窗
+        function showPurchasePopup(itemId, itemName, price, imageUrl, location, sellerId) {
+            Swal.fire({
+                title: `確認購買「${itemName}」？`,
+                html: `
+                    <div class="text-start">
+                        <p><strong>價格：</strong>$${price}</p>
+                        <p><strong>賣家ID：</strong>${sellerId}</p>
+                        <p><strong>交易地點：</strong>${location}</p>
+                        <img src="${imageUrl}" alt="${itemName}" style="max-width: 100%; border-radius: 8px; margin-top: 10px;">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '✅ 確認購買',
+                cancelButtonText: '取消',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                showLoaderOnConfirm: true,
+                preConfirm: async () => {
+                    try {
+                        // 這裡替換為實際的購買API調用
+                        const response = await fetch('/api/purchase', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify({ itemId })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        
+                        return await response.json();
+                    } catch (error) {
+                        Swal.showValidationMessage(
+                            `購買失敗: ${error.message}`
+                        );
+                        return false;
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: '✅ 購買成功！',
+                        text: `「${itemName}」已成功購買。`,
+                        icon: 'success',
+                        confirmButtonText: '知道了',
+                        confirmButtonColor: '#6474E1'
+                    });
+                    // 刷新商品列表
+                    fetchProducts();
+                }
+            });
+        }
+
+        // 登入選單功能
+        function showMenu() {
             const menuList = document.getElementById('menuList');
             menuList.innerHTML = '';
 
@@ -448,172 +784,54 @@
             if (!token) {
                 // 未登入，顯示訪客選單
                 menuList.innerHTML = `
-                <li><a class="dropdown-item" href="/login.html">登入/註冊</a></li>
+                    <li><a class="dropdown-item" href="/login.html"><i class="fas fa-sign-in-alt me-2"></i>登入/註冊</a></li>
                 `;
             } else {
                 try {
-                const decoded = jwt_decode(token);
-                const role = decoded.role;
+                    const decoded = jwt_decode(token);
+                    const role = decoded.role;
 
-                if (role === 'user') {
-                // 一般用戶
-                menuList.innerHTML = `
-                    <li><a class="dropdown-item" href="dist/elements/profile.html">個人檔案</a></li>
-                    <li><a class="dropdown-item" href="dist/elements/point.html">點數兌換</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="logout()">登出</a></li>
-                `;
-                } else if (role === 'admin') {
-                // 管理員
-                menuList.innerHTML = `
-                    <li><a class="dropdown-item" href="/admin.html">管理員後台</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="logout()">登出</a></li>
-                `;
-                } else {
-                // 其他預設當訪客
-                menuList.innerHTML = `
-                    <li><a class="dropdown-item" href="../public/login.html">登入/註冊</a></li>
-                `;
-                }
+                    if (role === 'user') {
+                        // 一般使用者
+                        menuList.innerHTML = `
+                            <li><a class="dropdown-item" href="dist/elements/profile.html"><i class="fas fa-user me-2"></i>個人檔案</a></li>
+                            <li><a class="dropdown-item" href="dist/elements/point.html"><i class="fas fa-coins me-2"></i>點數兌換</a></li>
+                            <li><a class="dropdown-item" href="dist/elements/myitems.html"><i class="fas fa-box-open me-2"></i>我的商品</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>登出</a></li>
+                        `;
+                    } else if (role === 'admin') {
+                        // 管理員
+                        menuList.innerHTML = `
+                            <li><a class="dropdown-item" href="/admin.html"><i class="fas fa-cog me-2"></i>管理員後台</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>登出</a></li>
+                        `;
+                    } else {
+                        // 其他預設當訪客
+                        menuList.innerHTML = `
+                            <li><a class="dropdown-item" href="../public/login.html"><i class="fas fa-sign-in-alt me-2"></i>登入/註冊</a></li>
+                        `;
+                    }
                 } catch (e) {
-                console.error('JWT 解碼失敗:', e);
-                menuList.innerHTML = `
-                    <li><a class="dropdown-item" href="../public/login.html">登入/註冊</a></li>
-                `;
+                    console.error('JWT 解碼失敗:', e);
+                    menuList.innerHTML = `
+                        <li><a class="dropdown-item" href="../public/login.html"><i class="fas fa-sign-in-alt me-2"></i>登入/註冊</a></li>
+                    `;
                 }
             }
             menuList.classList.add('show');
-            }
+        }
 
-            // 登出功能
-            function logout() {
+        function hideMenu() {
+            document.getElementById('menuList').classList.remove('show');
+        }
+
+        // 登出功能
+        function logout() {
             localStorage.removeItem('token');
             window.location.href = '/index.html';
-            }
-
-            // 在頁面載入時顯示 menu
-            document.getElementById('menuWrapper').addEventListener('mouseenter', showMenu);
-            document.getElementById('menuWrapper').addEventListener('mouseleave', () => {
-            document.getElementById('menuList').classList.remove('show');
-            });
-        </script>
-        <script>
-            // 模擬的商品資料陣列（未來可改為資料庫回傳的 JSON）
-            const products = [
-            {
-                name: "筆電支架",
-                price: 350,
-                image: "",
-                place: "圖書館一樓交接"
-            },
-            {
-                name: "藍牙耳機",
-                price: 699,
-                image: "",
-                place: "校門口便利商店"
-            },
-            {
-                name: "二手教科書",
-                price: 150,
-                image: "",
-                place: "C棟大廳"
-            }
-            ];
-
-            // 動態渲染商品卡片
-            const container = document.getElementById('productContainer');
-            products.forEach((item) => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <img src="${item.image}" alt="${item.name}">
-                <h3>${item.name}</h3>
-                <p>價格：$${item.price}</p>
-                <p>地點：${item.place}</p>
-                <button onclick="showPurchasePopup('${item.name}', ${item.price}, '${item.image}', '${item.place}')">購買</button>
-            `;
-            container.appendChild(card);
-            });
-
-            // 彈窗邏輯整合
-            function showPurchasePopup(itemName, price, imagePath, place) {
-            Swal.fire({
-                title: `確認購買「${itemName}」？`,
-                html: `
-                <p>價格：<strong>$${price}</strong></p>
-                <p>交易地點：<strong>${place}</strong></p>
-                `,
-                imageUrl: imagePath,
-                imageWidth: 200,
-                imageHeight: 200,
-                showCancelButton: true,
-                confirmButtonText: '✅ 確認購買',
-                cancelButtonText: '取消',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                Swal.fire({
-                    title: '✅ 已加入購物車！',
-                    text: `「${itemName}」已成功加入購物車。`,
-                    icon: 'success',
-                    confirmButtonText: '知道了',
-                    confirmButtonColor: '#6474E1'
-                });
-
-                // 🔁 若未來接後端可在這裡送出資料
-                // fetch('/api/add-to-cart', {...})
-                }
-            });
-            }
-
-            function sendFloatingMessage() {
-                const chatContent = document.getElementById('chatContent');
-                const msg = input.value.trim();
-                if (msg !== "") {
-                    const messageBubble = document.createElement('div');
-                    messageBubble.style.textAlign = 'right';
-                    messageBubble.innerHTML = `<span style="background:#3085d6; color:white; padding:6px 10px; border-radius:12px; margin:4px; display:inline-block;">${msg}</span>`;
-                    chatContent.appendChild(messageBubble);
-                    input.value = '';
-                    chatContent.scrollTop = chatContent.scrollHeight;
-                }
-            }
-            // 頁面載入時檢查 role
-            window.addEventListener('DOMContentLoaded', function () {
-                const params = new URLSearchParams(window.location.search);
-                const role = params.get('role');
-                const chatToggleBtn = document.getElementById('chatToggleBtn');
-                const floatingChat = document.getElementById('floatingChat');
-
-                if (role === '2' || role === '3') {
-                chatToggleBtn.style.display = 'flex';
-                } else {
-                chatToggleBtn.style.display = 'none';
-                floatingChat.style.display = 'none';
-                }
-            });
-
-            // 開關聊天室視窗
-            function toggleChat() {
-                const chat = document.getElementById("floatingChat");
-                chat.classList.toggle("active");
-            }
-
-            // 傳送訊息
-            function sendMessage() {
-                const input = document.getElementById("chatInput");
-                const chatBox = document.getElementById("chatBox");
-                const msg = input.value.trim();
-
-                if (msg !== "") {
-                const newMsg = document.createElement("div");
-                newMsg.className = "chat-message user";
-                newMsg.innerHTML = `<div class="bubble">${msg}</div>`;
-                chatBox.appendChild(newMsg);
-                input.value = "";
-                chatBox.scrollTop = chatBox.scrollHeight;
-                }
-            }
-            </script>
-    </body>
+        }
+    </script>
+</body>
 </html>

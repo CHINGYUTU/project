@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path'); // 
+
 dotenv.config(); // 載入 .env 檔案中的環境變數
 
 // 載入自訂模組
@@ -22,7 +23,6 @@ const app = express();
 
 // 使用中介層
 
-
 app.use(cors()); // 解決 CORS 問題
 app.use(express.json()); // 解析 JSON 請求
 app.use(express.urlencoded({ extended: true })); // 解析 URL-encoded 格式資料
@@ -38,6 +38,7 @@ app.use('/avatars', express.static(path.join(__dirname, 'uploads', 'avatars')));
 app.use('/api/user', userRoutes); // 使用者個人功能（大頭貼、密碼修改等）
 app.use('/api/view-history', viewHistoryRoutes);//瀏覽紀錄
 app.use('/logout', logoutRoute);//登出
+app.use('/uploads', express.static('uploads'));
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 

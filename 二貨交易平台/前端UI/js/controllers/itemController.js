@@ -4,7 +4,7 @@ const db = require('../db');
 exports.addItem = async (req, res) => {
   const { name, description, price, category_id, location} = req.body;
   const userId = req.user.id;
-  const image_url = req.file ? `/uploads/items/${req.file.filename}` : null;
+  const image_url = req.file ? `/uploads/${req.file.filename}` : null; // 統一使用根目錄路徑
 
   if (req.user.role === 'admin') {
     return res.status(403).json({ message: '管理員無法上架商品' });
@@ -25,10 +25,12 @@ exports.addItem = async (req, res) => {
 
 // 📌 編輯商品（僅限賣家本人）
 exports.updateItem = async (req, res) => {
+
   const itemId = req.params.id;
   const userId = req.user.id;
   const { name, description, price, category_id, location } = req.body;
-  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+  const existingImage = rows[0].image_url;
+  const image_url = req.file ? `/uploads/${req.file.filename}` : existingImage;
 
   try {
     // 取得原本商品資料
@@ -103,13 +105,14 @@ exports.getMyItems = async (req, res) => {
   }
 
   try {
-    const [rows] = await db.query(
-      `SELECT i.*, c.name AS category_name
-       FROM items i
-       JOIN categories c ON i.category_id = c.id
-       WHERE i.user_id = ?
-       ORDER BY i.created_at DESC`,
-      [userId]
+    const [rows] = await db.query(`
+      SELECT 
+        id, name, description, price, category_id,
+        IFNULL(image_url, 'default-product.png') AS image_url,
+        location, status
+      FROM items
+      WHERE user_id = ?
+    `, [userId]
     );
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {

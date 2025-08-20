@@ -298,7 +298,7 @@
   const API_CONFIG = {
     BASE_URL: 'http://localhost:3000',
     ENDPOINTS: {
-      GET_MY_ITEMS: '/api/item/my-items',
+      GET_MY_ITEMS: '/api/item/item',
       ITEM_DETAIL: '/api/item/:id',
       ADD_ITEM: '/api/item/add'
     }
@@ -338,42 +338,59 @@
     `;
   }
 
-  // 修正圖片URL處理函數（確保包含後端基礎URL）
-    function getSafeImageUrl(url) {
-      const defaultImage = '../assets/images/3.png';
-      
-      // 1. 如果沒有圖片URL，返回默認圖片
-      if (!url) return defaultImage;
-      
-      // 2. 如果已經是完整URL（http/https開頭），直接返回
-      if (url.startsWith('http://') || url.startsWith('https://')) {
-        return url;
-      }
-      
-      // 3. 如果是相對路徑（以/開頭），拼接後端基礎URL
-      if (url.startsWith('/')) {
-        return `${API_CONFIG.BASE_URL}${url}`;
-      }
-      
-      // 4. 其他情況（如只是文件名），假設存放在/uploads目錄
-      return `${API_CONFIG.BASE_URL}/uploads/${url}`;
-    }
+  // 圖片處理函數修改
 
-  // 獲取當前用戶的商品
-  async function loadMyItems() {
+  function getSafeImageUrl(url) {
+    const defaultImage = '../assets/images/default-product.png';
+    
+    if (!url || url === 'NULL' || url === 'null') {
+      return defaultImage;
+    }
+    
+    // 處理可能的多餘斜線
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    
+    // 如果已經是完整 URL 則直接使用
+    if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+      return cleanUrl;
+    }
+    
+    // 確保 BASE_URL 不以斜線結尾
+    const baseUrl = API_CONFIG.BASE_URL.endsWith('/') 
+      ? API_CONFIG.BASE_URL.slice(0, -1) 
+      : API_CONFIG.BASE_URL;
+    
+    return `${baseUrl}${cleanUrl}`;
+  }
+
+    // 獲取當前用戶的商品
+    async function loadMyItems() {
     showLoading();
     
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('請先登入');
 
-      const res = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_MY_ITEMS}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_MY_ITEMS}`;
+      console.log('請求 URL:', url); // 添加這行來檢查實際請求的 URL
+
+      const res = await fetch(url, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || '獲取商品失敗');
+        // 嘗試獲取更多錯誤資訊
+        let errorMsg = `HTTP 錯誤! 狀態碼: ${res.status}`;
+        try {
+          const errorData = await res.json();
+          errorMsg += `, 訊息: ${errorData.message || '無詳細訊息'}`;
+        } catch (e) {
+          errorMsg += ', 無法解析錯誤響應';
+        }
+        throw new Error(errorMsg);
       }
 
       const { data } = await res.json();
@@ -381,7 +398,7 @@
       
     } catch (error) {
       console.error('載入失敗:', error);
-      showError(error.message);
+      showError(`無法載入商品: ${error.message}`);
     }
   }
 
@@ -401,9 +418,9 @@
     container.innerHTML = items.map(item => `
       <div class="col-span-12 xl:col-span-4 md:col-span-6">
         <div class="card h-full flex flex-col">
-          <img src="${getSafeImageUrl(item.image)}" 
-              class="w-full h-48 object-cover"
-              onerror="this.onerror=null; this.src='../assets/images/default-product.png'">
+          <img src="http://localhost:3000${item.image_url}"
+          onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
+          class="w-full h-48 object-cover" />
           <div class="card-header !pb-0 !border-b-0">
             <h4 class="text-lg font-semibold">${item.name || "未命名商品"}</h4>
             ${item.description ? `<p class="text-gray-600 mt-1">${item.description}</p>` : ''}
@@ -411,7 +428,7 @@
           <div class="card-body flex-grow">
             <div class="space-y-2">
               <p><span class="font-medium">價格:</span> $${item.price || "0"}</p>
-              <p><span class="font-medium">分類:</span> ${CATEGORY_MAPPING[item.category_id] || "未知類別"}</p>
+              <p><span class="font-medium">分類:</span> ${CATEGORY_MAPPING[Number(item.category_id)] || "未知類別"}</p>
               <p><span class="font-medium">交易地點:</span> ${item.location || "未指定"}</p>
             </div>
           </div>
@@ -478,101 +495,106 @@
   async function openEditModal(itemId) {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ITEM_DETAIL.replace(':id', itemId)}`,
-        { headers: { 'Authorization': `Bearer ${token}` } }
+      if (!token) throw new Error('請先登入');
+
+      // [1] 先取得商品現有資料
+      const getRes = await fetch(
+        `${API_CONFIG.BASE_URL}/api/item/${itemId}`, // 確認這裡是正確的 API 路徑
+        {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
       );
-      
-      if (!res.ok) throw new Error('獲取商品資料失敗');
-      
-      const { data: item } = await res.json();
-      
-      // 使用 SweetAlert2 創建編輯表單
-      const { value: formValues } = await Swal.fire({
+
+      if (!getRes.ok) throw new Error('獲取商品資料失敗');
+      const { data: item } = await getRes.json();
+
+      // [2] 使用 FormData 處理資料（支援檔案上傳）
+      const formData = new FormData();
+      let imageChanged = false;
+
+      // [3] 創建互動式表單
+      const { value: formValues, isConfirmed } = await Swal.fire({
         title: '編輯商品',
         html: `
           <div class="text-left space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">商品名稱</label>
-              <input 
-                id="swal-input-name" 
-                class="swal2-input" 
-                value="${item.name || ''}"
-                placeholder="商品名稱"
-                required>
+              <label class="block text-sm font-medium text-gray-700 mb-1">商品名稱*</label>
+              <input id="name" value="${item.name || ''}" class="swal2-input" required>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">商品描述</label>
-              <textarea 
-                id="swal-input-desc" 
-                class="swal2-textarea"
-                placeholder="商品描述（可選）">${item.description || ''}</textarea>
+              <textarea id="description" class="swal2-textarea">${item.description || ''}</textarea>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">價格</label>
-              <input 
-                type="number" 
-                id="swal-input-price" 
-                class="swal2-input" 
-                value="${item.price || ''}"
-                placeholder="價格"
-                required>
+              <label class="block text-sm font-medium text-gray-700 mb-1">價格*</label>
+              <input type="number" id="price" value="${item.price || ''}" class="swal2-input" required>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">分類 ID</label>
-              <input 
-                type="number" 
-                id="swal-input-category" 
-                class="swal2-input" 
-                value="${item.category_id || ''}"
-                placeholder="分類 ID"
-                required>
+              <label class="block text-sm font-medium text-gray-700 mb-1">分類*</label>
+              <select id="category_id" class="swal2-select">
+                ${Object.entries(CATEGORY_MAPPING).map(([id, name]) => 
+                  `<option value="${id}" ${id == item.category_id ? 'selected' : ''}>${name}</option>`
+                ).join('')}
+              </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">交易地點</label>
-              <input 
-                id="swal-input-location" 
-                class="swal2-input" 
-                value="${item.location || ''}"
-                placeholder="面交地點"
-                required>
+              <label class="block text-sm font-medium text-gray-700 mb-1">交易地點*</label>
+              <input id="location" value="${item.location || ''}" class="swal2-input" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">商品圖片</label>
+              <input type="file" id="image" accept="image/*" class="swal2-file">
+              <small class="text-gray-500">不選擇檔案則保留原圖片</small>
             </div>
           </div>
         `,
         focusConfirm: false,
         showCancelButton: true,
         preConfirm: () => {
-          return {
-            name: document.getElementById('swal-input-name').value,
-            description: document.getElementById('swal-input-desc').value,
-            price: document.getElementById('swal-input-price').value,
-            category_id: document.getElementById('swal-input-category').value,
-            location: document.getElementById('swal-input-location').value
-          };
+          const imageInput = document.getElementById('image');
+          if (imageInput.files[0]) {
+            formData.append('image', imageInput.files[0]);
+            imageChanged = true;
+          }
+          
+          formData.append('name', document.getElementById('name').value);
+          formData.append('description', document.getElementById('description').value);
+          formData.append('price', document.getElementById('price').value);
+          formData.append('category_id', document.getElementById('category_id').value);
+          formData.append('location', document.getElementById('location').value);
+          
+          return formData;
         }
       });
 
-      if (formValues) {
-        // 發送更新請求
-        const updateRes = await fetch(
-          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ITEM_DETAIL.replace(':id', itemId)}`,
+      // [4] 發送更新請求
+      if (isConfirmed) {
+        const patchRes = await fetch(
+          `${API_CONFIG.BASE_URL}/api/item/${itemId}`,
           {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
+              // 注意：使用 FormData 時不要手動設置 Content-Type，
+              // 瀏覽器會自動處理並加上 boundary
             },
-            body: JSON.stringify(formValues)
+            body: formData
           }
         );
 
-        if (!updateRes.ok) throw new Error('更新失敗');
-        
+        if (!patchRes.ok) {
+          const error = await patchRes.json();
+          throw new Error(error.message || '更新失敗');
+        }
+
         Swal.fire('成功', '商品已更新', 'success');
         loadMyItems(); // 刷新列表
       }
-      
     } catch (error) {
+      console.error('編輯商品錯誤:', error);
       Swal.fire('錯誤', error.message, 'error');
     }
   }
