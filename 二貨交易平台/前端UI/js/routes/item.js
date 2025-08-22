@@ -23,6 +23,9 @@ router.get('/all', verifyToken, itemController.getAllItems);
 // 📌 管理員審核商品（approve/reject）
 router.patch('/review/:id', verifyToken, itemController.reviewItem);
 
+ // 獲取待審核商品
+router.get('/admin/pending', verifyToken, itemController.getPendingItems);
+
 // 📌 查詢所有上架中商品（開放所有人）
 router.get('/available', itemController.getAvailableItems);
 
