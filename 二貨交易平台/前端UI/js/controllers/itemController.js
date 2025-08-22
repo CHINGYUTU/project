@@ -4,7 +4,8 @@ const ITEM_STATUS = {
   PENDING: 'pending',
   AVAILABLE: 'available',
   REJECTED: 'rejected',
-  SOLD: 'sold'
+  SOLD: 'sold',
+  RESERVED: 'reserved'
 };
 
 // 📌 上架商品（初始狀態：pending，待管理員審核）
@@ -18,10 +19,11 @@ exports.addItem = async (req, res) => {
   }
 
   try {
+    // 修正：添加 status 參數到數組中
     await db.query(
       `INSERT INTO items (name, description, price, category_id, user_id, image_url, location, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`,  // ⚠️ 改成 pending
-      [name, description, price, category_id, userId, image_url, location, pending]
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,  // 改成9個佔位符
+      [name, description, price, category_id, userId, image_url, location, 'pending'] // 添加 'pending' 參數
     );
     res.json({ message: '商品上架成功，待管理員審核' });
   } catch (err) {
@@ -101,8 +103,9 @@ exports.getAvailableItems = async (req, res) => {
       `SELECT i.*, c.name AS category_name
        FROM items i
        JOIN categories c ON i.category_id = c.id
-       WHERE i.status = 'available'
-       ORDER BY i.created_at DESC`
+       WHERE i.status = ?  // 使用參數化查詢
+       ORDER BY i.created_at DESC`,
+      [ITEM_STATUS.AVAILABLE]  // 使用常量
     );
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {
