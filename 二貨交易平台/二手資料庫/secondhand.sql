@@ -115,13 +115,18 @@ CREATE TABLE `items` (
   `image_url` text COLLATE utf8mb4_unicode_ci,
   `location` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '面交地點',
   `status` enum('pending','available','sold','reserved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `reviewed_at` datetime DEFAULT NULL,
+  `review_notes` text COLLATE utf8mb4_unicode_ci,
+  `reviewed_by` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `fk_seller_idx` (`user_id`),
   KEY `fk_category` (`category_id`),
+  KEY `fk_items_reviewed_by` (`reviewed_by`),
   CONSTRAINT `fk_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
-  CONSTRAINT `fk_item_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `fk_item_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_items_reviewed_by` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -130,7 +135,7 @@ CREATE TABLE `items` (
 
 LOCK TABLES `items` WRITE;
 /*!40000 ALTER TABLE `items` DISABLE KEYS */;
-INSERT INTO `items` VALUES (3,'小電吹風','使用一年',300.00,1,1,NULL,'廁所','available','2025-08-15 14:10:31');
+INSERT INTO `items` VALUES (4,'中毒劑','一定要配溫開水',9999.00,2,1,'/uploads/1755791252485-575473799.png','活動中心旁的小巷子','pending',NULL,NULL,NULL,'2025-08-21 15:47:32'),(5,'測試用1','測試用1',50.00,1,1,'/uploads/1755864181435-36555251.png','大門口','pending',NULL,NULL,NULL,'2025-08-22 12:02:32');
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -399,4 +404,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-08-20 22:10:00
+-- Dump completed on 2025-08-22 21:29:54
