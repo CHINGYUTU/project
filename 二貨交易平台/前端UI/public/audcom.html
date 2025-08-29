@@ -1,238 +1,1043 @@
-<!doctype html>
-<html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
-  <!-- [Head] start -->
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品審核系統</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --bg-color: #f5f7fb;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --sidebar-width: 250px;
+            --header-height: 70px;
+        }
 
-  <head>
-    <title>個人檔案</title>
-    <!-- [Meta] -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="description"
-      content="Datta Able is trending dashboard template made using Bootstrap 5 design framework. Datta Able is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies."
-    />
-    <meta
-      name="keywords"
-      content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard"
-    />
-    <meta name="author" content="CodedThemes" />
+        .dark-mode {
+            --bg-color: #121826;
+            --light: #1e293b;
+            --dark: #f8f9fa;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
 
-    <!-- [Favicon] icon -->
-    <link rel="icon" href="../images/logo.png" type="image/x-icon" />
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
 
-     <!-- [Font] Family -->
-     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-    <!-- [phosphor Icons] https://phosphoricons.com/ -->
-    <link rel="stylesheet" href="../dist/assets/fonts/phosphor/duotone/style.css" />
-    <!-- [Tabler Icons] https://tablericons.com -->
-    <link rel="stylesheet" href="../dist/assets/fonts/tabler-icons.min.css" />
-    <!-- [Feather Icons] https://feathericons.com -->
-    <link rel="stylesheet" href="../dist/assets/fonts/feather.css" />
-    <!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-    <link rel="stylesheet" href="../dist/assets/fonts/fontawesome.css" />
-    <!-- [Material Icons] https://fonts.google.com/icons -->
-    <link rel="stylesheet" href="../dist/assets/fonts/material.css" />
-    <!-- [Template CSS Files] -->
-    <link rel="stylesheet" href="../dist/assets/css/style.css" id="main-style-link" />
+        body {
+            background-color: var(--bg-color);
+            color: var(--dark);
+            transition: all 0.3s ease;
+        }
 
-  </head>
-  <!-- [Head] end -->
-  <!-- [Body] Start -->
+        /* 佈局 */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
 
-  <body>
-    <!-- [ Pre-loader ] start -->
-<div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
-  <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
-    <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
-  </div>
-</div>
-<!-- [ Pre-loader ] End -->
- <!-- [ Sidebar Menu ] start -->
-<nav class="pc-sidebar">
-  <div class="navbar-wrapper">
-    <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
-      <ul class="pc-navbar">
-        <li class="pc-item pc-caption">
-          <label>管理員</label>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="/audcom.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="edit"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">使用者管理</span>
-          </a>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="/proman.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="shopping-cart"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">商品管理</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a href="/index.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon">
-              <i data-feather="log-out"></i>
-            </span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">登出</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-<!-- [ Sidebar Menu ] end -->
- <!-- [ Header Topbar ] start -->
-<header class="pc-header">
-  <div class="header-wrapper flex max-sm:px-[15px] px-[25px] grow"><!-- [Mobile Media Block] start -->
-<div class="me-auto pc-mob-drp">
-  <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
-    <!-- ======= Menu collapse Icon ===== -->
-    <li class="pc-h-item pc-sidebar-collapse max-lg:hidden lg:inline-flex">
-      <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="sidebar-hide">
-        <i data-feather="menu"></i>
-      </a>
-    </li>
-    <li class="pc-h-item pc-sidebar-popup lg:hidden">
-      <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="mobile-collapse">
-        <i data-feather="menu"></i>
-      </a>
-    </li>
-  </ul>
-</div>
-<!-- [Mobile Media Block end] -->
-<div class="ms-auto">
-  <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
-    <li class="dropdown pc-h-item">
-      <a class="pc-head-link dropdown-toggle me-0" data-pc-toggle="dropdown" href="#" role="button"
-        aria-haspopup="false" aria-expanded="false">
-        <i data-feather="sun"></i>
-      </a>
-      <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
-        <a href="#!" class="dropdown-item" onclick="layout_change('dark')">
-          <i data-feather="moon"></i>
-          <span>深色</span>
-        </a>
-        <a href="#!" class="dropdown-item" onclick="layout_change('light')">
-          <i data-feather="sun"></i>
-          <span>明亮</span>
-        </a>
-      </div>
-    </li>
-  </ul>
-</div></div>
-</header>
-<!-- [ Header ] end -->
+        /* 側邊欄 */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 20px 0;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
 
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 25px;
+            text-align: center;
+        }
 
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 0;
+        }
 
-    <!-- [ Main Content ] start -->
-    <div class="pc-container">
-      <div class="pc-content">
-        <h3>商品管理</h3>
-        <div class="overflow-x-auto mt-4">
-          <table class="min-w-full table-auto border border-gray-300 text-left">
-            <thead class="bg-gray-100">
-              <tr class="text-gray-900 text-lg font-semibold">
-                <th class="px-4 py-3 border-b">商品名稱</th>
-                <th class="px-4 py-3 border-b">賣家名稱</th>
-                <th class="px-4 py-3 border-b">價格</th>
-                <th class="px-4 py-3 border-b">檢視</th>
-              </tr>
-            </thead>
-            <tbody class="text-gray-900 text-base">
-              <tr class="hover:bg-gray-50">
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <th class="px-4 py-3 border-b flex gap-1">
-                    <button style="float: left; font-size: 12pt; color: white; border-radius: 12px; height: 30pt; width: 50pt; background-color: rgba(100, 100, 225, 100);">
-                    檢視
-                    </button>
-                </th>
-              </tr>
-              <tr class="hover:bg-gray-50">
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <td class="px-4 py-2 border-b"></td>
-                <th class="px-4 py-3 border-b flex gap-1">
-                    <button style="float: left; font-size: 12pt; color: white; border-radius: 12px; height: 30pt; width: 50pt; background-color: rgba(100, 100, 225, 100);">
-                    檢視
-                    </button>
-                </th>
-              </tr>
-            </tbody>
-          </table>
+        .sidebar-logo i {
+            font-size: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+
+        .menu-item {
+            padding: 14px 20px;
+            margin: 6px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover::before,
+        .menu-item.active::before {
+            transform: scaleY(1);
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+
+        .menu-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .menu-item.active i,
+        .menu-item:hover i {
+            transform: scale(1.1);
+        }
+
+        .menu-item a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* 暗色模式下的侧边栏 */
+        .dark-mode .sidebar {
+            background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* 主內容區 */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+
+        /* 頂部導航 */
+        .topbar {
+            background-color: var(--light);
+            border-radius: 12px;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 統計卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background-color: var(--light);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-title {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        /* 商品卡片 */
+        .card {
+            background-color: var(--light);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            background: none;
+            outline: none;
+            flex: 1;
+            padding: 5px;
+            color: var(--dark);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .product-table th {
+            background-color: rgba(67, 97, 238, 0.1);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .product-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .product-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.03);
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .badge-available {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .badge-rejected {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-view {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: #4f46e5;
+        }
+
+        .btn-view:hover {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-approve {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .btn-approve:hover {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .btn-reject {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .btn-reject:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* 商品圖片樣式 */
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* 商品詳情模態框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--light);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .product-image-large {
+            width: 100%;
+            border-radius: 12px;
+            object-fit: cover;
+            max-height: 300px;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        /* 頁尾 */
+        .app-footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 1000;
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box {
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .product-detail {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 載入動畫 */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 側邊欄 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="images/logo-w.png" width="50">
+                    <span>後臺管理系統</span>
+                </div>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active">
+                    <a href="proman.html">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>商品審核</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="audcom.html">
+                        <i class="fas fa-users"></i>
+                        <span>使用者管理</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>回首頁</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-      </div>
+
+        <!-- 主內容區 -->
+        <div class="main-content">
+            <!-- 頂部導航 -->
+            <div class="topbar">
+                <div class="page-title">商品審核</div>
+                <div class="user-actions">
+                    <button class="theme-toggle" id="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">管理員</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 統計卡片 -->
+             
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: rgba(79, 70, 229, 0.1); color: #4f46e5;">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="total-items"><span id="rejected-products">0</span></div>
+                        <div class="stat-title">總商品數</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="pending-items"><span id="rejected-products">0</span></div>
+                        <div class="stat-title">待審核商品</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="approved-items"><span id="rejected-products">0</span></div>
+                        <div class="stat-title">已通過商品</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="rejected-items"><span id="rejected-products">0</span></div>
+                        <div class="stat-title">已拒絕商品</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 商品表格 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">待審核商品列表</div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="搜尋商品..." id="search-input">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>圖片</th>
+                                <th>商品名稱</th>
+                                <th>價格</th>
+                                <th>面交地點</th>
+                                <th>狀態</th>
+                                <th>上架日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-table-body">
+                            <tr>
+                                <td colspan="8">
+                                    <div class="loader" id="table-loader"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 頁尾 -->
+            <div class="app-footer">
+                <p>© 2023 商品審核系統 - 版權所有</p>
+            </div>
+        </div>
     </div>
-    <!-- [ Main Content ] end -->
-    <footer class="pc-footer">
-    </footer>
- 
-    <!-- Required Js -->
-    <script src="../dist/assets/js/plugins/simplebar.min.js"></script>
-    <script src="../dist/assets/js/plugins/popper.min.js"></script>
-    <script src="../dist/assets/js/icon/custom-icon.js"></script>
-    <script src="../dist/assets/js/plugins/feather.min.js"></script>
-    <script src="../dist/assets/js/component.js"></script>
-    <script src="../dist/assets/js/theme.js"></script>
-    <script src="../dist/assets/js/script.js"></script>
 
-    <div class="floting-button fixed bottom-[50px] right-[30px] z-[1030]">
+    <!-- 商品詳情模態框 -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">商品詳情</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-detail">
+                    <div class="product-image-container">
+                        <img src="" alt="商品圖片" class="product-image-large" id="modal-image">
+                    </div>
+                    <div class="product-info">
+                        <div class="info-row">
+                            <span class="info-label">商品ID:</span>
+                            <span id="modal-id"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">商品名稱:</span>
+                            <span id="modal-name"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">描述:</span>
+                            <span id="modal-description"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">價格:</span>
+                            <span id="modal-price"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">面交地點:</span>
+                            <span id="modal-location"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">狀態:</span>
+                            <span id="modal-status"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">上架日期:</span>
+                            <span id="modal-created-at"></span>
+                        </div>
+                        <div class="action-buttons" style="margin-top: 20px;">
+                            <button class="btn btn-approve" id="modal-approve">
+                                <i class="fas fa-check"></i> 通過審核
+                            </button>
+                            <button class="btn btn-reject" id="modal-reject">
+                                <i class="fas fa-times"></i> 拒絕審核
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    
     <script>
-      layout_change('false');
-    </script>
-     
-    
-    <script>
-      layout_theme_sidebar_change('dark');
-    </script>
-    
-     
-    <script>
-      change_box_container('false');
-    </script>
-     
-    <script>
-      layout_caption_change('true');
-    </script>
-     
-    <script>
-      layout_rtl_change('false');
-    </script>
-     
-    <script>
-      preset_change('preset-1');
-    </script>
-     
-    <script>
-      main_layout_change('vertical');
-    </script>
-    <script src="../dist/assets/js/script.js"></script>
+        let currentProductId = null;
+        let allProducts = [];
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initThemeToggle();
+            loadProducts();
+            initSearch();
+            initModalEvents();
+        });
 
-  <script>
-    
-    const logo = document.getElementById("logo");
-    function updateLogo() {
-      const isDark = document.documentElement.getAttribute("data-pc-theme") === "dark";
-      logo.src = isDark ? "../assets/images/logo-w.png" : "../assets/images/logo.png";
-    }
+        function initThemeToggle() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                }
+            });
+        }
 
-    // 初始設定一次
-    updateLogo();
+        async function loadProducts() {
+            try {
+                const res = await fetch("http://localhost:3000/api/item/pending", {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
+                });
 
-    // 監聽深色模式切換
-    const darkModeObserver = new MutationObserver(updateLogo);
-    darkModeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-pc-theme"]
-    });
-  </script>
-  </body>
-  <!-- [Body] end -->
+                const result = await res.json();
+                console.log("後端回傳:", result);
+
+                const products = Array.isArray(result) ? result : result.data;
+
+                // 過濾待審核的商品
+                const pendingProducts = products.filter(p => p.status === "pending");
+
+                // 確保表格存在
+                const tbody = document.getElementById("product-table-body");
+                if (!tbody) {
+                    console.error("❌ 沒找到 #productTable tbody");
+                    return;
+                }
+                tbody.innerHTML = "";
+
+                pendingProducts.forEach(product => {
+                    const tr = document.createElement("tr");
+
+                    tr.innerHTML = `
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.description || ""}</td>
+                        <td>${product.price}</td>
+                        <td>${product.location}</td>
+                        <td>${product.status}</td>
+                        <td>${product.created_at}</td>
+                        <td>
+                            <div class="action-buttons">
+                            <button class="btn btn-approve" onclick="approveProduct(${product.id})">
+                                <i class="fas fa-check"></i> 通過
+                            </button>
+                            <button class="btn btn-reject" onclick="rejectProduct(${product.id})">
+                                <i class="fas fa-times"></i> 拒絕
+                            </button>
+                            </div>
+                        </td>
+                    `;
+
+                    tbody.appendChild(tr);
+                });
+
+                updateStats(products);
+
+            } catch (err) {
+                console.error("載入商品失敗", err);
+            }
+        }
+
+        function updateStats(data) {
+        const total = data.length;
+        const pending = data.filter(p => p.status === 'pending').length;
+        const approved = data.filter(p => p.status === 'available').length;
+        const rejected = data.filter(p => p.status === 'rejected').length;
+
+        const elTotal = document.getElementById("total-products");
+        if (elTotal) elTotal.textContent = total;
+
+        const elPending = document.getElementById("pending-products");
+        if (elPending) elPending.textContent = pending;
+
+        const elApproved = document.getElementById("approved-products");
+        if (elApproved) elApproved.textContent = approved;
+
+        const elRejected = document.getElementById("rejected-products");
+        if (elRejected) elRejected.textContent = rejected;
+        }
+
+        function renderProducts(products) {
+            const tableBody = document.getElementById('product-table-body');
+            if (products.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">目前沒有待審核的商品</td></tr>`;
+                return;
+            }
+            tableBody.innerHTML = '';
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                let statusBadgeClass = '';
+                let statusText = '';
+                switch (product.status) {
+                    case 'pending': statusBadgeClass = 'badge-pending'; statusText = '待審核'; break;
+                    case 'available': statusBadgeClass = 'badge-available'; statusText = '已通過'; break;
+                    case 'rejected': statusBadgeClass = 'badge-rejected'; statusText = '已拒絕'; break;
+                }
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td><img src="${product.image_url || 'https://via.placeholder.com/60'}" class="product-image"></td>
+                    <td>${product.name}</td>
+                    <td>$${product.price}</td>
+                    <td>${product.location}</td>
+                    <td><span class="badge ${statusBadgeClass}">${statusText}</span></td>
+                    <td>${formatDate(product.created_at)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-view" data-id="${product.id}"><i class="fas fa-eye"></i> 查看</button>
+                            <button class="btn btn-approve" data-id="${product.id}"><i class="fas fa-check"></i> 通過</button>
+                            <button class="btn btn-reject" data-id="${product.id}"><i class="fas fa-times"></i> 拒絕</button>
+                        </div>
+                    </td>`;
+                tableBody.appendChild(row);
+            });
+            document.querySelectorAll('.btn-view').forEach(b => b.onclick = () => showProductDetail(b.dataset.id));
+            document.querySelectorAll('.btn-approve').forEach(b => b.onclick = () => approveProduct(b.dataset.id));
+            document.querySelectorAll('.btn-reject').forEach(b => b.onclick = () => rejectProduct(b.dataset.id));
+        }
+
+        function initSearch() {
+            document.getElementById('search-input').addEventListener('input', function() {
+                const term = this.value.toLowerCase();
+                const filtered = allProducts
+                    .filter(p => p.status === 'pending')
+                    .filter(p =>
+                        p.name.toLowerCase().includes(term) ||
+                        (p.description && p.description.toLowerCase().includes(term)) ||
+                        p.location.toLowerCase().includes(term)
+                    );
+                renderProducts(filtered);
+            });
+        }
+
+        function initModalEvents() {
+            const modal = document.getElementById('product-modal');
+            document.getElementById('modal-close').onclick = () => modal.style.display = 'none';
+            window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+            document.getElementById('modal-approve').onclick = () => { if (currentProductId) approveProduct(currentProductId); modal.style.display = 'none'; };
+            document.getElementById('modal-reject').onclick = () => { if (currentProductId) rejectProduct(currentProductId); modal.style.display = 'none'; };
+        }
+
+        function showProductDetail(productId) {
+            const product = allProducts.find(p => p.id == productId);
+            if (!product) return;
+            currentProductId = productId;
+            document.getElementById('modal-id').textContent = product.id;
+            document.getElementById('modal-name').textContent = product.name;
+            document.getElementById('modal-description').textContent = product.description || '無描述';
+            document.getElementById('modal-price').textContent = `$${product.price}`;
+            document.getElementById('modal-location').textContent = product.location;
+            document.getElementById('modal-created-at').textContent = formatDate(product.created_at);
+            document.getElementById('modal-image').src = product.image_url || 'https://via.placeholder.com/300';
+            let statusText = product.status === 'pending' ? '待審核' : product.status === 'available' ? '已通過' : '已拒絕';
+            document.getElementById('modal-status').textContent = statusText;
+            document.getElementById('modal-approve').style.display = product.status === 'pending' ? 'flex' : 'none';
+            document.getElementById('modal-reject').style.display = product.status === 'pending' ? 'flex' : 'none';
+            document.getElementById('product-modal').style.display = 'flex';
+        }
+
+        async function reviewProduct(productId, status) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/item/review/${productId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem("token")}`
+                    },
+                    body: JSON.stringify({ action: status === 'available' ? 'approve' : 'reject' })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                const idx = allProducts.findIndex(p => p.id == productId);
+                if (idx !== -1) allProducts[idx].status = status;
+                renderProducts(allProducts.filter(p => p.status === 'pending'));
+                updateStats(allProducts);
+                alert(`商品已${status === 'available' ? '通過' : '拒絕'}審核`);
+            } catch (err) {
+                console.error('審核失敗:', err);
+                alert(`審核失敗: ${err.message}`);
+            }
+        }
+
+        function approveProduct(id) {
+            if (confirm('確定要通過此商品嗎？')) reviewProduct(id, 'available');
+        }
+
+        function rejectProduct(id) {
+            if (confirm('確定要拒絕此商品嗎？')) reviewProduct(id, 'rejected');
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return isNaN(d) ? '-' : d.toLocaleDateString();
+        }
+
+        // 移动端菜单切换功能
+        function initMobileMenu() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            
+            document.body.appendChild(overlay);
+            
+            // 检查屏幕宽度决定是否显示菜单按钮
+            function checkScreenSize() {
+                if (window.innerWidth <= 992) {
+                    menuToggle.style.display = 'flex';
+                    sidebar.classList.remove('open');
+                } else {
+                    menuToggle.style.display = 'none';
+                    sidebar.classList.remove('open');
+                }
+            }
+            
+            // 初始检查
+            checkScreenSize();
+            
+            // 窗口大小变化时检查
+            window.addEventListener('resize', checkScreenSize);
+            
+            // 菜单切换
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+            
+            // 点击遮罩层关闭菜单
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        }
+
+        // 在DOM加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initMobileMenu();
+            // 其他初始化代码...
+        });
+    </script>
+
+</body>
 </html>

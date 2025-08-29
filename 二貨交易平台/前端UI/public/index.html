@@ -670,7 +670,7 @@
                     if (item.image_url.startsWith('http')) {
                         imageUrl = item.image_url;
                     } else if (item.image_url.startsWith('/')) {
-                        imageUrl = `${API_BASE}${item.image_url}`;
+                        imageUrl = `${API_BASE}/uploads${item.image_url}`;
                     } else {
                         imageUrl = `${API_BASE}/${item.image_url}`;
                     }
@@ -737,21 +737,47 @@
                 showLoaderOnConfirm: true,
                 preConfirm: async () => {
                     try {
-                        // 這裡替換為實際的購買API調用
-                        const response = await fetch('/api/purchase', {
+                        const token = localStorage.getItem('token');
+                        if (!token) {
+                            throw new Error("請先登入再購買");
+                        }
+
+                        // 1️⃣ 先建立訂單
+                        const createRes = await fetch(`${API_BASE}/api/purchase`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                'Authorization': `Bearer ${token}`
                             },
                             body: JSON.stringify({ itemId })
                         });
-                        
-                        if (!response.ok) {
-                            throw new Error(response.statusText);
+
+                        if (!createRes.ok) {
+                            const err = await createRes.json();
+                            throw new Error(err.message || "建立訂單失敗");
                         }
-                        
-                        return await response.json();
+
+                        const orderData = await createRes.json();
+                        const orderId = orderData.data?.id; // 假設後端回傳 { data: { id: xxx } }
+                        if (!orderId) throw new Error("後端未回傳訂單 ID");
+
+                        // 2️⃣ 更新訂單狀態為 confirmed
+                        const updateRes = await fetch(`${API_BASE}/api/order/update-status/${orderId}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ orderStatus: "confirmed" })
+                        });
+
+                        if (!updateRes.ok) {
+                            const err = await updateRes.json();
+                            throw new Error(err.message || "更新訂單狀態失敗");
+                        }
+
+                        return await updateRes.json();
+
                     } catch (error) {
                         Swal.showValidationMessage(
                             `購買失敗: ${error.message}`
@@ -764,7 +790,7 @@
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: '✅ 購買成功！',
-                        text: `「${itemName}」已成功購買。`,
+                        text: `「${itemName}」已成功購買，狀態已更新為 Confirmed。`,
                         icon: 'success',
                         confirmButtonText: '知道了',
                         confirmButtonColor: '#6474E1'

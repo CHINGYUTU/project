@@ -59,12 +59,15 @@
             top: 0;
             padding: 20px 0;
             overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
 
         .sidebar-header {
             padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 25px;
+            text-align: center;
         }
 
         .sidebar-logo {
@@ -72,31 +75,119 @@
             font-weight: 700;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
+            padding: 10px 0;
+        }
+
+        .sidebar-logo i {
+            font-size: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar-menu {
             list-style: none;
+            padding: 0 15px;
         }
 
         .menu-item {
-            padding: 12px 20px;
-            margin: 5px 0;
-            border-radius: 8px;
+            padding: 14px 20px;
+            margin: 6px 0;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover::before,
+        .menu-item.active::before {
+            transform: scaleY(1);
         }
 
         .menu-item:hover, .menu-item.active {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
         }
 
         .menu-item i {
             width: 24px;
             text-align: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .menu-item.active i,
+        .menu-item:hover i {
+            transform: scale(1.1);
+        }
+
+        .menu-item a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* 暗色模式下的侧边栏 */
+        .dark-mode .sidebar {
+            background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
         }
 
         /* 主內容區 */
@@ -507,34 +598,28 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <i class="fas fa-box-check"></i>
-                    <span>商品審核系統</span>
+                    <img src="images/logo-w.png" width="50">
+                    <span>後臺管理系統</span>
                 </div>
             </div>
             <ul class="sidebar-menu">
                 <li class="menu-item active">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>商品審核</span>
+                    <a href="proman.html">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>商品審核</span>
+                    </a>
                 </li>
                 <li class="menu-item">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>商品管理</span>
+                    <a href="audcom.html">
+                        <i class="fas fa-users"></i>
+                        <span>使用者管理</span>
+                    </a>
                 </li>
                 <li class="menu-item">
-                    <i class="fas fa-users"></i>
-                    <span>使用者管理</span>
-                </li>
-                <li class="menu-item">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>數據分析</span>
-                </li>
-                <li class="menu-item">
-                    <i class="fas fa-cog"></i>
-                    <span>系統設置</span>
-                </li>
-                <li class="menu-item">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>登出系統</span>
+                    <a href="index.html">
+                        <i class="fas fa-home"></i>
+                        <span>回首頁</span>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -558,13 +643,14 @@
             </div>
 
             <!-- 統計卡片 -->
+             
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon" style="background-color: rgba(79, 70, 229, 0.1); color: #4f46e5;">
                         <i class="fas fa-box"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value" id="total-items">0</div>
+                        <div class="stat-value" id="total-items"><span id="rejected-products">0</span></div>
                         <div class="stat-title">總商品數</div>
                     </div>
                 </div>
@@ -573,7 +659,7 @@
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value" id="pending-items">0</div>
+                        <div class="stat-value" id="pending-items"><span id="rejected-products">0</span></div>
                         <div class="stat-title">待審核商品</div>
                     </div>
                 </div>
@@ -582,7 +668,7 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value" id="approved-items">0</div>
+                        <div class="stat-value" id="approved-items"><span id="rejected-products">0</span></div>
                         <div class="stat-title">已通過商品</div>
                     </div>
                 </div>
@@ -591,7 +677,7 @@
                         <i class="fas fa-times-circle"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value" id="rejected-items">0</div>
+                        <div class="stat-value" id="rejected-items"><span id="rejected-products">0</span></div>
                         <div class="stat-title">已拒絕商品</div>
                     </div>
                 </div>
@@ -753,8 +839,14 @@
                         <td>${product.status}</td>
                         <td>${product.created_at}</td>
                         <td>
-                            <button onclick="reviewItem(${product.id}, 'available')">通過</button>
-                            <button onclick="reviewItem(${product.id}, 'rejected')">拒絕</button>
+                            <div class="action-buttons">
+                            <button class="btn btn-approve" onclick="approveProduct(${product.id})">
+                                <i class="fas fa-check"></i> 通過
+                            </button>
+                            <button class="btn btn-reject" onclick="rejectProduct(${product.id})">
+                                <i class="fas fa-times"></i> 拒絕
+                            </button>
+                            </div>
                         </td>
                     `;
 
@@ -768,14 +860,23 @@
             }
         }
 
-        function updateStats(products) {
-            const pendingCount = products.filter(p => p.status === "pending").length;
-            const availableCount = products.filter(p => p.status === "available").length;
-            const rejectedCount = products.filter(p => p.status === "rejected").length;
+        function updateStats(data) {
+        const total = data.length;
+        const pending = data.filter(p => p.status === 'pending').length;
+        const approved = data.filter(p => p.status === 'available').length;
+        const rejected = data.filter(p => p.status === 'rejected').length;
 
-            document.getElementById("pendingCount").textContent = pendingCount;
-            document.getElementById("availableCount").textContent = availableCount;
-            document.getElementById("rejectedCount").textContent = rejectedCount;
+        const elTotal = document.getElementById("total-products");
+        if (elTotal) elTotal.textContent = total;
+
+        const elPending = document.getElementById("pending-products");
+        if (elPending) elPending.textContent = pending;
+
+        const elApproved = document.getElementById("approved-products");
+        if (elApproved) elApproved.textContent = approved;
+
+        const elRejected = document.getElementById("rejected-products");
+        if (elRejected) elRejected.textContent = rejected;
         }
 
         function renderProducts(products) {
@@ -864,7 +965,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem("token")}`
                     },
-                    body: JSON.stringify({ status })
+                    body: JSON.stringify({ action: status === 'available' ? 'approve' : 'reject' })
                 });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const result = await response.json();
@@ -891,6 +992,51 @@
             const d = new Date(dateStr);
             return isNaN(d) ? '-' : d.toLocaleDateString();
         }
+
+        // 移动端菜单切换功能
+        function initMobileMenu() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            
+            document.body.appendChild(overlay);
+            
+            // 检查屏幕宽度决定是否显示菜单按钮
+            function checkScreenSize() {
+                if (window.innerWidth <= 992) {
+                    menuToggle.style.display = 'flex';
+                    sidebar.classList.remove('open');
+                } else {
+                    menuToggle.style.display = 'none';
+                    sidebar.classList.remove('open');
+                }
+            }
+            
+            // 初始检查
+            checkScreenSize();
+            
+            // 窗口大小变化时检查
+            window.addEventListener('resize', checkScreenSize);
+            
+            // 菜单切换
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+            
+            // 点击遮罩层关闭菜单
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        }
+
+        // 在DOM加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initMobileMenu();
+            // 其他初始化代码...
+        });
     </script>
 
 </body>

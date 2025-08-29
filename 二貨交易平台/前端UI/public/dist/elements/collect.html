@@ -138,7 +138,13 @@
         display: inline-block;
         margin-bottom: 0.5rem;
       }
-      
+      /* 商品狀態 */
+      .product-status {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        margin-left: 0.5rem;
+      }
       /* 加載動畫 */
       .loading-spinner {
         display: flex;
@@ -316,11 +322,14 @@
         </div>
         
         <!-- 空狀態 -->
-        <div class="empty-state d-none" id="emptyState">
+        <div class="empty-state" id="emptyState" style="display: none;">
           <i class="bi bi-heart"></i>
           <h4>尚未收藏任何商品</h4>
           <p>開始瀏覽商品並將喜歡的加入收藏吧！</p>
-          <a href="../../index.html" class="btn btn-primary mt-3">去逛逛</a>
+          <div class="mt-3">
+            <a href="../../index.html" class="btn btn-primary me-2">去逛逛</a>
+            <button onclick="loadFavoriteItems()" class="btn btn-outline-primary">重新載入</button>
+          </div>
         </div>
         
         <!-- 商品列表 -->
@@ -378,30 +387,34 @@
         const emptyState = document.getElementById('emptyState');
         
         if (show) {
-          spinner.classList.remove('d-none');
-          container.classList.add('d-none');
-          emptyState.classList.add('d-none'); // 確保加載時隱藏空狀態
+          spinner.style.display = 'flex';
+          container.style.display = 'none';
+          emptyState.style.display = 'none';
         } else {
-          spinner.classList.add('d-none');
+          spinner.style.display = 'none';
         }
       }
-      
+
       // 顯示空狀態
       function showEmptyState() {
         const container = document.getElementById('favoritesContainer');
         const emptyState = document.getElementById('emptyState');
+        const spinner = document.getElementById('loadingSpinner');
         
-        container.classList.add('d-none');
-        emptyState.classList.remove('d-none'); // 顯示空狀態
+        spinner.style.display = 'none';
+        container.style.display = 'none';
+        emptyState.style.display = 'block';
       }
-      
+
       // 顯示商品列表
       function showItems() {
         const container = document.getElementById('favoritesContainer');
         const emptyState = document.getElementById('emptyState');
+        const spinner = document.getElementById('loadingSpinner');
         
-        container.classList.remove('d-none');
-        emptyState.classList.add('d-none'); // 隱藏空狀態
+        spinner.style.display = 'none';
+        container.style.display = 'grid';
+        emptyState.style.display = 'none';
       }
       
       // 從API獲取收藏商品
@@ -409,9 +422,14 @@
         try {
           showLoading(true);
           
+          console.log('開始加載收藏商品...'); // 调试信息
+          
           const token = localStorage.getItem('token');
           if (!token) {
-            throw new Error('請先登入');
+            console.log('未找到token，顯示空狀態');
+            showEmptyState();
+            showLoading(false);
+            return;
           }
           
           const response = await fetch(`${API_BASE}/api/favorite/list`, {
@@ -420,24 +438,45 @@
             }
           });
           
+          // 处理未授权情况
+          if (response.status === 401) {
+            console.log('Token已過期，顯示空狀態');
+            localStorage.removeItem('token');
+            showEmptyState();
+            Swal.fire('請重新登入', '登入狀態已過期', 'warning');
+            showLoading(false);
+            return;
+          }
+          
           if (!response.ok) {
-            throw new Error('無法獲取收藏列表');
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
           
           const result = await response.json();
+          console.log('API回應:', result); // 调试信息
           
-          if (result.data && result.data.length > 0) {
+          if (result.data && Array.isArray(result.data)) {
             favoriteItems = result.data;
-            renderFavoriteItems();
-            showItems(); // 显示商品列表，隐藏空状态
+            console.log(`獲取到 ${favoriteItems.length} 個收藏商品`); // 调试信息
+            
+            if (favoriteItems.length > 0) {
+              console.log('有收藏商品，顯示商品列表');
+              renderFavoriteItems();
+              showItems();
+            } else {
+              console.log('沒有收藏商品，顯示空狀態');
+              showEmptyState();
+            }
           } else {
-            showEmptyState(); // 显示空状态，隐藏商品列表
+            console.log('API返回數據格式不正確，顯示空狀態');
+            showEmptyState();
           }
           
           showLoading(false);
         } catch (error) {
           console.error('獲取收藏商品失敗:', error);
           showLoading(false);
+          showEmptyState();
           Swal.fire('錯誤', '無法載入收藏商品，請稍後再試', 'error');
         }
       }
@@ -457,7 +496,7 @@
             if (item.image_url.startsWith('http')) {
               imageUrl = item.image_url;
             } else if (item.image_url.startsWith('/')) {
-              imageUrl = `${API_BASE}${item.image_url}`;
+              imageUrl = `${API_BASE}/uploads${item.image_url}`;
             } else {
               imageUrl = `${API_BASE}/${item.image_url}`;
             }
@@ -473,13 +512,16 @@
                 
                 <!-- 商品圖片 -->
                 <img src="${imageUrl}" alt="${item.name}" class="product-image" 
-                     onerror="this.src='../assets/images/3.png'">
+                    onerror="this.src='../assets/images/3.png'">
               </div>
               
               <div class="card-body">
                 <!-- 商品分類 -->
                 <span class="product-category">${CATEGORY_MAPPING[item.category_id] || '未分類'}</span>
-                
+                <span class="badge ${item.status === 'available' ? 'bg-green-500' : 'bg-gray-500'} text-white product-status">
+                  ${item.status === 'available' ? '可購買' : item.status}
+                </span>
+                                
                 <!-- 商品名稱 -->
                 <h5 class="product-title">${item.name}</h5>
                 
@@ -493,12 +535,14 @@
                 
                 <div class="flex items-center justify-between mt-3">
                   <!-- 商品價格 -->
-                  <span class="product-price">$${item.price}</span>
+                  <span class="product-price">$${formatPrice(item.price)}</span>
                   
                   <!-- 購買按鈕 -->
                   <button class="btn btn-primary" 
-                          onclick="showPurchasePopup(${item.id}, '${escapeHtml(item.name)}', ${item.price}, '${escapeHtml(imageUrl)}', '${escapeHtml(item.location)}')">
-                    <i class="bi bi-cart-plus me-1"></i> 購買
+                          ${item.status !== 'available' ? 'disabled' : ''}
+                          onclick="confirmPurchase(${item.id}, '${escapeHtml(item.name)}', ${item.price}, '${escapeHtml(imageUrl)}', '${escapeHtml(item.location)}')">
+                    <i class="bi bi-cart-plus me-1"></i> 
+                    ${item.status === 'available' ? '購買' : '已售出'}
                   </button>
                 </div>
               </div>
@@ -506,6 +550,22 @@
           `;
           
           container.appendChild(col);
+        });
+      }
+      
+      // 添加確認函數
+      function confirmPurchase(itemId, itemName, price, imageUrl, location) {
+        Swal.fire({
+          title: '確認購買？',
+          text: `您即將購買「${itemName}」`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: '確認',
+          cancelButtonText: '取消'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            showPurchasePopup(itemId, itemName, price, imageUrl, location);
+          }
         });
       }
       
@@ -527,15 +587,18 @@
           });
           
           if (response.ok) {
-            // 從本地列表中移除
+            // 直接移除對應的商品卡片
+            const itemElement = button.closest('.col-span-12');
+            if (itemElement) {
+              itemElement.remove();
+            }
+
+            // 更新本地列表
             favoriteItems = favoriteItems.filter(item => item.id !== itemId);
-            
-            // 更新UI
+
+            // 檢查是否還有其他收藏商品
             if (favoriteItems.length === 0) {
-              showEmptyState(); // 如果沒有收藏商品，顯示空狀態
-            } else {
-              renderFavoriteItems();
-              showItems(); // 如果有收藏商品，顯示商品列表
+              showEmptyState();
             }
             
             Swal.fire('成功', '已從收藏中移除', 'success');
@@ -591,11 +654,11 @@
           title: `確認購買「${itemName}」？`,
           html: `
             <div class="text-start">
-              <p><strong>價格：</strong>$${price}</p>
+              <p><strong>價格：</strong>$${price.toLocaleString()}</p>
               <p><strong>交易地點：</strong>${location}</p>
               <img src="${imageUrl}" alt="${itemName}" 
-                   style="max-width: 100%; border-radius: 8px; margin-top: 10px;"
-                   onerror="this.src='../assets/images/3.png'">
+                  style="max-width: 100%; border-radius: 8px; margin-top: 10px;"
+                  onerror="this.src='../assets/images/3.png'">
             </div>
           `,
           showCancelButton: true,
@@ -606,19 +669,28 @@
           showLoaderOnConfirm: true,
           preConfirm: async () => {
             try {
-              // 這裡替換為實際的購買API調用
               const token = localStorage.getItem('token');
-              const response = await fetch(`${API_BASE}/api/purchase`, {
+              if (!token) {
+                throw new Error('請先登入');
+              }
+              
+              // 使用正確的API端點 - 創建訂單
+              const response = await fetch(`${API_BASE}/api/order/create`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                   'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ item_id: itemId })
+                body: JSON.stringify({ 
+                  item_id: itemId,
+                  price: price,
+                  location: location
+                })
               });
               
               if (!response.ok) {
-                throw new Error(response.statusText);
+                const errorData = await response.json();
+                throw new Error(errorData.message || '購買失敗');
               }
               
               return await response.json();
@@ -630,15 +702,68 @@
           allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
           if (result.isConfirmed) {
+            // 購買成功後更新商品狀態
+            updateItemStatusAfterPurchase(itemId);
+            
             Swal.fire({
               title: '✅ 購買成功！',
-              text: `「${itemName}」已成功購買。`,
+              html: `
+                <div class="text-start">
+                  <p>「${itemName}」已成功購買。</p>
+                  <p><strong>訂單詳情：</strong></p>
+                  <p>• 價格: $${price.toLocaleString()}</p>
+                  <p>• 交易地點: ${location}</p>
+                  <p class="text-sm text-muted mt-2">請聯繫賣家確認面交時間</p>
+                </div>
+              `,
               icon: 'success',
-              confirmButtonText: '知道了',
+              confirmButtonText: '查看訂單',
               confirmButtonColor: '#6474E1'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // 跳轉到訂單頁面
+                window.location.href = '../elements/order.html';
+              }
             });
           }
         });
+      }
+
+      // 購買後更新商品狀態
+      async function updateItemStatusAfterPurchase(itemId) {
+        try {
+          const token = localStorage.getItem('token');
+          
+          // 更新商品狀態為 reserved
+          const response = await fetch(`${API_BASE}/api/item/${itemId}/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status: 'reserved' })
+          });
+          
+          if (response.ok) {
+            console.log('商品狀態更新為 reserved');
+            
+            // 從收藏列表中移除已購買的商品
+            const purchasedItem = document.querySelector(`[onclick*="toggleFavorite(${itemId}"]`);
+            if (purchasedItem) {
+              purchasedItem.closest('.col-span-12').remove();
+            }
+            
+            // 更新本地列表
+            favoriteItems = favoriteItems.filter(item => item.id !== itemId);
+            
+            // 檢查是否還有其他收藏商品
+            if (favoriteItems.length === 0) {
+              showEmptyState();
+            }
+          }
+        } catch (error) {
+          console.error('更新商品狀態失敗:', error);
+        }
       }
       
       // HTML跳脫函數
@@ -651,6 +776,14 @@
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#039;');
       }
+      // 價格格式化函數
+      function formatPrice(price) {
+        return new Intl.NumberFormat('zh-TW', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(price);
+      }
+
     </script>
   </body>
   <!-- [Body] end -->
