@@ -36,166 +36,86 @@
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="../../assets/css/style.css" id="main-style-link" />
     <style>
-      .password-checklist li {
-          font-size: 15px;
-          margin-bottom: 4px;
-      }
-      .progress {
-          height: 8px;
-          margin-top: 8px;
-          background-color: #e0e0e0;
-          border-radius: 10px;
-          overflow: hidden;
-      }
-      .progress-bar {
-          transition: width 0.5s ease, background-color 0.4s ease;
-          border-radius: 10px;
-      }
-      #strengthText {
-          transition: color 0.4s ease;
-      }
-      /* 確保圖片容器保持正方形 */
-      .avatar-container {
-              width: 50px;
-              height: 50px;
-              overflow: hidden;
-              border: 1px solid #e2e8f0; /* 灰色邊框 */
-              flex-shrink: 0; /* 防止壓縮 */
-          }
-      /* 預覽大頭貼 */
-      .avatar-preview-image {
-        max-width: 100px;
-        max-height: 100px;
-        border: 1px dashed #ccc;
-        margin-top: 5px;
-      }
-      /* 圖片樣式 */
-      #avatar-display {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-              display: block;
-          }
-
-      .password-checklist li {
-          font-size: 15px;
-          margin-bottom: 4px;
-      }
-      .progress {
-          height: 8px;
-          margin-top: 8px;
-          background-color: #e0e0e0;
-          border-radius: 10px;
-          overflow: hidden;
-      }
-      .progress-bar {
-          transition: width 0.5s ease, background-color 0.4s ease;
-          border-radius: 10px;
-      }
-      #strengthText {
-          transition: color 0.4s ease;
-      }
-      /* 商品圖片預覽樣式 */
-      #product-preview-container {
-        margin-top: 1rem;
-        text-align: center;
-      }
-
-      #product-image-preview {
-        max-width: 200px;
-        max-height: 200px;
-        object-fit: contain;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
-        padding: 5px;
-        background-color: #f8fafc;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      }
-
-      /* 上傳按鈕樣式 */
-      #uploadProductBtn {
-        transition: all 0.3s ease;
-      }
-
-      /* 新增審核狀態樣式 */
-        .status-alert {
-          padding: 1rem;
-          border-radius: 0.5rem;
-          margin-bottom: 1.5rem;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
+	   .password-checklist li {
+	       font-size: 15px;
+	       margin-bottom: 4px;
+	   }
+	   .progress {
+	       height: 8px;
+	       margin-top: 8px;
+	       background-color: #e0e0e0;
+	       border-radius: 10px;
+	       overflow: hidden;
+	   }
+	   .progress-bar {
+	       transition: width 0.5s ease, background-color 0.4s ease;
+	       border-radius: 10px;
+	   }
+	   #strengthText {
+	       transition: color 0.4s ease;
+	   }
+		/* 確保圖片容器保持正方形 */
+		.avatar-container {
+            width: 50px;
+            height: 50px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0; /* 灰色邊框 */
+            flex-shrink: 0; /* 防止壓縮 */
         }
-        .status-pending {
-          background-color: #ffedd5;
-          border: 1px solid #fdba74;
-          color: #9a3412;
-        }
-        .status-approved {
-          background-color: #dcfce7;
-          border: 1px solid #86efac;
-          color: #166534;
-        }
-        .status-rejected {
-          background-color: #fee2e2;
-          border: 1px solid #fca5a5;
-          color: #991b1b;
-        }
-        .status-icon {
-          font-size: 1.25rem;
-          flex-shrink: 0;
-        }
-        /* 載入動畫 */
-        .submit-loading {
-          position: relative;
-          pointer-events: none;
-        }
-        .submit-loading::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 1rem;
-          height: 1rem;
-          margin: -0.5rem 0 0 -0.5rem;
-          border: 2px solid transparent;
-          border-top: 2px solid currentColor;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        /* 確保按鈕有足夠的寬度 */
-        #submit-btn {
-          min-width: 120px;
-          height: 38px;
+		/* 預覽大頭貼 */
+		.avatar-preview-image {
+			max-width: 100px;
+			max-height: 100px;
+			border: 1px dashed #ccc;
+			margin-top: 5px;
+		}
+		/* 圖片樣式 */
+		 #avatar-display {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
-        /* 載入動畫居中 */
-        .position-absolute {
-          position: absolute;
-        }
-        .top-50 {
-          top: 50%;
-        }
-        .start-50 {
-          left: 50%;
-        }
-        .translate-middle {
-          transform: translate(-50%, -50%);
-        }
-        .visually-hidden {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
-        }
+    .password-checklist li {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+    .progress {
+        height: 8px;
+        margin-top: 8px;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        transition: width 0.5s ease, background-color 0.4s ease;
+        border-radius: 10px;
+    }
+    #strengthText {
+        transition: color 0.4s ease;
+    }
+    /* 商品圖片預覽樣式 */
+    #product-preview-container {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    #product-image-preview {
+      max-width: 200px;
+      max-height: 200px;
+      object-fit: contain;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      padding: 5px;
+      background-color: #f8fafc;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* 上傳按鈕樣式 */
+    #uploadProductBtn {
+      transition: all 0.3s ease;
+    }
     </style>
 
   </head>
@@ -352,14 +272,6 @@
             <h5 class="mb-0">商品上架</h5>
           </div>
           <div class="card-body">
-             <!-- 審核狀態提示區 -->
-              <div id="status-alert" class="status-alert d-none">
-                <i id="status-icon" class="status-icon"></i>
-                <div>
-                  <h6 id="status-title" class="mb-1 fw-semibold"></h6>
-                  <p id="status-message" class="mb-0 small"></p>
-                  <p id="status-notes" class="mb-0 small mt-1 d-none"></p>
-              </div>
             <form id="itemForm" method="post" enctype="multipart/form-data">
               <!-- 商品照片上傳區塊 -->
               <div class="mb-4">
@@ -368,7 +280,6 @@
                   <img id="product-image-preview" alt="商品預覽">
                 </div>
                 <input type="file" id="productImageInput" class="form-control" accept="image/*">
-                <div class="form-text">支援 JPG, PNG, WebP 格式，最大 5MB</div>
               </div>
               <!-- 商品名稱 -->
               <div class="mb-4">
@@ -404,35 +315,11 @@
                 <input type="text" name="location" class="form-control" placeholder="請輸入交易地點" required>
               </div>
 
-             <!-- 提交按鈕 -->
+              <!-- 提交按鈕 -->
               <div class="text-end">
-                <button type="submit" class="btn btn-primary position-relative" id="submit-btn">
-                  <!-- 正常狀態文字 -->
-                  <span id="submit-text">提交審核</span>
-                  
-                  <!-- 載入狀態 -->
-                  <span id="submit-loading" class="position-absolute top-50 start-50 translate-middle d-none">
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span class="visually-hidden">提交中...</span>
-                  </span>
-                </button>
+                <button type="submit" class="btn btn-primary">送出</button>
               </div>
             </form>
-
-            <!-- 審核說明卡片 -->
-            <div class="card mt-4">
-              <div class="card-header">
-                <h6 class="mb-0">審核說明</h6>
-              </div>
-              <div class="card-body">
-                <ul class="list-unstyled mb-0">
-                  <li class="mb-2">✅ 商品提交後需要經過管理員審核</li>
-                  <li class="mb-2">✅ 審核通過後商品才會顯示在平台上</li>
-                  <li class="mb-2">✅ 審核時間通常為1-2個工作日</li>
-                  <li>✅ 如有疑問請聯繫客服</li>
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -552,14 +439,7 @@
           imageInput: document.getElementById("productImageInput"),
           preview: document.getElementById("product-image-preview"),
           previewContainer: document.getElementById("product-preview-container"),
-          submitBtn: document.querySelector("#itemForm button[type='submit']"),
-          submitText: document.getElementById("submit-text"),
-          submitLoading: document.getElementById("submit-loading"),
-          statusAlert: document.getElementById("status-alert"),
-          statusIcon: document.getElementById("status-icon"),
-          statusTitle: document.getElementById("status-title"),
-          statusMessage: document.getElementById("status-message"),
-          statusNotes: document.getElementById("status-notes")
+          submitBtn: document.querySelector("#itemForm button[type='submit']")
         };
 
         // 狀態管理
@@ -575,27 +455,11 @@
             return;
           }
           setupEventListeners();
-          checkUrlParams();
-        }
-
-        // 檢查URL參數（用於顯示審核結果）
-        function checkUrlParams() {
-          const urlParams = new URLSearchParams(window.location.search);
-          const status = urlParams.get('status');
-          const message = urlParams.get('message');
-          
-          if (status && message) {
-            showStatusAlert(status, decodeURIComponent(message));
-            // 清除URL參數
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
         }
 
         // 事件監聽
         function setupEventListeners() {
-          if (elements.imageInput) {
-            elements.imageInput.addEventListener("change", handleFileSelect);
-          }
+          elements.imageInput.addEventListener("change", handleFileSelect);
           elements.form.addEventListener("submit", handleFormSubmit);
         }
 
@@ -639,145 +503,64 @@
 
         // 表單提交處理
         async function handleFormSubmit(e) {
-          e.preventDefault();
-          
-          // 檢查是否已選擇圖片
-          if (!state.selectedFile) {
-            alert("請選擇商品圖片");
-            return;
-          }
-
-          // 表單驗證
-          if (!validateForm()) {
-            return;
-          }
-
-          try {
-            setSubmitState(true);
-            hideStatusAlert();
-
-            const formData = new FormData(elements.form);
-            formData.append("image", state.selectedFile);
-
-            const response = await fetch(`${API_BASE}/item/add`, {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-              },
-              body: formData
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) throw new Error(result.message || "提交失敗");
-
-            // 顯示成功訊息
-            showStatusAlert("pending", result.message || "商品已提交審核，請等待管理員審核");
+            e.preventDefault();
             
-            // 重置表單
-            resetForm();
+            // 檢查是否已選擇圖片
+            if (!state.selectedFile) {
+                alert("請選擇商品圖片");
+                return;
+            }
 
-          } catch (error) {
-            console.error("提交錯誤:", error);
-            showStatusAlert("error", `提交失敗: ${error.message}`);
-          } finally {
-            setSubmitState(false);
-          }
+            try {
+                setSubmitState(true);
+                
+                const formData = new FormData(elements.form);
+                formData.append("image", state.selectedFile);
+                
+                // 添加路徑參數告訴後端這是商品圖片
+                formData.append("pathType", "items"); // 新增這一行
+
+                const response = await fetch(`${API_BASE}/item/add`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) throw new Error(result.message || "提交失敗");
+
+                alert("商品上架成功！");
+                resetForm();
+
+            } catch (error) {
+                alert(`提交失敗: ${error.message}`);
+                console.error("提交錯誤:", error);
+            } finally {
+                setSubmitState(false);
+            }
         }
 
-        // 表單驗證
-        function validateForm() {
-          const formData = new FormData(elements.form);
-          const price = parseFloat(formData.get('price'));
-          
-          if (price <= 0) {
-            alert("價格必須大於0");
-            return false;
-          }
-          
-          return true;
-        }
-
-        // 顯示狀態提示
-        function showStatusAlert(type, message, notes = "") {
-          elements.statusAlert.classList.remove("d-none", "status-pending", "status-approved", "status-rejected", "status-error");
-          
-          switch(type) {
-            case "pending":
-              elements.statusAlert.classList.add("status-pending");
-              elements.statusIcon.className = "status-icon ti ti-clock";
-              elements.statusTitle.textContent = "審核中";
-              break;
-            case "success":
-            case "approved":
-              elements.statusAlert.classList.add("status-approved");
-              elements.statusIcon.className = "status-icon ti ti-check";
-              elements.statusTitle.textContent = "審核通過";
-              break;
-            case "rejected":
-              elements.statusAlert.classList.add("status-rejected");
-              elements.statusIcon.className = "status-icon ti ti-x";
-              elements.statusTitle.textContent = "審核未通過";
-              break;
-            case "error":
-              elements.statusAlert.classList.add("status-rejected");
-              elements.statusIcon.className = "status-icon ti ti-alert-triangle";
-              elements.statusTitle.textContent = "錯誤";
-              break;
-          }
-          
-          elements.statusMessage.textContent = message;
-          
-          if (notes) {
-            elements.statusNotes.textContent = `備註: ${notes}`;
-            elements.statusNotes.classList.remove("d-none");
-          } else {
-            elements.statusNotes.classList.add("d-none");
-          }
-        }
-
-        // 隱藏狀態提示
-        function hideStatusAlert() {
-          elements.statusAlert.classList.add("d-none");
-        }
-
-        // 重置表單
+        // 輔助函數
         function resetForm() {
           elements.form.reset();
           resetImage();
-          // 清空預覽
+        }
+
+        function resetImage() {
           elements.preview.src = "";
           elements.previewContainer.style.display = "none";
-        }
-
-        // 重置圖片
-        function resetImage() {
+          elements.imageInput.value = "";
           state.selectedFile = null;
-          if (elements.imageInput) {
-            elements.imageInput.value = "";
-          }
         }
 
-        // 設置提交狀態
         function setSubmitState(isSubmitting) {
           state.isSubmitting = isSubmitting;
-          
-          const submitBtn = document.getElementById("submit-btn");
-          const submitText = document.getElementById("submit-text");
-          const submitLoading = document.getElementById("submit-loading");
-          
-          if (submitBtn) {
-            submitBtn.disabled = isSubmitting;
-          }
-          
-          if (submitText && submitLoading) {
-            if (isSubmitting) {
-              submitText.classList.add("d-none");
-              submitLoading.classList.remove("d-none");
-            } else {
-              submitText.classList.remove("d-none");
-              submitLoading.classList.add("d-none");
-            }
+          if (elements.submitBtn) {
+            elements.submitBtn.disabled = isSubmitting;
+            elements.submitBtn.textContent = isSubmitting ? "上傳中..." : "送出";
           }
         }
 
