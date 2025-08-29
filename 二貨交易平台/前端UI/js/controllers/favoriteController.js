@@ -1,11 +1,12 @@
 const db = require('../db');
 
-// 📌 加入收藏
+// 📌 加入收藏 (加強版)
 exports.addFavorite = async (req, res) => {
   const userId = req.user.id;
   const { item_id } = req.body;
 
   try {
+    // 檢查是否已收藏
     const [existing] = await db.query(
       'SELECT * FROM favorites WHERE user_id = ? AND item_id = ?',
       [userId, item_id]
@@ -15,6 +16,17 @@ exports.addFavorite = async (req, res) => {
       return res.status(400).json({ message: '已經收藏過此商品' });
     }
 
+    // 新增：檢查商品是否存在且為 available 狀態
+    const [itemCheck] = await db.query(
+      'SELECT * FROM items WHERE id = ? AND status = "available"',
+      [item_id]
+    );
+
+    if (itemCheck.length === 0) {
+      return res.status(404).json({ message: '商品不存在或無法收藏' });
+    }
+
+    // 加入收藏
     await db.query(
       'INSERT INTO favorites (user_id, item_id) VALUES (?, ?)',
       [userId, item_id]
