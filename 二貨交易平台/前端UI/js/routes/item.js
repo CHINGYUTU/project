@@ -1,5 +1,24 @@
 const express = require('express');
 const router = express.Router();
+const {
+  createItem,
+  updateItem,
+  getAvailableItems,
+  getMyItems,
+  getAllItems,
+  reviewItem,
+  deleteItem,
+  searchItems,
+  getPendingItems
+} = require("../controllers/itemController");
+const authorize = (roles = []) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: '沒有權限' });
+    }
+    next();
+  };
+};
 const itemController = require('../controllers/itemController');
 const verifyToken = require('../middleware/verifyToken');
 const { uploadItemImage } = require('../middleware/upload');
@@ -22,6 +41,9 @@ router.get('/available', itemController.getAvailableItems);
 
 // 📌 搜尋商品（僅 available，開放所有人）
 router.get('/search', itemController.searchItems);
+
+// 📌 搜尋待審核商品(僅限管理員)
+router.get("/pending", verifyToken, authorize(["admin"]), itemController.getPendingItems);
 
 // 📌 修改商品（重新進入 pending）
 router.patch('/:id', verifyToken, uploadItemImage.single('image'), itemController.updateItem);

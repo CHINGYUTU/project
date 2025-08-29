@@ -91,6 +91,23 @@ exports.getAvailableItems = async (req, res) => {
   }
 };
 
+// 查詢所有待審核的商品 (管理員用)
+exports.getPendingItems = async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT i.*, c.name AS category_name
+       FROM items i
+       JOIN categories c ON i.category_id = c.id
+       WHERE i.status = 'pending'
+       ORDER BY i.created_at DESC`
+    );
+    res.json({ message: '查詢成功', data: rows });
+  } catch (err) {
+    console.error('❌ 查詢待審核商品錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+};
+
 // 📌 賣家查看自己上架的商品（可看到 pending 與 available）
 exports.getMyItems = async (req, res) => {
   const userId = req.user.id;

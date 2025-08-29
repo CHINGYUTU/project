@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>使用者管理系統</title>
+    <title>商品審核系統</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -198,7 +198,7 @@
             font-size: 14px;
         }
 
-        /* 使用者表格 */
+        /* 商品卡片 */
         .card {
             background-color: var(--light);
             border-radius: 12px;
@@ -242,26 +242,26 @@
             overflow-x: auto;
         }
 
-        .user-table {
+        .product-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .user-table th {
-            background-color: rgba(var(--primary-rgb), 0.1);
+        .product-table th {
+            background-color: rgba(67, 97, 238, 0.1);
             padding: 15px;
             text-align: left;
             font-weight: 600;
             color: var(--primary);
         }
 
-        .user-table td {
+        .product-table td {
             padding: 15px;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .user-table tr:hover {
-            background-color: rgba(var(--primary-rgb), 0.03);
+        .product-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.03);
         }
 
         .badge {
@@ -271,14 +271,19 @@
             font-weight: 500;
         }
 
-        .badge-admin {
-            background-color: rgba(79, 70, 229, 0.1);
-            color: #4f46e5;
+        .badge-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
         }
 
-        .badge-user {
+        .badge-available {
             background-color: rgba(34, 197, 94, 0.1);
             color: #22c55e;
+        }
+
+        .badge-rejected {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
         }
 
         .action-buttons {
@@ -308,14 +313,110 @@
             color: white;
         }
 
-        .btn-delete {
+        .btn-approve {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .btn-approve:hover {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .btn-reject {
             background-color: rgba(239, 68, 68, 0.1);
             color: #ef4444;
         }
 
-        .btn-delete:hover {
+        .btn-reject:hover {
             background-color: #ef4444;
             color: white;
+        }
+
+        /* 商品圖片樣式 */
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* 商品詳情模態框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--light);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .product-image-large {
+            width: 100%;
+            border-radius: 12px;
+            object-fit: cover;
+            max-height: 300px;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            min-width: 100px;
         }
 
         /* 頁尾 */
@@ -377,6 +478,26 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+            
+            .product-detail {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 載入動畫 */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -386,18 +507,22 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <i class="fas fa-users-cog"></i>
-                    <span>管理員系統</span>
+                    <i class="fas fa-box-check"></i>
+                    <span>商品審核系統</span>
                 </div>
             </div>
             <ul class="sidebar-menu">
                 <li class="menu-item active">
-                    <i class="fas fa-user-cog"></i>
-                    <span>使用者管理</span>
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>商品審核</span>
                 </li>
                 <li class="menu-item">
                     <i class="fas fa-shopping-cart"></i>
                     <span>商品管理</span>
+                </li>
+                <li class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>使用者管理</span>
                 </li>
                 <li class="menu-item">
                     <i class="fas fa-chart-bar"></i>
@@ -418,7 +543,7 @@
         <div class="main-content">
             <!-- 頂部導航 -->
             <div class="topbar">
-                <div class="page-title">使用者管理</div>
+                <div class="page-title">商品審核</div>
                 <div class="user-actions">
                     <button class="theme-toggle" id="theme-toggle">
                         <i class="fas fa-moon"></i>
@@ -436,133 +561,69 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon" style="background-color: rgba(79, 70, 229, 0.1); color: #4f46e5;">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-box"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value">128</div>
-                        <div class="stat-title">總使用者數</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e;">
-                        <i class="fas fa-user-check"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-value">96</div>
-                        <div class="stat-title">活躍使用者</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444;">
-                        <i class="fas fa-crown"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-value">8</div>
-                        <div class="stat-title">管理員帳號</div>
+                        <div class="stat-value" id="total-items">0</div>
+                        <div class="stat-title">總商品數</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                        <i class="fas fa-coins"></i>
+                        <i class="fas fa-clock"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-value">5,280</div>
-                        <div class="stat-title">總點數</div>
+                        <div class="stat-value" id="pending-items">0</div>
+                        <div class="stat-title">待審核商品</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="approved-items">0</div>
+                        <div class="stat-title">已通過商品</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="rejected-items">0</div>
+                        <div class="stat-title">已拒絕商品</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 使用者表格 -->
+            <!-- 商品表格 -->
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">使用者列表</div>
+                    <div class="card-title">待審核商品列表</div>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="搜尋使用者...">
+                        <input type="text" placeholder="搜尋商品..." id="search-input">
                     </div>
                 </div>
                 <div class="table-container">
-                    <table class="user-table">
+                    <table class="product-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>姓名</th>
-                                <th>電子郵件</th>
-                                <th>角色</th>
-                                <th>點數</th>
-                                <th>註冊日期</th>
+                                <th>圖片</th>
+                                <th>商品名稱</th>
+                                <th>價格</th>
+                                <th>面交地點</th>
+                                <th>狀態</th>
+                                <th>上架日期</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="product-table-body">
                             <tr>
-                                <td>1001</td>
-                                <td>張小明</td>
-                                <td>ming@example.com</td>
-                                <td><span class="badge badge-user">使用者</span></td>
-                                <td>120</td>
-                                <td>2023-05-15</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-view"><i class="fas fa-eye"></i> 檢視</button>
-                                        <button class="btn btn-delete"><i class="fas fa-trash"></i> 刪除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1002</td>
-                                <td>李大同</td>
-                                <td>datong@example.com</td>
-                                <td><span class="badge badge-admin">管理員</span></td>
-                                <td>500</td>
-                                <td>2023-02-10</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-view"><i class="fas fa-eye"></i> 檢視</button>
-                                        <button class="btn btn-delete"><i class="fas fa-trash"></i> 刪除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1003</td>
-                                <td>王美美</td>
-                                <td>meimei@example.com</td>
-                                <td><span class="badge badge-user">使用者</span></td>
-                                <td>85</td>
-                                <td>2023-07-22</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-view"><i class="fas fa-eye"></i> 檢視</button>
-                                        <button class="btn btn-delete"><i class="fas fa-trash"></i> 刪除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1004</td>
-                                <td>陳小華</td>
-                                <td>xiaohua@example.com</td>
-                                <td><span class="badge badge-user">使用者</span></td>
-                                <td>210</td>
-                                <td>2023-04-05</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-view"><i class="fas fa-eye"></i> 檢視</button>
-                                        <button class="btn btn-delete"><i class="fas fa-trash"></i> 刪除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>1005</td>
-                                <td>林大為</td>
-                                <td>dawei@example.com</td>
-                                <td><span class="badge badge-admin">管理員</span></td>
-                                <td>750</td>
-                                <td>2023-01-18</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-view"><i class="fas fa-eye"></i> 檢視</button>
-                                        <button class="btn btn-delete"><i class="fas fa-trash"></i> 刪除</button>
-                                    </div>
+                                <td colspan="8">
+                                    <div class="loader" id="table-loader"></div>
                                 </td>
                             </tr>
                         </tbody>
@@ -572,57 +633,265 @@
 
             <!-- 頁尾 -->
             <div class="app-footer">
-                <p>© 2023 使用者管理系統 - 版權所有</p>
+                <p>© 2023 商品審核系統 - 版權所有</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品詳情模態框 -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">商品詳情</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-detail">
+                    <div class="product-image-container">
+                        <img src="" alt="商品圖片" class="product-image-large" id="modal-image">
+                    </div>
+                    <div class="product-info">
+                        <div class="info-row">
+                            <span class="info-label">商品ID:</span>
+                            <span id="modal-id"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">商品名稱:</span>
+                            <span id="modal-name"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">描述:</span>
+                            <span id="modal-description"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">價格:</span>
+                            <span id="modal-price"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">面交地點:</span>
+                            <span id="modal-location"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">狀態:</span>
+                            <span id="modal-status"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">上架日期:</span>
+                            <span id="modal-created-at"></span>
+                        </div>
+                        <div class="action-buttons" style="margin-top: 20px;">
+                            <button class="btn btn-approve" id="modal-approve">
+                                <i class="fas fa-check"></i> 通過審核
+                            </button>
+                            <button class="btn btn-reject" id="modal-reject">
+                                <i class="fas fa-times"></i> 拒絕審核
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 切換深色/淺色模式
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
-        
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            
-            if (document.body.classList.contains('dark-mode')) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-        });
+        let currentProductId = null;
+        let allProducts = [];
 
-        // 模擬從API獲取資料
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('頁面載入完成，可以從API獲取資料');
-            
-            // 這裡可以添加從 http://localhost:3000/api/user 獲取資料的代碼
-            // fetch('http://localhost:3000/api/user')
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         console.log('獲取到的使用者資料:', data);
-            //         // 更新頁面內容
-            //     })
-            //     .catch(error => {
-            //         console.error('獲取資料失敗:', error);
-            //     });
+            initThemeToggle();
+            loadProducts();
+            initSearch();
+            initModalEvents();
         });
 
-        // 刪除使用者功能
-        const deleteButtons = document.querySelectorAll('.btn-delete');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const userName = this.closest('tr').querySelector('td:nth-child(2)').textContent;
-                if (confirm(`確定要刪除使用者 "${userName}" 嗎？`)) {
-                    // 這裡可以添加刪除使用者的API呼叫
-                    this.closest('tr').style.opacity = '0.5';
-                    this.disabled = true;
-                    console.log(`已刪除使用者: ${userName}`);
+        function initThemeToggle() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
                 }
             });
-        });
+        }
+
+        async function loadProducts() {
+            try {
+                const res = await fetch("http://localhost:3000/api/item/pending", {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
+                });
+
+                const result = await res.json();
+                console.log("後端回傳:", result);
+
+                const products = Array.isArray(result) ? result : result.data;
+
+                // 過濾待審核的商品
+                const pendingProducts = products.filter(p => p.status === "pending");
+
+                // 確保表格存在
+                const tbody = document.getElementById("product-table-body");
+                if (!tbody) {
+                    console.error("❌ 沒找到 #productTable tbody");
+                    return;
+                }
+                tbody.innerHTML = "";
+
+                pendingProducts.forEach(product => {
+                    const tr = document.createElement("tr");
+
+                    tr.innerHTML = `
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.description || ""}</td>
+                        <td>${product.price}</td>
+                        <td>${product.location}</td>
+                        <td>${product.status}</td>
+                        <td>${product.created_at}</td>
+                        <td>
+                            <button onclick="reviewItem(${product.id}, 'available')">通過</button>
+                            <button onclick="reviewItem(${product.id}, 'rejected')">拒絕</button>
+                        </td>
+                    `;
+
+                    tbody.appendChild(tr);
+                });
+
+                updateStats(products);
+
+            } catch (err) {
+                console.error("載入商品失敗", err);
+            }
+        }
+
+        function updateStats(products) {
+            const pendingCount = products.filter(p => p.status === "pending").length;
+            const availableCount = products.filter(p => p.status === "available").length;
+            const rejectedCount = products.filter(p => p.status === "rejected").length;
+
+            document.getElementById("pendingCount").textContent = pendingCount;
+            document.getElementById("availableCount").textContent = availableCount;
+            document.getElementById("rejectedCount").textContent = rejectedCount;
+        }
+
+        function renderProducts(products) {
+            const tableBody = document.getElementById('product-table-body');
+            if (products.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">目前沒有待審核的商品</td></tr>`;
+                return;
+            }
+            tableBody.innerHTML = '';
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                let statusBadgeClass = '';
+                let statusText = '';
+                switch (product.status) {
+                    case 'pending': statusBadgeClass = 'badge-pending'; statusText = '待審核'; break;
+                    case 'available': statusBadgeClass = 'badge-available'; statusText = '已通過'; break;
+                    case 'rejected': statusBadgeClass = 'badge-rejected'; statusText = '已拒絕'; break;
+                }
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td><img src="${product.image_url || 'https://via.placeholder.com/60'}" class="product-image"></td>
+                    <td>${product.name}</td>
+                    <td>$${product.price}</td>
+                    <td>${product.location}</td>
+                    <td><span class="badge ${statusBadgeClass}">${statusText}</span></td>
+                    <td>${formatDate(product.created_at)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-view" data-id="${product.id}"><i class="fas fa-eye"></i> 查看</button>
+                            <button class="btn btn-approve" data-id="${product.id}"><i class="fas fa-check"></i> 通過</button>
+                            <button class="btn btn-reject" data-id="${product.id}"><i class="fas fa-times"></i> 拒絕</button>
+                        </div>
+                    </td>`;
+                tableBody.appendChild(row);
+            });
+            document.querySelectorAll('.btn-view').forEach(b => b.onclick = () => showProductDetail(b.dataset.id));
+            document.querySelectorAll('.btn-approve').forEach(b => b.onclick = () => approveProduct(b.dataset.id));
+            document.querySelectorAll('.btn-reject').forEach(b => b.onclick = () => rejectProduct(b.dataset.id));
+        }
+
+        function initSearch() {
+            document.getElementById('search-input').addEventListener('input', function() {
+                const term = this.value.toLowerCase();
+                const filtered = allProducts
+                    .filter(p => p.status === 'pending')
+                    .filter(p =>
+                        p.name.toLowerCase().includes(term) ||
+                        (p.description && p.description.toLowerCase().includes(term)) ||
+                        p.location.toLowerCase().includes(term)
+                    );
+                renderProducts(filtered);
+            });
+        }
+
+        function initModalEvents() {
+            const modal = document.getElementById('product-modal');
+            document.getElementById('modal-close').onclick = () => modal.style.display = 'none';
+            window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+            document.getElementById('modal-approve').onclick = () => { if (currentProductId) approveProduct(currentProductId); modal.style.display = 'none'; };
+            document.getElementById('modal-reject').onclick = () => { if (currentProductId) rejectProduct(currentProductId); modal.style.display = 'none'; };
+        }
+
+        function showProductDetail(productId) {
+            const product = allProducts.find(p => p.id == productId);
+            if (!product) return;
+            currentProductId = productId;
+            document.getElementById('modal-id').textContent = product.id;
+            document.getElementById('modal-name').textContent = product.name;
+            document.getElementById('modal-description').textContent = product.description || '無描述';
+            document.getElementById('modal-price').textContent = `$${product.price}`;
+            document.getElementById('modal-location').textContent = product.location;
+            document.getElementById('modal-created-at').textContent = formatDate(product.created_at);
+            document.getElementById('modal-image').src = product.image_url || 'https://via.placeholder.com/300';
+            let statusText = product.status === 'pending' ? '待審核' : product.status === 'available' ? '已通過' : '已拒絕';
+            document.getElementById('modal-status').textContent = statusText;
+            document.getElementById('modal-approve').style.display = product.status === 'pending' ? 'flex' : 'none';
+            document.getElementById('modal-reject').style.display = product.status === 'pending' ? 'flex' : 'none';
+            document.getElementById('product-modal').style.display = 'flex';
+        }
+
+        async function reviewProduct(productId, status) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/item/review/${productId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem("token")}`
+                    },
+                    body: JSON.stringify({ status })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                const idx = allProducts.findIndex(p => p.id == productId);
+                if (idx !== -1) allProducts[idx].status = status;
+                renderProducts(allProducts.filter(p => p.status === 'pending'));
+                updateStats(allProducts);
+                alert(`商品已${status === 'available' ? '通過' : '拒絕'}審核`);
+            } catch (err) {
+                console.error('審核失敗:', err);
+                alert(`審核失敗: ${err.message}`);
+            }
+        }
+
+        function approveProduct(id) {
+            if (confirm('確定要通過此商品嗎？')) reviewProduct(id, 'available');
+        }
+
+        function rejectProduct(id) {
+            if (confirm('確定要拒絕此商品嗎？')) reviewProduct(id, 'rejected');
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return isNaN(d) ? '-' : d.toLocaleDateString();
+        }
     </script>
+
 </body>
 </html>
