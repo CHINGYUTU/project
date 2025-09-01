@@ -56,6 +56,45 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
+// 📌 審核訂單（同意 / 拒絕）
+exports.reviewOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const { decision } = req.body; // 'agree' 或 'reject'
+
+  try {
+    // 找訂單 & 對應的商品
+    const [orders] = await db.query(
+      `SELECT o.*, oi.item_id 
+       FROM orders o
+       JOIN order_items oi ON o.id = oi.order_id
+       WHERE o.id = ?`, 
+      [orderId]
+    );
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: '找不到該訂單' });
+    }
+
+    const order = orders[0];
+
+    if (decision === 'agree') {
+      // ✅ 同意 → 訂單完成
+      await db.query('UPDATE orders SET status = ? WHERE id = ?', ['completed', orderId]);
+      return res.json({ message: '訂單審核通過' });
+    } else if (decision === 'reject') {
+      // ❌ 拒絕 → 商品恢復 available，刪除訂單
+      await db.query('UPDATE items SET status = ? WHERE id = ?', ['available', order.item_id]);
+      await db.query('DELETE FROM orders WHERE id = ?', [orderId]);
+      return res.json({ message: '拒絕審核，已重新上架' });
+    } else {
+      return res.status(400).json({ message: 'decision 必須是 agree 或 reject' });
+    }
+  } catch (error) {
+    console.error('❌ 審核訂單錯誤:', error);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+};
+
 // 📌 建立訂單
 exports.createOrder = async (req, res) => {
   const { itemId } = req.body;
@@ -69,7 +108,12 @@ exports.createOrder = async (req, res) => {
     }
     const item = itemRows[0];
 
-    // 1️⃣ 先建立訂單
+    // 檢查商品是否可購買
+    if (item.status !== 'available') {
+      return res.status(400).json({ message: '此商品目前無法購買' });
+    }
+
+    // 1️⃣ 建立訂單（保持 orders.status 為 confirmed）
     const [orderResult] = await db.query(
       `INSERT INTO orders (buyer_id, seller_id, status, created_at, total_price)
        VALUES (?, ?, 'confirmed', NOW(), ?)`,
@@ -84,8 +128,8 @@ exports.createOrder = async (req, res) => {
       [orderId, item.id, item.name, item.location, item.price]
     );
 
-    // 3️⃣ 更新商品狀態
-    await db.query('UPDATE items SET status = ? WHERE id = ?', ['confirmed', itemId]);
+    // 3️⃣ 更新商品狀態為 reserved（不是 confirmed）
+    await db.query('UPDATE items SET status = ? WHERE id = ?', ['reserved', itemId]);
 
     // 4️⃣ 回傳 orderId
     res.json({ message: '訂單建立成功', data: { orderId } });
@@ -96,13 +140,33 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// 刪除訂單
+exports.deleteOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // 確認訂單是屬於這個使用者
+    const [rows] = await db.query('SELECT * FROM orders WHERE id = ? AND user_id = ?', [orderId, userId]);
+    if (rows.length === 0) {
+      return res.status(403).json({ message: '無權刪除此訂單或訂單不存在' });
+    }
+
+    await db.query('DELETE FROM orders WHERE id = ?', [orderId]);
+    res.json({ message: '訂單已刪除' });
+  } catch (error) {
+    console.error('❌ 刪除訂單失敗:', error);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+};
+
 // 📌 更新訂單狀態
 exports.updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
   const { newStatus } = req.body;
   const userId = req.user.id;
 
-  const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+  const validStatuses = ['confirmed', 'completed', 'cancelled'];
   if (!validStatuses.includes(newStatus)) {
     return res.status(400).json({ message: '不合法的訂單狀態' });
   }
@@ -118,6 +182,7 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(403).json({ message: '無權限更新此訂單' });
     }
 
+    // 權限檢查邏輯保持不變
     if (newStatus === 'confirmed' && userId !== order.seller_id) {
       return res.status(403).json({ message: '只有賣家可以確認訂單' });
     }
@@ -129,8 +194,9 @@ exports.updateOrderStatus = async (req, res) => {
     // 更新訂單狀態
     await db.query('UPDATE orders SET status = ? WHERE id = ?', [newStatus, orderId]);
 
-    // 更新商品狀態
+    // 根據訂單狀態更新商品狀態
     if (newStatus === 'completed') {
+      // 訂單完成 → 商品售出
       await db.query(
         `UPDATE items 
          SET status = 'sold' 
@@ -138,6 +204,7 @@ exports.updateOrderStatus = async (req, res) => {
         [orderId]
       );
     } else if (newStatus === 'cancelled') {
+      // 訂單取消 → 商品恢復可購買
       await db.query(
         `UPDATE items 
          SET status = 'available' 
@@ -145,6 +212,7 @@ exports.updateOrderStatus = async (req, res) => {
         [orderId]
       );
     }
+    // confirmed 狀態保持商品為 reserved
 
     res.json({ message: `訂單狀態已更新為 ${newStatus}` });
   } catch (err) {

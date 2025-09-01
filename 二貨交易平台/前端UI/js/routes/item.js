@@ -33,6 +33,9 @@ router.get('/my-items', verifyToken, itemController.getMyItems);
 // 📌 查詢所有商品（僅限管理員）
 router.get('/all', verifyToken, itemController.getAllItems);
 
+// 📌 修改訂單狀態
+router.patch('/update-status/:itemId', verifyToken, itemController.updateStatus);
+
 // 📌 管理員審核商品（approve/reject）
 router.patch('/review/:id', verifyToken, itemController.reviewItem);
 

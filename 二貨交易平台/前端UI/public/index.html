@@ -758,7 +758,8 @@
                         }
 
                         const orderData = await createRes.json();
-                        const orderId = orderData.data?.id; // 假設後端回傳 { data: { id: xxx } }
+                        // 修正這裡：後端回傳的是 { data: { orderId: xxx } }，不是 { data: { id: xxx } }
+                        const orderId = orderData.data?.orderId;
                         if (!orderId) throw new Error("後端未回傳訂單 ID");
 
                         // 2️⃣ 更新訂單狀態為 confirmed
@@ -768,7 +769,8 @@
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${token}`
                             },
-                            body: JSON.stringify({ orderStatus: "confirmed" })
+                            // 將 orderStatus 改為 newStatus
+                            body: JSON.stringify({ newStatus: "confirmed" })
                         });
 
                         if (!updateRes.ok) {
@@ -790,7 +792,7 @@
                 if (result.isConfirmed) {
                     Swal.fire({
                         title: '✅ 購買成功！',
-                        text: `「${itemName}」已成功購買，狀態已更新為 Confirmed。`,
+                        text: `「${itemName}」已成功預定，請待商家審核。`,
                         icon: 'success',
                         confirmButtonText: '知道了',
                         confirmButtonColor: '#6474E1'

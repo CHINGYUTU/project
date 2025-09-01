@@ -18,4 +18,7 @@ router.patch('/update-status/:orderId', verifyToken, orderController.updateOrder
 // 查詢單筆訂單詳情（買家 / 賣家 / 管理員）
 router.get('/:orderId', verifyToken, orderController.getOrderDetail);
 
+// 修改訂單狀態
+router.patch('/review/:orderId', verifyToken, orderController.reviewOrder);
+
 module.exports = router;

@@ -333,7 +333,8 @@
     'pending': { text: '審核中', class: 'status-pending' },
     'available': { text: '已上架', class: 'status-available' },
     'rejected': { text: '已拒絕', class: 'status-rejected' },
-    'sold': { text: '已售出', class: 'status-sold' }
+    'sold': { text: '已售出', class: 'status-sold' },
+    'reserved': { text: '待審核', class: 'status-reserved' }
   };
 
   const CATEGORY_MAPPING = {
@@ -442,80 +443,84 @@
 
    // 在displayItems函數中保存商品數據
     function displayItems(items) {
-      const container = document.getElementById("items-container");
+  const container = document.getElementById("items-container");
+  
+  // 過濾掉 reserved 和 sold 狀態的商品
+  const filteredItems = items.filter(item => 
+    item.status !== 'reserved' && item.status !== 'sold'
+  );
+  
+  if (!filteredItems || filteredItems.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-12 text-center p-4 bg-blue-50 border border-blue-200 rounded">
+        目前沒有可管理的商品
+      </div>
+    `;
+    return;
+  }
+  
+  // 確保正確設置 data-item 屬性
+    container.innerHTML = filteredItems.map(item => {
+      const statusInfo = STATUS_MAPPING[item.status] || { text: '未知狀態', class: 'status-pending' };
       
-      if (!items || items.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-12 text-center p-4 bg-blue-50 border border-blue-200 rounded">
-            目前沒有商品
+      // 將商品數據轉為JSON字符串，確保特殊字符被正確處理
+      const itemData = JSON.stringify(item).replace(/"/g, '&quot;');
+      
+      return `
+      <div class="col-span-12 xl:col-span-4 md:col-span-6" 
+          data-id="${item.id}" 
+          data-item="${itemData}">
+        <div class="card h-full flex flex-col">
+          <img src="${getSafeImageUrl(item.image_url)}"
+          onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
+          class="w-full h-48 object-cover" />
+          <div class="card-header !pb-0 !border-b-0">
+            <div class="flex justify-between items-start">
+              <h4 class="text-lg font-semibold">${item.name || "未命名商品"}</h4>
+              <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
+            </div>
+            ${item.description ? `<p class="text-gray-600 mt-1">${item.description}</p>` : ''}
           </div>
-        `;
-        return;
-      }
-      
-      // 確保正確設置 data-item 屬性
-      container.innerHTML = items.map(item => {
-        const statusInfo = STATUS_MAPPING[item.status] || { text: '未知狀態', class: 'status-pending' };
-        
-        // 將商品數據轉為JSON字符串，確保特殊字符被正確處理
-        const itemData = JSON.stringify(item).replace(/"/g, '&quot;');
-        
-        return `
-        <div class="col-span-12 xl:col-span-4 md:col-span-6" 
-            data-id="${item.id}" 
-            data-item="${itemData}">
-          <div class="card h-full flex flex-col">
-            <img src="${getSafeImageUrl(item.image_url)}"
-            onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
-            class="w-full h-48 object-cover" />
-            <div class="card-header !pb-0 !border-b-0">
-              <div class="flex justify-between items-start">
-                <h4 class="text-lg font-semibold">${item.name || "未命名商品"}</h4>
-                <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
-              </div>
-              ${item.description ? `<p class="text-gray-600 mt-1">${item.description}</p>` : ''}
+          <div class="card-body flex-grow">
+            <div class="space-y-2">
+              <p><span class="font-medium">價格:</span> $${item.price || "0"}</p>
+              <p><span class="font-medium">分類:</span> ${CATEGORY_MAPPING[Number(item.category_id)] || "未知類別"}</p>
+              <p><span class="font-medium">交易地點:</span> ${item.location || "未指定"}</p>
             </div>
-            <div class="card-body flex-grow">
-              <div class="space-y-2">
-                <p><span class="font-medium">價格:</span> $${item.price || "0"}</p>
-                <p><span class="font-medium">分類:</span> ${CATEGORY_MAPPING[Number(item.category_id)] || "未知類別"}</p>
-                <p><span class="font-medium">交易地點:</span> ${item.location || "未指定"}</p>
-              </div>
-            </div>
-            <div class="card-footer p-4 border-t">
-              <div class="flex gap-2 justify-end">
-                ${item.status !== 'sold' ? `
-                <button class="btn btn-primary btn-edit" data-id="${item.id}">
-                  <i class="fas fa-edit mr-1"></i>修改
-                </button>
-                ` : ''}
-                <button class="btn btn-danger btn-delete" data-id="${item.id}">
-                  <i class="fas fa-trash-alt mr-1"></i>刪除
-                </button>
-              </div>
+          </div>
+          <div class="card-footer p-4 border-t">
+            <div class="flex gap-2 justify-end">
+              <button class="btn btn-primary btn-edit" data-id="${item.id}">
+                <i class="fas fa-edit mr-1"></i>修改
+              </button>
+              <button class="btn btn-danger btn-delete" data-id="${item.id}">
+                <i class="fas fa-trash-alt mr-1"></i>刪除
+              </button>
             </div>
           </div>
         </div>
-        `;
-      }).join('');
+      </div>
+      `;
+    }).join('');
+    
+    // 重新綁定按鈕事件
+    setTimeout(() => {
+      document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openEditModal(btn.dataset.id);
+        });
+      });
       
-      // 重新綁定按鈕事件
-      setTimeout(() => {
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openEditModal(btn.dataset.id);
-          });
+      document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteItem(btn.dataset.id);
         });
-        
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            deleteItem(btn.dataset.id);
-          });
-        });
-      }, 100);
-    }
+      });
+    }, 100);
+  }
+
 
     // 开启修改模态框 - 修正API路径
     async function openEditModal(itemId) {

@@ -91,6 +91,37 @@ exports.getAvailableItems = async (req, res) => {
   }
 };
 
+// 修改商品狀態
+exports.updateStatus = async (req, res) => {
+  const { itemId } = req.params;
+  const { status } = req.body; // 前端傳入新的狀態
+  const userId = req.user.id;  // 從 token 取得登入者 id
+  const userRole = req.user.role; // 從 token 取得登入者角色 (admin / user)
+
+  try {
+    // 如果是 admin → 可以修改任何商品狀態
+    // 如果是一般 user → 只能修改自己上架的商品
+    let query = 'UPDATE items SET status = ? WHERE id = ?';
+    let params = [status, itemId];
+
+    if (userRole !== 'admin') {
+      query += ' AND user_id = ?';
+      params.push(userId);
+    }
+
+    const [result] = await db.query(query, params);
+
+    if (result.affectedRows === 0) {
+      return res.status(403).json({ message: '無權限修改或商品不存在' });
+    }
+
+    res.json({ message: '商品狀態已更新' });
+  } catch (error) {
+    console.error('❌ 修改商品狀態失敗:', error);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+};
+
 // 查詢所有待審核的商品 (管理員用)
 exports.getPendingItems = async (req, res) => {
   try {
