@@ -56,6 +56,46 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
+// 📌 建立訂單
+exports.createOrder = async (req, res) => {
+  const { itemId } = req.body;
+  const buyerId = req.user.id;
+
+  try {
+    // 取得商品資訊
+    const [itemRows] = await db.query('SELECT * FROM items WHERE id = ?', [itemId]);
+    if (itemRows.length === 0) {
+      return res.status(404).json({ message: '找不到此商品' });
+    }
+    const item = itemRows[0];
+
+    // 1️⃣ 先建立訂單
+    const [orderResult] = await db.query(
+      `INSERT INTO orders (buyer_id, seller_id, status, created_at, total_price)
+       VALUES (?, ?, 'confirmed', NOW(), ?)`,
+      [buyerId, item.user_id, item.price]
+    );
+
+    const orderId = orderResult.insertId;
+
+    // 2️⃣ 插入 order_items
+    await db.query(
+      'INSERT INTO order_items (order_id, item_id, item_name, location, price) VALUES (?, ?, ?, ?, ?)',
+      [orderId, item.id, item.name, item.location, item.price]
+    );
+
+    // 3️⃣ 更新商品狀態
+    await db.query('UPDATE items SET status = ? WHERE id = ?', ['confirmed', itemId]);
+
+    // 4️⃣ 回傳 orderId
+    res.json({ message: '訂單建立成功', data: { orderId } });
+
+  } catch (err) {
+    console.error('❌ 建立訂單錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤', error: err.message });
+  }
+};
+
 // 📌 更新訂單狀態
 exports.updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;

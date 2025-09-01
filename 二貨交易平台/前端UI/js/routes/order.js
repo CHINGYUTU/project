@@ -9,6 +9,9 @@ router.get('/my-orders', verifyToken, orderController.getMyOrders);
 // 管理員查詢所有訂單
 router.get('/all', verifyToken, orderController.getAllOrders);
 
+// 建立訂單
+router.post('/purchase', verifyToken, orderController.createOrder);
+
 // 新增訂單狀態更新路由
 router.patch('/update-status/:orderId', verifyToken, orderController.updateOrderStatus);
 
