@@ -1,6 +1,6 @@
 const db = require('../db');
 
-// 📌 加入收藏 (加強版)
+// 📌 加入收藏
 exports.addFavorite = async (req, res) => {
   const userId = req.user.id;
   const { item_id } = req.body;
@@ -69,7 +69,7 @@ exports.getFavorites = async (req, res) => {
     const [rows] = await db.query(
       `SELECT i.* FROM favorites f
        JOIN items i ON f.item_id = i.id
-       WHERE f.user_id = ?`,
+       WHERE f.user_id = ? AND i.status = 'available'`,
       [userId]
     );
     if (rows.length === 0) {
