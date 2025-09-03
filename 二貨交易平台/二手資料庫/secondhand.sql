@@ -219,7 +219,7 @@ CREATE TABLE `orders` (
   `seller_id` int DEFAULT NULL,
   `status` enum('pending','confirmed','completed','cancelled') COLLATE utf8mb4_unicode_ci DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `trade_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `trade_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_order_buyer_idx` (`buyer_id`),
   KEY `fk_order_seller_idx` (`seller_id`),
@@ -234,7 +234,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (57,1,1,'confirmed','2025-09-02 19:01:47','2025-09-03 12:07:51');
+INSERT INTO `orders` VALUES (57,1,1,'confirmed','2025-09-02 19:01:47',NULL);
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -407,4 +407,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-03 20:28:45
+-- Dump completed on 2025-09-03 20:41:47

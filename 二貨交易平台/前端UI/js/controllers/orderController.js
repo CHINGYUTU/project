@@ -97,7 +97,7 @@ exports.reviewOrder = async (req, res) => {
 
 // 📌 建立訂單
 exports.createOrder = async (req, res) => {
-  const { itemId } = req.body;
+  const { itemId, tradeTime } = req.body; // 接收買家選擇的預計面交時間
   const buyerId = req.user.id;
 
   try {
@@ -113,11 +113,11 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: '此商品目前無法購買' });
     }
 
-    // 1️⃣ 建立訂單（保持 orders.status 為 confirmed）
+    // 1️⃣ 建立訂單（含 trade_time）
     const [orderResult] = await db.query(
-      `INSERT INTO orders (buyer_id, seller_id, status, created_at, total_price)
+      `INSERT INTO orders (buyer_id, seller_id, status, created_at, trade_time)
        VALUES (?, ?, 'confirmed', NOW(), ?)`,
-      [buyerId, item.user_id, item.price]
+      [buyerId, item.user_id, tradeTime || null]
     );
 
     const orderId = orderResult.insertId;
@@ -128,7 +128,7 @@ exports.createOrder = async (req, res) => {
       [orderId, item.id, item.name, item.location, item.price]
     );
 
-    // 3️⃣ 更新商品狀態為 reserved（不是 confirmed）
+    // 3️⃣ 更新商品狀態為 reserved
     await db.query('UPDATE items SET status = ? WHERE id = ?', ['reserved', itemId]);
 
     // 4️⃣ 回傳 orderId
@@ -139,6 +139,8 @@ exports.createOrder = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
+
+
 
 // 刪除訂單
 exports.deleteOrder = async (req, res) => {
@@ -163,7 +165,7 @@ exports.deleteOrder = async (req, res) => {
 // 📌 更新訂單狀態
 exports.updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
-  const { newStatus } = req.body;
+  const { newStatus, tradeTime } = req.body; 
   const userId = req.user.id;
 
   const validStatuses = ['confirmed', 'completed', 'cancelled'];
@@ -182,37 +184,42 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(403).json({ message: '無權限更新此訂單' });
     }
 
-    // 權限檢查邏輯保持不變
+    // 權限檢查
     if (newStatus === 'confirmed' && userId !== order.seller_id) {
       return res.status(403).json({ message: '只有賣家可以確認訂單' });
     }
-
     if (newStatus === 'completed' && userId !== order.buyer_id) {
       return res.status(403).json({ message: '只有買家可以完成訂單' });
     }
 
-    // 更新訂單狀態
-    await db.query('UPDATE orders SET status = ? WHERE id = ?', [newStatus, orderId]);
-
-    // 根據訂單狀態更新商品狀態
-    if (newStatus === 'completed') {
-      // 訂單完成 → 商品售出
+    //  更新狀態 & 可選更新 trade_time
+    if (tradeTime) {
       await db.query(
-        `UPDATE items 
-         SET status = 'sold' 
+        `UPDATE orders SET status = ?, trade_time = ? WHERE id = ?`,
+        [newStatus, tradeTime, orderId]
+      );
+    } else {
+      await db.query(
+        `UPDATE orders SET status = ? WHERE id = ?`,
+        [newStatus, orderId]
+      );
+    }
+
+    // 根據狀態更新商品
+    if (newStatus === 'completed') {
+      await db.query(
+        `UPDATE items SET status = 'sold' 
          WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
         [orderId]
       );
     } else if (newStatus === 'cancelled') {
-      // 訂單取消 → 商品恢復可購買
       await db.query(
-        `UPDATE items 
-         SET status = 'available' 
+        `UPDATE items SET status = 'available' 
          WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
         [orderId]
       );
     }
-    // confirmed 狀態保持商品為 reserved
+    // confirmed 狀態 → 保持 reserved
 
     res.json({ message: `訂單狀態已更新為 ${newStatus}` });
   } catch (err) {
@@ -220,6 +227,8 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
+
+
 
 // 📌 查詢單筆訂單詳情
 exports.getOrderDetail = async (req, res) => {
