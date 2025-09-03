@@ -95,6 +95,44 @@ exports.reviewOrder = async (req, res) => {
   }
 };
 
+// 📌 新增：查詢「我的訂單」+ 買家與商品詳細資訊
+exports.getMyOrdersWithDetails = async (req, res) => {
+  const sellerId = req.user.id; // 假設 token 解析後有 user.id
+
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        o.id AS order_id,
+        o.status,
+        o.created_at,
+        o.total_price,
+
+        -- 買家資訊
+        u.id AS buyer_id,
+        u.name AS buyer_name,
+        u.avatar_url AS buyer_avatar,
+
+        -- 商品資訊（只抓 order_items 的 item）
+        i.id AS item_id,
+        i.name AS item_name,
+        i.image_url AS item_image,
+        i.location AS order_location
+
+      FROM orders o
+      JOIN users u ON o.buyer_id = u.id
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN items i ON oi.item_id = i.id
+      WHERE o.seller_id = ? AND o.status = 'confirmed'
+      ORDER BY o.created_at DESC
+    `, [sellerId]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Error fetching orders with details:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 // 📌 建立訂單
 exports.createOrder = async (req, res) => {
   const { itemId } = req.body;
