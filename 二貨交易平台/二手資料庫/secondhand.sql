@@ -86,7 +86,7 @@ CREATE TABLE `favorites` (
   KEY `fk_favorite_item_idx` (`item_id`),
   CONSTRAINT `fk_favorite_item` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_favorite_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -95,6 +95,7 @@ CREATE TABLE `favorites` (
 
 LOCK TABLES `favorites` WRITE;
 /*!40000 ALTER TABLE `favorites` DISABLE KEYS */;
+INSERT INTO `favorites` VALUES (7,1,6,'2025-09-02 18:26:47'),(9,1,4,'2025-09-02 18:48:12');
 /*!40000 ALTER TABLE `favorites` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -126,7 +127,7 @@ CREATE TABLE `items` (
   CONSTRAINT `fk_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
   CONSTRAINT `fk_item_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_items_reviewed_by` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +136,7 @@ CREATE TABLE `items` (
 
 LOCK TABLES `items` WRITE;
 /*!40000 ALTER TABLE `items` DISABLE KEYS */;
-INSERT INTO `items` VALUES (4,'中毒劑','一定要配溫開水',9999.00,2,1,'/uploads/1755791252485-575473799.png','活動中心旁的小巷子','pending',NULL,NULL,NULL,'2025-08-21 15:47:32'),(5,'測試用1','測試用1',50.00,1,1,'/uploads/1755864181435-36555251.png','大門口','pending',NULL,NULL,NULL,'2025-08-22 12:02:32');
+INSERT INTO `items` VALUES (4,'中毒劑','一定要配溫開水',9999.00,2,1,'/items/1756736682050-291487329.png','活動中心旁的小巷子','available',NULL,NULL,NULL,'2025-08-21 15:47:32'),(5,'測試用1','測試用1',50.00,1,1,'/uploads/1755864181435-36555251.png','大門口','pending',NULL,NULL,NULL,'2025-08-22 12:02:32'),(6,'英國廉航','Nothing beats a jet2 holiday ',777777.00,2,1,'/uploads/1755872082928-747608257.png','側門口附近','reserved',NULL,NULL,NULL,'2025-08-22 14:14:42'),(7,'高空彈跳體驗券','阿阿阿阿阿',9999.00,2,1,'/uploads/1755872838156-915580102.png','體育館','pending',NULL,NULL,NULL,'2025-08-22 14:27:18');
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -192,7 +193,7 @@ CREATE TABLE `order_items` (
   KEY `item_id` (`item_id`),
   CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
   CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `items` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -201,6 +202,7 @@ CREATE TABLE `order_items` (
 
 LOCK TABLES `order_items` WRITE;
 /*!40000 ALTER TABLE `order_items` DISABLE KEYS */;
+INSERT INTO `order_items` VALUES (57,57,6,'英國廉航','側門口附近',777777.00);
 /*!40000 ALTER TABLE `order_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -217,13 +219,13 @@ CREATE TABLE `orders` (
   `seller_id` int DEFAULT NULL,
   `status` enum('pending','confirmed','completed','cancelled') COLLATE utf8mb4_unicode_ci DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `total_price` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `trade_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `fk_order_buyer_idx` (`buyer_id`),
   KEY `fk_order_seller_idx` (`seller_id`),
   CONSTRAINT `fk_order_buyer` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_order_seller` FOREIGN KEY (`seller_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -232,6 +234,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+INSERT INTO `orders` VALUES (57,1,1,'confirmed','2025-09-02 19:01:47','2025-09-03 12:07:51');
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -362,7 +365,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'chi','11236015@ntub.edu.tw','$2b$10$Tlb4oUUk/fKkP6x9whtEMu.3m/cDB2CymqRSeFF5FXuB8BziHjEXC','user',0,'2025-08-08 15:21:33',1,NULL,NULL,NULL,'/avatars/1755018035651-508880746.png',NULL);
+INSERT INTO `users` VALUES (1,'chi','11236015@ntub.edu.tw','$2b$10$Tlb4oUUk/fKkP6x9whtEMu.3m/cDB2CymqRSeFF5FXuB8BziHjEXC','user',0,'2025-08-08 15:21:33',1,NULL,NULL,NULL,'/avatars/1756834173895-198909322.png',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -404,4 +407,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-08-22 21:29:54
+-- Dump completed on 2025-09-03 20:28:45
