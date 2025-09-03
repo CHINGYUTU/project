@@ -439,54 +439,31 @@
 
       // 獲取待確認訂單
       async function loadConfirmedOrders() {
-        showLoading();
-        
         try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-            window.location.href = '../../index.html';
-            return;
-          }
+          const token = localStorage.getItem("token");
+          if (!token) throw new Error("尚未登入，缺少 token");
 
-          const response = await fetch(`${API_BASE}/api/order/my-orders`, {
-            headers: { 
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
+          const response = await fetch(`${API_BASE}/api/order/my-orders-with-details`, {
+            headers: {
+              "Authorization": `Bearer ${token}`,  // 🔑 核心：帶上 Token
+              "Content-Type": "application/json"
             }
           });
 
-          if (response.status === 401) {
-            localStorage.removeItem('token');
-            window.location.href = '../../index.html';
-            return;
-          }
-
           if (!response.ok) {
-            throw new Error(`HTTP 錯誤! 狀態碼: ${response.status}`);
+            if (response.status === 401) {
+              throw new Error("登入已過期，請重新登入");
+            }
+            throw new Error("Failed to fetch orders");
           }
 
-          const { data } = await response.json();
-          
-          // 過濾出 confirmed 狀態的訂單
-          const confirmedOrders = data.filter(order => order.status === 'confirmed');
-          
-          // 獲取每個訂單的買家信息
-          const ordersWithBuyerInfo = await Promise.all(
-            confirmedOrders.map(async (order) => {
-              const buyerInfo = await getBuyerInfo(order.buyer_id);
-              return {
-                ...order,
-                buyer_name: buyerInfo.name,
-                buyer_avatar: buyerInfo.avatar
-              };
-            })
-          );
-          
-          displayOrders(ordersWithBuyerInfo);
-          
+          const orders = await response.json();
+          console.log("✅ Loaded enriched orders:", orders);
+
+          displayOrders(orders);
         } catch (error) {
-          console.error('載入訂單失敗:', error);
-          showError(`無法載入訂單: ${error.message}`);
+          console.error("❌ Error loading confirmed orders:", error);
+          showError(error.message);
         }
       }
 
@@ -504,15 +481,13 @@
         }
         
         container.innerHTML = orders.map(order => `
-          <div class="col-span-12 xl:col-span-4 md:col-span-6" data-order-id="${order.id}">
+          <div class="col-span-12 xl:col-span-4 md:col-span-6" data-order-id="${order.order_id}">
             <div class="order-card bg-white rounded-lg overflow-hidden h-full flex flex-col">
-              <!-- 修改圖片部分 -->
               <div class="relative overflow-hidden" style="height: 200px;">
-                <img src="${getSafeImageUrl(order.image_url)}"
+                <img src="${getSafeImageUrl(order.item_image)}"
                     class="product-image absolute inset-0 w-full h-full object-cover"
                     onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
                     alt="${order.item_name || '商品圖片'}">
-                <div class="image-loader absolute inset-0 bg-gray-200 animate-pulse hidden"></div>
               </div>
               
               <div class="p-4 flex-grow">
@@ -523,16 +498,15 @@
                 
                 <div class="space-y-2 text-sm text-gray-600">
                   <div class="buyer-info">
-                    <img src="${order.buyer_avatar}" 
-                        class="buyer-avatar" 
-                        onerror="this.onerror=null; this.src='../assets/images/default-avatar.png'"
-                        alt="買家頭像">
+                    <img src="${getSafeImageUrl(order.buyer_avatar)}" 
+                        class="buyer-avatar"
+                        onerror="this.onerror=null; this.src='../assets/images/default-avatar.png'">
                     <span>${order.buyer_name}</span>
                   </div>
                   
-                  <p><span class="font-medium">交易地點:</span> ${order.location || "未指定"}</p>
+                  <p><span class="font-medium">交易地點:</span> ${order.order_location || "未指定"}</p>
                   <p><span class="font-medium">預定時間:</span> ${new Date(order.created_at).toLocaleString()}</p>
-                  <p><span class="font-medium">訂單編號:</span> #${order.id}</p>
+                  <p><span class="font-medium">訂單編號:</span> #${order.order_id}</p>
                 </div>
               </div>
               
@@ -541,10 +515,10 @@
                   $${order.total_price || "0"}
                 </div>
                 <div class="flex gap-2">
-                  <button class="btn-approve" onclick="approveOrder(${order.id})">
+                  <button class="btn-approve" onclick="approveOrder(${order.order_id})">
                     <i class="fas fa-check mr-1"></i>通過
                   </button>
-                  <button class="btn-reject" onclick="rejectOrder(${order.id})">
+                  <button class="btn-reject" onclick="rejectOrder(${order.order_id})">
                     <i class="fas fa-times mr-1"></i>拒絕
                   </button>
                 </div>
