@@ -22,7 +22,6 @@
     <link rel="stylesheet" href="css/chat.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* 保持原有的樣式不變 */
         .product-container {
             display: flex;
             flex-wrap: wrap;
@@ -171,6 +170,25 @@
         }
         .favorite-btn.favorited i {
             color: #dc3545; /* 收藏後紅色實心 */
+        }
+        /* 時間選擇器樣式 */
+        .time-picker-container {
+        margin: 15px 0;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        }
+        .time-picker-label {
+        font-weight: bold;
+        margin-bottom: 8px;
+        }
+        .swal2-popup .form-control {
+        margin: 5px 0;
+        }
+        .swal2-popup .form-text {
+        font-size: 0.8rem;
+        color: #6c757d;
         }
     </style>
 </head>
@@ -693,12 +711,12 @@
                     <p class="text-muted small">${categoryNames[item.category_id] || `分類${item.category_id}`}</p>
                     <p class="description">${item.description || '暫無描述'}</p>
                     <p class="price">$${item.price}</p>
-                    <p class="seller"><i class="bi bi-person"></i> 賣家ID: ${item.user_id}</p>
+                    <p class="seller"><i class="bi bi-person"></i> 賣家: ${item.seller_name}</p>
                     <p class="location"><i class="bi bi-geo-alt"></i> ${item.location}</p>
                     <p class="date"><i class="bi bi-clock"></i> ${formattedDate}</p>
                     <button class="btn btn-primary btn-buy" 
                             onclick="showPurchasePopup(${item.id}, '${escapeHtml(item.name)}', ${item.price}, 
-                            '${escapeHtml(imageUrl)}', '${escapeHtml(item.location)}', ${item.user_id})">
+                            '${escapeHtml(imageUrl)}', '${escapeHtml(item.location)}', '${escapeHtml(item.seller_name)}')">
                         <i class="bi bi-cart-plus"></i> 購買
                     </button>
                 `;
@@ -718,90 +736,150 @@
         }
 
         // 顯示購買彈窗
-        function showPurchasePopup(itemId, itemName, price, imageUrl, location, sellerId) {
-            Swal.fire({
-                title: `確認購買「${itemName}」？`,
-                html: `
-                    <div class="text-start">
-                        <p><strong>價格：</strong>$${price}</p>
-                        <p><strong>賣家ID：</strong>${sellerId}</p>
-                        <p><strong>交易地點：</strong>${location}</p>
-                        <img src="${imageUrl}" alt="${itemName}" style="max-width: 100%; border-radius: 8px; margin-top: 10px;">
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: '✅ 確認購買',
-                cancelButtonText: '取消',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                showLoaderOnConfirm: true,
-                preConfirm: async () => {
-                    try {
-                        const token = localStorage.getItem('token');
-                        if (!token) {
-                            throw new Error("請先登入再購買");
-                        }
+        function showPurchasePopup(itemId, itemName, price, imageUrl, location, seller_name) {
+        // 計算現在時間和三天後的時間
+        const now = new Date();
+        const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        
+        // 設定最小時間為三天後（不能選擇現在到三天內的時間）
+        const minDate = new Date(threeDaysLater.getTime());
+        
+        // 格式化為 datetime-local 輸入框需要的格式 (YYYY-MM-DDTHH:MM)
+        const minDateFormatted = formatDateForInput(minDate);
+        const defaultDate = formatDateForInput(minDate); // 預設為最小時間（三天後）
+        
+        // 創建時間選擇器的HTML
+        const timePickerHTML = `
+            <div class="time-picker-container mt-3">
+            <label class="form-label"><strong>選擇面交時間：</strong></label>
+            <input type="datetime-local" class="form-control" id="tradeTimePicker" 
+                    value="${defaultDate}" 
+                    min="${minDateFormatted}" 
+                    required>
+            <div class="form-text">⚠️ 面交時間必須在三天後，不能選擇立即或三天內的時間</div>
+            </div>
+        `;
 
-                        // 1️⃣ 先建立訂單
-                        const createRes = await fetch(`${API_BASE}/api/order/purchase`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`
-                            },
-                            body: JSON.stringify({ itemId })
-                        });
-
-                        if (!createRes.ok) {
-                            const err = await createRes.json();
-                            throw new Error(err.message || "建立訂單失敗");
-                        }
-
-                        const orderData = await createRes.json();
-                        // 修正這裡：後端回傳的是 { data: { orderId: xxx } }，不是 { data: { id: xxx } }
-                        const orderId = orderData.data?.orderId;
-                        if (!orderId) throw new Error("後端未回傳訂單 ID");
-
-                        // 2️⃣ 更新訂單狀態為 confirmed
-                        const updateRes = await fetch(`${API_BASE}/api/order/update-status/${orderId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`
-                            },
-                            // 將 orderStatus 改為 newStatus
-                            body: JSON.stringify({ newStatus: "confirmed" })
-                        });
-
-                        if (!updateRes.ok) {
-                            const err = await updateRes.json();
-                            throw new Error(err.message || "更新訂單狀態失敗");
-                        }
-
-                        return await updateRes.json();
-
-                    } catch (error) {
-                        Swal.showValidationMessage(
-                            `購買失敗: ${error.message}`
-                        );
-                        return false;
-                    }
-                },
-                allowOutsideClick: () => !Swal.isLoading()
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: '✅ 購買成功！',
-                        text: `「${itemName}」已成功預定，請待商家審核。`,
-                        icon: 'success',
-                        confirmButtonText: '知道了',
-                        confirmButtonColor: '#6474E1'
-                    });
-                    // 刷新商品列表
-                    fetchProducts();
+        Swal.fire({
+            title: `確認購買「${itemName}」？`,
+            html: `<div class="text-start">
+            <p><strong>價格：</strong>$${price}</p>
+            <p><strong>賣家：</strong>${seller_name}</p>
+            <p><strong>交易地點：</strong>${location}</p>
+            ${timePickerHTML}
+            <img src="${imageUrl}" alt="${itemName}" style="max-width: 100%; border-radius: 8px; margin-top: 10px;">
+            </div>`,
+            showCancelButton: true,
+            confirmButtonText: '✅ 確認購買',
+            cancelButtonText: '取消',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            showLoaderOnConfirm: true,
+            preConfirm: async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                throw new Error("請先登入再購買");
                 }
+                
+                // 獲取選擇的時間
+                const tradeTime = document.getElementById('tradeTimePicker').value;
+                if (!tradeTime) {
+                throw new Error("請選擇面交時間");
+                }
+
+                // 檢查選擇的時間是否在有效範圍內（必須在三天後）
+                const selectedTime = new Date(tradeTime);
+                const minAllowedTime = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+                if (selectedTime < minAllowedTime) {
+                throw new Error("面交時間必須在三天後，不能選擇立即或三天內的時間");
+                }
+
+                // 1️⃣ 先建立訂單（傳遞tradeTime）
+                const createRes = await fetch(`${API_BASE}/api/order/purchase`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                    itemId, 
+                    tradeTime
+                })
+                });
+
+                if (!createRes.ok) {
+                const err = await createRes.json();
+                throw new Error(err.message || "建立訂單失敗");
+                }
+
+                const orderData = await createRes.json();
+                const orderId = orderData.data?.orderId;
+                if (!orderId) throw new Error("後端未回傳訂單 ID");
+
+                // 2️⃣ 更新訂單狀態為 pending
+                const updateRes = await fetch(`${API_BASE}/api/order/update-status/${orderId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        newStatus: "pending"
+                    })
+                });
+
+                if (!updateRes.ok) {
+                const err = await updateRes.json();
+                throw new Error(err.message || "更新訂單狀態失敗");
+                }
+
+                return await updateRes.json();
+            } catch (error) {
+                Swal.showValidationMessage(`購買失敗: ${error.message}`);
+                return false;
+            }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+            const tradeTime = document.getElementById('tradeTimePicker').value;
+            Swal.fire({
+                title: '✅ 購買成功！',
+                html: `「${itemName}」已成功預定，請待商家審核。<br>
+                    <strong>預定面交時間：</strong>${formatDateTimeForDisplay(tradeTime)}`,
+                icon: 'success',
+                confirmButtonText: '知道了',
+                confirmButtonColor: '#6474E1'
             });
+            // 刷新商品列表
+            fetchProducts();
+            }
+        });
         }
+
+        // 輔助函數：格式化日期時間用於輸入框 (YYYY-MM-DDTHH:MM)
+        function formatDateForInput(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        // 輔助函數：格式化日期時間用於顯示
+        function formatDateTimeForDisplay(dateTimeString) {
+        const date = new Date(dateTimeString);
+        return `${date.getFullYear()}年${(date.getMonth() + 1).toString().padStart(2, '0')}月${date.getDate().toString().padStart(2, '0')}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        // 輔助函數：格式化日期用於顯示（不含時間）
+        function formatDateForDisplay(date) {
+        return `${date.getFullYear()}年${(date.getMonth() + 1).toString().padStart(2, '0')}月${date.getDate().toString().padStart(2, '0')}日`;
+        }
+
 
         // 登入選單功能
         function showMenu() {

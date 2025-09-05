@@ -78,8 +78,8 @@ exports.reviewOrder = async (req, res) => {
     const order = orders[0];
 
     if (decision === 'agree') {
-      // ✅ 同意 → 訂單完成
-      await db.query('UPDATE orders SET status = ? WHERE id = ?', ['completed', orderId]);
+      // ✅ 同意 → 訂單狀態改為 confirmed (已確認)
+      await db.query('UPDATE orders SET status = ? WHERE id = ?', ['confirmed', orderId]);
       return res.json({ message: '訂單審核通過' });
     } else if (decision === 'reject') {
       // ❌ 拒絕 → 商品恢復 available，刪除訂單
@@ -95,9 +95,9 @@ exports.reviewOrder = async (req, res) => {
   }
 };
 
-// 📌 新增：查詢「我的訂單」+ 買家與商品詳細資訊
-exports.getMyOrdersWithDetails = async (req, res) => {
-  const sellerId = req.user.id; // 假設 token 解析後有 user.id
+// 📌 查詢「待確認訂單」+ 買家與商品詳細資訊 (修改為查詢 pending 狀態訂單)
+exports.getPendingOrdersWithDetails = async (req, res) => {
+  const sellerId = req.user.id;
 
   try {
     const [rows] = await db.query(`
@@ -106,30 +106,31 @@ exports.getMyOrdersWithDetails = async (req, res) => {
         o.status,
         o.created_at,
         o.total_price,
+        o.trade_time,
 
         -- 買家資訊
-        u.id AS buyer_id,
-        u.name AS buyer_name,
-        u.avatar_url AS buyer_avatar,
+        buyer.id AS buyer_id,
+        buyer.name AS buyer_name,
+        buyer.avatar_url AS buyer_avatar,
 
-        -- 商品資訊（只抓 order_items 的 item）
+        -- 商品資訊
         i.id AS item_id,
         i.name AS item_name,
         i.image_url AS item_image,
         i.location AS order_location
 
       FROM orders o
-      JOIN users u ON o.buyer_id = u.id
+      JOIN users buyer ON o.buyer_id = buyer.id
       JOIN order_items oi ON o.id = oi.order_id
       JOIN items i ON oi.item_id = i.id
-      WHERE o.seller_id = ? AND o.status = 'confirmed'
+      WHERE o.seller_id = ? AND o.status = 'pending'  -- 修改為查詢 pending 狀態
       ORDER BY o.created_at DESC
     `, [sellerId]);
 
     res.json(rows);
   } catch (err) {
-    console.error("❌ Error fetching orders with details:", err);
-    res.status(500).json({ error: "Server error" });
+    console.error("❌ 獲取待確認訂單錯誤:", err);
+    res.status(500).json({ error: "伺服器錯誤" });
   }
 };
 
@@ -151,11 +152,11 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: '此商品目前無法購買' });
     }
 
-    // 1️⃣ 建立訂單（含 trade_time）
+    // 1️⃣ 建立訂單
     const [orderResult] = await db.query(
-      `INSERT INTO orders (buyer_id, seller_id, status, created_at, trade_time)
-       VALUES (?, ?, 'confirmed', NOW(), ?)`,
-      [buyerId, item.user_id, tradeTime || null]
+      `INSERT INTO orders (buyer_id, seller_id, status, created_at, trade_time, total_price)
+       VALUES (?, ?, 'pending', NOW(), ?, ?)`, // 添加 total_price
+      [buyerId, item.user_id, tradeTime, item.price] // 添加商品價格
     );
 
     const orderId = orderResult.insertId;
@@ -177,8 +178,6 @@ exports.createOrder = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
-
-
 
 // 刪除訂單
 exports.deleteOrder = async (req, res) => {
@@ -203,10 +202,10 @@ exports.deleteOrder = async (req, res) => {
 // 📌 更新訂單狀態
 exports.updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
-  const { newStatus, tradeTime } = req.body; 
+  const { newStatus, tradeTime } = req.body; // 添加tradeTime參數
   const userId = req.user.id;
 
-  const validStatuses = ['confirmed', 'completed', 'cancelled'];
+  const validStatuses = ['pending' , 'confirmed', 'completed', 'cancelled'];
   if (!validStatuses.includes(newStatus)) {
     return res.status(400).json({ message: '不合法的訂單狀態' });
   }
@@ -230,7 +229,7 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(403).json({ message: '只有買家可以完成訂單' });
     }
 
-    //  更新狀態 & 可選更新 trade_time
+    // 更新狀態 & 可選更新 trade_time
     if (tradeTime) {
       await db.query(
         `UPDATE orders SET status = ?, trade_time = ? WHERE id = ?`,
@@ -265,8 +264,6 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
-
-
 
 // 📌 查詢單筆訂單詳情
 exports.getOrderDetail = async (req, res) => {

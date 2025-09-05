@@ -78,11 +78,12 @@ exports.updateItem = async (req, res) => {
 exports.getAvailableItems = async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT i.*, c.name AS category_name
-       FROM items i
-       JOIN categories c ON i.category_id = c.id
-       WHERE i.status = 'available'
-       ORDER BY i.created_at DESC`
+      `SELECT i.*, c.name AS category_name, u.name AS seller_name 
+      FROM items i 
+      JOIN categories c ON i.category_id = c.id 
+      JOIN users u ON i.user_id = u.id 
+      WHERE i.status = 'available' 
+      ORDER BY i.created_at DESC`
     );
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {
@@ -126,11 +127,15 @@ exports.updateStatus = async (req, res) => {
 exports.getPendingItems = async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT i.*, c.name AS category_name
-       FROM items i
-       JOIN categories c ON i.category_id = c.id
-       WHERE i.status = 'pending'
-       ORDER BY i.created_at DESC`
+      `SELECT 
+          i.*, 
+          c.name AS category_name,
+          u.name AS seller_name
+      FROM items i
+      JOIN categories c ON i.category_id = c.id
+      JOIN users u ON i.user_id = u.id
+      WHERE i.status = 'pending'
+      ORDER BY i.created_at DESC`
     );
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {
@@ -172,10 +177,14 @@ exports.getAllItems = async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT i.*, c.name AS category_name
-       FROM items i
-       JOIN categories c ON i.category_id = c.id
-       ORDER BY i.created_at DESC`
+      `SELECT 
+          i.*, 
+          c.name AS category_name,
+          u.name AS seller_name
+      FROM items i
+      JOIN categories c ON i.category_id = c.id
+      JOIN users u ON i.user_id = u.id
+      ORDER BY i.created_at DESC`
     );
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {
@@ -247,10 +256,14 @@ exports.searchItems = async (req, res) => {
   const { category, keyword } = req.query;
 
   try {
-    let query = `SELECT i.*, c.name AS category_name 
-                 FROM items i
-                 JOIN categories c ON i.category_id = c.id
-                 WHERE i.status = 'available'`;
+    let query = `SELECT 
+                    i.*, 
+                    c.name AS category_name,
+                    u.name AS seller_name
+                FROM items i
+                JOIN categories c ON i.category_id = c.id
+                JOIN users u ON i.user_id = u.id
+                WHERE i.status = 'available'`;
     const params = [];
 
     if (category) {

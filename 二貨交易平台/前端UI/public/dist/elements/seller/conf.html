@@ -383,10 +383,10 @@
 
       // 圖片處理函數
       function getSafeImageUrl(url) {
-        const defaultImage = '../assets/images/default-product.png';
+        const defaultImage = '../assets/images/default-avatar.png';
         
         // 處理空值或無效值
-        if (!url || url === 'NULL' || url === 'null' || url === 'default-product.png') {
+        if (!url || url === 'NULL' || url === 'null' || url === 'default-avatar.png') {
           return defaultImage;
         }
         
@@ -438,114 +438,156 @@
       }
 
       // 獲取待確認訂單
-      async function loadConfirmedOrders() {
+        async function loadPendingOrders() {
+            try {
+                const token = localStorage.getItem("token");
+                if (!token) throw new Error("尚未登入，缺少 token");
+
+                // 修改API端點以獲取待確認訂單
+                const response = await fetch(`${API_BASE}/api/order/pending-orders`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error("登入已過期，請重新登入");
+                    }
+                    throw new Error("獲取待確認訂單失敗");
+                }
+
+                const orders = await response.json();
+                console.log("✅ 已加載待確認訂單:", orders);
+
+                displayOrders(orders);
+            } catch (error) {
+                console.error("❌ 加載待確認訂單時發生錯誤:", error);
+                showError(error.message);
+            }
+        }
+
+
+      // 格式化面交時間函數
+      function formatTradeTime(tradeTime) {
+        if (!tradeTime) return "未指定";
+        
         try {
-          const token = localStorage.getItem("token");
-          if (!token) throw new Error("尚未登入，缺少 token");
-
-          const response = await fetch(`${API_BASE}/api/order/my-orders-with-details`, {
-            headers: {
-              "Authorization": `Bearer ${token}`,  // 🔑 核心：帶上 Token
-              "Content-Type": "application/json"
-            }
+          // 轉換為本地時間格式
+          const date = new Date(tradeTime);
+          return date.toLocaleString('zh-TW', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
           });
-
-          if (!response.ok) {
-            if (response.status === 401) {
-              throw new Error("登入已過期，請重新登入");
-            }
-            throw new Error("Failed to fetch orders");
-          }
-
-          const orders = await response.json();
-          console.log("✅ Loaded enriched orders:", orders);
-
-          displayOrders(orders);
         } catch (error) {
-          console.error("❌ Error loading confirmed orders:", error);
-          showError(error.message);
+          console.error("時間格式化錯誤:", error);
+          return "時間格式錯誤";
         }
       }
 
-      // 顯示訂單函數中的圖片部分修改
-      function displayOrders(orders) {
-        const container = document.getElementById("orders-container");
-        
-        if (!orders || orders.length === 0) {
-          container.innerHTML = `
-            <div class="col-span-12 text-center p-4 bg-blue-50 border border-blue-200 rounded">
-              目前沒有待確認的訂單
-            </div>
-          `;
-          return;
+      // 顯示訂單函數
+        function displayOrders(orders) {
+            const container = document.getElementById("orders-container");
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `
+                <div class="col-span-12 text-center p-4 bg-blue-50 border border-blue-200 rounded">
+                    目前沒有待確認的訂單
+                </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = orders.map(order => `
+                <div class="col-span-12 xl:col-span-4 md:col-span-6" data-order-id="${order.order_id}">
+                <div class="order-card bg-white rounded-lg overflow-hidden h-full flex flex-col">
+                    <!-- 商品圖片部分 -->
+                    <div class="relative overflow-hidden" style="height: 200px;">
+                    <img src="${getSafeImageUrl(order.item_image)}"
+                        class="product-image absolute inset-0 w-full h-full object-cover"
+                        onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
+                        alt="${order.item_name || '商品圖片'}">
+                    </div>
+                    
+                    <div class="p-4 flex-grow">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="text-lg font-semibold text-gray-800">${order.item_name || "未命名商品"}</h4>
+                        <!-- 修改狀態顯示為待確認 -->
+                        <span class="status-badge status-pending">待確認</span>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <!-- 買家資訊 -->
+                        <div class="buyer-info">
+                        <img src="${order.buyer_avatar ? getSafeImageUrl(order.buyer_avatar) : '../assets/images/default-avatar.png'}" 
+                            class="buyer-avatar"
+                            onerror="this.onerror=null; this.src='../assets/images/default-avatar.png'"
+                            alt="買家頭像">
+                        <span>${order.buyer_name || '未知買家'}</span>
+                        </div>                      
+                        <p><span class="font-medium">交易地點:</span> ${order.order_location || "未指定"}</p>
+                        <p><span class="font-medium">預定時間:</span> ${new Date(order.created_at).toLocaleString()}</p>
+                        <p><span class="font-medium">面交時間:</span> ${formatTradeTime(order.trade_time)}</p>  
+                        <p><span class="font-medium">訂單編號:</span> #${order.order_id}</p>
+                    </div>
+                    </div>
+                    
+                    <!-- 底部操作區域 -->
+                    <div class="card-actions">
+                    <div class="price-display">
+                        $${order.total_price || "0"}
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn-approve" onclick="approveOrder(${order.order_id})">
+                        <i class="fas fa-check mr-1"></i>通過
+                        </button>
+                        <button class="btn-reject" onclick="rejectOrder(${order.order_id})">
+                        <i class="fas fa-times mr-1"></i>拒絕
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            `).join('');
         }
-        
-        container.innerHTML = orders.map(order => `
-          <div class="col-span-12 xl:col-span-4 md:col-span-6" data-order-id="${order.order_id}">
-            <div class="order-card bg-white rounded-lg overflow-hidden h-full flex flex-col">
-              <div class="relative overflow-hidden" style="height: 200px;">
-                <img src="${getSafeImageUrl(order.item_image)}"
-                    class="product-image absolute inset-0 w-full h-full object-cover"
-                    onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
-                    alt="${order.item_name || '商品圖片'}">
-              </div>
-              
-              <div class="p-4 flex-grow">
-                <div class="flex justify-between items-start mb-3">
-                  <h4 class="text-lg font-semibold text-gray-800">${order.item_name || "未命名商品"}</h4>
-                  <span class="status-badge status-confirmed">待確認</span>
-                </div>
-                
-                <div class="space-y-2 text-sm text-gray-600">
-                  <div class="buyer-info">
-                    <img src="${getSafeImageUrl(order.buyer_avatar)}" 
-                        class="buyer-avatar"
-                        onerror="this.onerror=null; this.src='../assets/images/default-avatar.png'">
-                    <span>${order.buyer_name}</span>
-                  </div>
-                  
-                  <p><span class="font-medium">交易地點:</span> ${order.order_location || "未指定"}</p>
-                  <p><span class="font-medium">預定時間:</span> ${new Date(order.created_at).toLocaleString()}</p>
-                  <p><span class="font-medium">訂單編號:</span> #${order.order_id}</p>
-                </div>
-              </div>
-              
-              <div class="card-actions">
-                <div class="price-display">
-                  $${order.total_price || "0"}
-                </div>
-                <div class="flex gap-2">
-                  <button class="btn-approve" onclick="approveOrder(${order.order_id})">
-                    <i class="fas fa-check mr-1"></i>通過
-                  </button>
-                  <button class="btn-reject" onclick="rejectOrder(${order.order_id})">
-                    <i class="fas fa-times mr-1"></i>拒絕
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `).join('');
-      }
 
       // ✅ 審核通過
       async function approveOrder(orderId) {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_BASE}/api/order/review/${orderId}`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ decision: 'agree' })
-        });
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            Swal.fire('錯誤', '請重新登入', 'error');
+            return;
+          }
 
-        const data = await res.json();
-        if (res.ok) {
-          Swal.fire('成功', data.message, 'success');
-          loadConfirmedOrders();
-        } else {
-          Swal.fire('錯誤', data.message, 'error');
+          // 使用 PATCH 方法更新訂單狀態為 confirmed
+          const res = await fetch(`${API_BASE}/api/order/update-status/${orderId}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+              newStatus: 'confirmed' 
+            })
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            Swal.fire('成功', '訂單已確認通過', 'success').then(() => {
+              // 重新載入訂單列表
+              loadPendingOrders();
+            });
+          } else {
+            Swal.fire('錯誤', data.message || '操作失敗', 'error');
+          }
+        } catch (error) {
+          console.error('審核訂單錯誤:', error);
+          Swal.fire('錯誤', '網路錯誤，請稍後再試', 'error');
         }
       }
 
@@ -571,23 +613,24 @@
       }
 
       // 頁面加載完成後初始化
-      document.addEventListener('DOMContentLoaded', () => {
-        try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-            window.location.href = '../../index.html';
-            return;
-          }
-          
-          loadConfirmedOrders();
-          
-          if (typeof feather !== 'undefined') {
-            feather.replace();
-          }
-        } catch (error) {
-          console.error('頁面初始化錯誤:', error);
-        }
-      });
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '../../index.html';
+                    return;
+                }
+                
+                // 修改為載入待確認訂單
+                loadPendingOrders();
+                
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                }
+            } catch (error) {
+                console.error('頁面初始化錯誤:', error);
+            }
+        });
     </script>
 
     <script>

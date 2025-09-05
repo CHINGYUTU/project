@@ -13,7 +13,7 @@ router.get('/all', verifyToken, orderController.getAllOrders);
 router.post('/purchase', verifyToken, orderController.createOrder);
 
 // 新增 API：拿完整的訂單資訊
-router.get("/my-orders-with-details", verifyToken, orderController.getMyOrdersWithDetails);
+router.get("/pending-orders", verifyToken, orderController.getPendingOrdersWithDetails);
 
 // 新增訂單狀態更新路由
 router.patch('/update-status/:orderId', verifyToken, orderController.updateOrderStatus);
