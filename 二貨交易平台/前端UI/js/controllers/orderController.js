@@ -199,10 +199,49 @@ exports.deleteOrder = async (req, res) => {
   }
 };
 
-// 📌 更新訂單狀態
+// 後端API - 獲取賣家待交易訂單(包含賣家訊息和商品圖片）
+exports.getSellerConfirmedOrders = async (req, res) => {
+  const sellerId = req.user.id;
+
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        o.id,
+        o.status,
+        o.created_at,
+        o.trade_time,
+        o.total_price,
+        
+        -- 买家信息
+        buyer.id AS buyer_id,
+        buyer.name AS buyer_name,
+        buyer.avatar_url AS buyer_avatar,
+        
+        -- 商品信息
+        i.id AS item_id,
+        i.name AS item_name,
+        i.image_url AS item_image,
+        i.location AS item_location
+        
+      FROM orders o
+      JOIN users buyer ON o.buyer_id = buyer.id
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN items i ON oi.item_id = i.id
+      WHERE o.seller_id = ? AND o.status = 'confirmed'
+      ORDER BY o.created_at DESC
+    `, [sellerId]);
+
+    res.json({ message: '查詢成功', data: rows });
+  } catch (err) {
+    console.error('❌ 查詢待交易訂單錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤' });
+  }
+};
+
+// 更新訂單狀態
 exports.updateOrderStatus = async (req, res) => {
   const { orderId } = req.params;
-  const { newStatus, tradeTime } = req.body; // 添加tradeTime參數
+  const { newStatus, tradeTime } = req.body;
   const userId = req.user.id;
 
   const validStatuses = ['pending' , 'confirmed', 'completed', 'cancelled'];
@@ -256,7 +295,6 @@ exports.updateOrderStatus = async (req, res) => {
         [orderId]
       );
     }
-    // confirmed 狀態 → 保持 reserved
 
     res.json({ message: `訂單狀態已更新為 ${newStatus}` });
   } catch (err) {
@@ -264,6 +302,102 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
+
+// 📌 完成訂單
+exports.completeOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const userId = req.user.id;
+
+  const conn = await db.getConnection(); // 取出連線
+  try {
+    const [orders] = await conn.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+    if (orders.length === 0) {
+      conn.release();
+      return res.status(404).json({ message: '找不到該訂單' });
+    }
+
+    const order = orders[0];
+
+    if (userId !== order.seller_id) {
+      conn.release();
+      return res.status(403).json({ message: '只有賣家可以完成訂單' });
+    }
+
+    await conn.beginTransaction();
+
+    await conn.query('UPDATE orders SET status = ? WHERE id = ?', ['completed', orderId]);
+
+    await conn.query(
+      `UPDATE items SET status = 'sold' 
+       WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
+      [orderId]
+    );
+
+    await conn.commit();
+    conn.release();
+
+    res.json({ message: '訂單已完成' });
+  } catch (err) {
+    await conn.rollback();
+    conn.release();
+    console.error('❌ 完成訂單錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤', error: err.message });
+  }
+};
+
+// 📌 取消訂單
+exports.cancelOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const userId = req.user.id;
+
+  const conn = await db.getConnection(); // ⚡ 取一個連線
+  try {
+    const [orders] = await conn.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+    if (orders.length === 0) {
+      conn.release();
+      return res.status(404).json({ message: '找不到該訂單' });
+    }
+
+    const order = orders[0];
+
+    // ✅ 權限檢查
+    if (userId !== order.seller_id) {
+      conn.release();
+      return res.status(403).json({ message: '只有賣家可以取消訂單' });
+    }
+
+    const now = new Date();
+    const tradeDate = new Date(order.trade_time);
+    const threeDaysBefore = new Date(tradeDate.getTime() - 3 * 24 * 60 * 60 * 1000);
+
+    if (now > threeDaysBefore) {
+      conn.release();
+      return res.status(400).json({ message: '面交時間已不足三天，無法取消訂單' });
+    }
+
+    // ⚡ 使用 transaction
+    await conn.beginTransaction();
+
+    await conn.query('UPDATE orders SET status = ? WHERE id = ?', ['cancelled', orderId]);
+
+    await conn.query(
+    `UPDATE items SET status = 'rejected' 
+    WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
+    [orderId]
+  );
+
+    await conn.commit();
+    conn.release();
+
+    res.json({ message: '訂單已取消' });
+  } catch (err) {
+    await conn.rollback(); // ❌ 記得這裡要用 conn，不是 db
+    conn.release();
+    console.error('❌ 取消訂單錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤', error: err.message });
+  }
+};
+
 
 // 📌 查詢單筆訂單詳情
 exports.getOrderDetail = async (req, res) => {

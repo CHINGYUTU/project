@@ -108,10 +108,20 @@
       }
       
       /* 商品圖片樣式 */
-      .product-image {
+      .product-image-container {
         width: 100%;
         height: 200px;
-        object-fit: cover;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8fafc;
+      }
+
+      .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
         border-radius: 8px;
       }
       
@@ -125,6 +135,7 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         transition: transform 0.2s, box-shadow 0.2s;
       }
+
       .order-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -436,7 +447,7 @@
           if (!token) throw new Error("尚未登入，缺少 token");
 
           // 獲取賣家的confirmed狀態訂單
-          const response = await fetch(`${API_BASE}/api/order/my-orders`, {
+           const response = await fetch(`${API_BASE}/api/order/seller-confirmed-orders`, {
             headers: {
               "Authorization": `Bearer ${token}`,
               "Content-Type": "application/json"
@@ -477,23 +488,32 @@
         
         container.innerHTML = orders.map(order => `
           <div class="col-span-12 xl:col-span-4 md:col-span-6" data-order-id="${order.id}">
-          <div class="order-card bg-white rounded-lg overflow-hidden h-full flex flex-col">
+            <div class="order-card bg-white rounded-lg overflow-hidden h-full flex flex-col">
               <!-- 商品圖片部分 -->
-              <div class="relative overflow-hidden" style="height: 200px;">
-              <img src="${getSafeImageUrl(order.image_url)}"
-                  class="product-image absolute inset-0 w-full h-full object-cover"
-                  onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
-                  alt="${order.item_names || '商品圖片'}">
+              <div class="product-image-container">
+                <img src="${getSafeImageUrl(order.item_image)}"
+                    class="product-image"
+                    onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
+                    alt="${order.item_name || '商品圖片'}">
               </div>
               
               <div class="p-4 flex-grow">
               <div class="flex justify-between items-start mb-3">
-                  <h4 class="text-lg font-semibold text-gray-800">${order.item_names || "未命名商品"}</h4>
+                  <h4 class="text-lg font-semibold text-gray-800">${order.item_name || "未命名商品"}</h4>
                   <span class="status-badge status-confirmed">待交易</span>
               </div>
               
+              <!-- 买家信息显示 -->
+              <div class="buyer-info mb-3">
+                  <img src="${getSafeImageUrl(order.buyer_avatar)}" 
+                      class="buyer-avatar"
+                      onerror="this.onerror=null; this.src='../assets/images/default-avatar.png'"
+                      alt="${order.buyer_name}">
+                  <span class="text-sm text-gray-600">買家: ${order.buyer_name}</span>
+              </div>
+              
               <div class="space-y-2 text-sm text-gray-600">
-                  <p><span class="font-medium">交易地點:</span> ${order.locations || "未指定"}</p>
+                  <p><span class="font-medium">交易地點:</span> ${order.item_location || "未指定"}</p>
                   <p><span class="font-medium">面交時間:</span> ${formatTradeTime(order.trade_time)}</p>  
                   <p><span class="font-medium">訂單編號:</span> #${order.id}</p>
                   <p><span class="font-medium">建立時間:</span> ${new Date(order.created_at).toLocaleString()}</p>
@@ -509,7 +529,7 @@
                   <button class="btn-complete" onclick="completeOrder(${order.id})">
                   <i class="fas fa-check mr-1"></i>完成
                   </button>
-                  <button class="btn-cancel" onclick="cancelOrder(${order.id})">
+                  <button class="btn-cancel" onclick="cancelOrder(${order.id}, '${order.trade_time}')">
                   <i class="fas fa-times mr-1"></i>取消
                   </button>
               </div>
@@ -529,15 +549,12 @@
           }
 
           // 使用 PATCH 方法更新訂單狀態為 completed
-          const res = await fetch(`${API_BASE}/api/order/update-status/${orderId}`, {
+          const res = await fetch(`${API_BASE}/api/order/complete/${orderId}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-              newStatus: 'completed' 
-            })
+            }
           });
 
           const data = await res.json();
@@ -555,8 +572,18 @@
         }
       }
 
-      // ❌ 取消訂單（雙重確認）
-      async function cancelOrder(orderId) {
+      // ❌ 取消訂單（雙重確認 + 時間檢查）
+      async function cancelOrder(orderId, tradeTime) {
+        // 檢查面交時間是否在三天內
+        const now = new Date();
+        const tradeDate = new Date(tradeTime);
+        const threeDaysBefore = new Date(tradeDate.getTime() - (3 * 24 * 60 * 60 * 1000));
+        
+        if (now > threeDaysBefore) {
+          Swal.fire('無法取消', '面交時間已不足三天，無法取消訂單', 'warning');
+          return;
+        }
+
         // 第一次確認
         const firstConfirm = await Swal.fire({
           title: '確定要取消訂單嗎？',
@@ -593,15 +620,12 @@
           }
 
           // 使用 PATCH 方法更新訂單狀態為 cancelled
-          const res = await fetch(`${API_BASE}/api/order/update-status/${orderId}`, {
+          const res = await fetch(`${API_BASE}/api/order/cancel/${orderId}`, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-              newStatus: 'cancelled' 
-            })
+            }
           });
 
           const data = await res.json();
