@@ -1,40 +1,44 @@
 const db = require('../db');
 
-// 📌 加入收藏
-exports.addFavorite = async (req, res) => {
+// 📌 切換收藏狀態（新增或移除）
+exports.toggleFavorite = async (req, res) => {
   const userId = req.user.id;
   const { item_id } = req.body;
 
   try {
-    // 檢查是否已收藏
+    // 檢查是否存在於收藏
     const [existing] = await db.query(
       'SELECT * FROM favorites WHERE user_id = ? AND item_id = ?',
       [userId, item_id]
     );
 
     if (existing.length > 0) {
-      return res.status(400).json({ message: '已經收藏過此商品' });
+      // 已收藏 → 移除
+      await db.query(
+        'DELETE FROM favorites WHERE user_id = ? AND item_id = ?',
+        [userId, item_id]
+      );
+      return res.json({ message: '已取消收藏', favorited: false });
+    } else {
+      // 沒收藏 → 檢查商品是否存在且可用
+      const [itemCheck] = await db.query(
+        'SELECT * FROM items WHERE id = ? AND status = "available"',
+        [item_id]
+      );
+
+      if (itemCheck.length === 0) {
+        return res.status(404).json({ message: '商品不存在或無法收藏' });
+      }
+
+      // 新增收藏
+      await db.query(
+        'INSERT INTO favorites (user_id, item_id) VALUES (?, ?)',
+        [userId, item_id]
+      );
+      return res.json({ message: '收藏成功', favorited: true });
     }
-
-    // 新增：檢查商品是否存在且為 available 狀態
-    const [itemCheck] = await db.query(
-      'SELECT * FROM items WHERE id = ? AND status = "available"',
-      [item_id]
-    );
-
-    if (itemCheck.length === 0) {
-      return res.status(404).json({ message: '商品不存在或無法收藏' });
-    }
-
-    // 加入收藏
-    await db.query(
-      'INSERT INTO favorites (user_id, item_id) VALUES (?, ?)',
-      [userId, item_id]
-    );
-
-    res.json({ message: '收藏成功' });
   } catch (err) {
-    console.error('❌ 收藏錯誤:', err);
+    console.error('❌ toggleFavorite 錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤' });
   }
 };

@@ -131,6 +131,66 @@
       .animate-spin {
         animation: spin 1s linear infinite;
       }
+      
+      /* ========== 新增的商品卡樣式 ========== */
+      /* 商品圖片樣式 */
+      .product-image-container {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8fafc;
+      }
+
+      .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+      }
+      
+      /* 商品卡片樣式 */
+      .product-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* 價格顯示樣式 */
+      .price-display {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #6474E1;
+        display: flex;
+        align-items: center;
+      }
+      
+      /* 底部操作區域 */
+      .card-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-top: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+      }
+      
+      /* 上架時間樣式 */
+      .created-time {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
     </style>
   </head>
   <!-- [Head] end -->
@@ -156,14 +216,18 @@
 
         <!-- 頭像顯示區域 -->
         <div class="m-header flex items-center py-4 px-6 h-header-height">
+          <!-- 頭像容器 - 添加加載狀態處理 -->
           <div class="avatar-container relative w-12 h-12 rounded-full overflow-hidden">
-            <img id="avatar-display" 
-                src="../assets/images/3.png"
-                class="w-full h-full object-cover"
-                onerror="this.src='../assets/images/3.png'">
-            <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
+              <img id="avatar-display" 
+                  src="../assets/images/3.png"
+                  class="w-full h-full object-cover"
+                  onerror="this.src='../assets/images/3.png'">
+              <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
           </div>
-          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
+          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white ml-2">
+              <span id="user-greeting">您好，</span>
+              <span id="username-display">使用者</span>
+          </p>
         </div>
         
         <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
@@ -199,12 +263,6 @@
               <a href="../../elements/seller/finish.html" class="pc-link">
                 <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="check-circle"></i></span>
                 <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">完成交易訂單</span>
-              </a>
-            </li>
-            <li class="pc-item pc-hasmenu">
-              <a href="../../elements/seller/cancle.html" class="pc-link">
-                <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="x-circle"></i></span>
-                <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">取消交易訂單</span>
               </a>
             </li>
             <li class="pc-item pc-caption">
@@ -285,7 +343,6 @@
             </div>
             <ul class="breadcrumb">
               <li class="breadcrumb-item"><a href="../../../index.html">回首頁</a></li>
-              <li class="breadcrumb-item"><a href="../../elements/profile.html">個人檔案</a></li>
               <li class="breadcrumb-item"><a href="../../elements/seller/shop.html">賣家專區</a></li>
               <li class="breadcrumb-item">訂單管理</li>
             </ul>
@@ -393,6 +450,26 @@
     return `${baseUrl}/uploads${url}`;
   }
 
+  // 格式化時間函數
+  function formatDateTime(dateTime) {
+    if (!dateTime) return "未指定";
+    
+    try {
+      // 轉換為本地時間格式
+      const date = new Date(dateTime);
+      return date.toLocaleString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error("時間格式化錯誤:", error);
+      return "時間格式錯誤";
+    }
+  }
+
     // 獲取當前用戶的商品
     async function loadMyItems() {
       showLoading();
@@ -470,31 +547,40 @@
       <div class="col-span-12 xl:col-span-4 md:col-span-6" 
           data-id="${item.id}" 
           data-item="${itemData}">
-        <div class="card h-full flex flex-col">
-          <img src="${getSafeImageUrl(item.image_url)}"
-          onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
-          class="w-full h-48 object-cover" />
-          <div class="card-header !pb-0 !border-b-0">
-            <div class="flex justify-between items-start">
-              <h4 class="text-lg font-semibold">${item.name || "未命名商品"}</h4>
+        <div class="product-card bg-white rounded-lg overflow-hidden h-full flex flex-col">
+          <!-- 商品圖片部分 -->
+          <div class="product-image-container">
+            <img src="${getSafeImageUrl(item.image_url)}"
+                class="product-image"
+                onerror="this.onerror=null; this.src='../assets/images/default-product.png'"
+                alt="${item.name || '商品圖片'}">
+          </div>
+          
+          <div class="p-4 flex-grow">
+            <div class="flex justify-between items-start mb-3">
+              <h4 class="text-lg font-semibold text-gray-800">${item.name || "未命名商品"}</h4>
               <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
             </div>
-            ${item.description ? `<p class="text-gray-600 mt-1">${item.description}</p>` : ''}
-          </div>
-          <div class="card-body flex-grow">
-            <div class="space-y-2">
-              <p><span class="font-medium">價格:</span> $${item.price || "0"}</p>
+            
+            <div class="space-y-2 text-sm text-gray-600">
+              <p><span class="font-medium">商品描述:</span> ${item.description || "無描述"}</p>
               <p><span class="font-medium">分類:</span> ${CATEGORY_MAPPING[Number(item.category_id)] || "未知類別"}</p>
               <p><span class="font-medium">交易地點:</span> ${item.location || "未指定"}</p>
+              <p class="created-time"><span class="font-medium">上架時間:</span> ${formatDateTime(item.created_at)}</p>
             </div>
           </div>
-          <div class="card-footer p-4 border-t">
-            <div class="flex gap-2 justify-end">
-              <button class="btn btn-primary btn-edit" data-id="${item.id}">
+          
+          <!-- 底部操作區域 -->
+          <div class="card-actions">
+            <div class="price-display">
+              $${item.price || "0"}
+            </div>
+            <div class="flex gap-2">
+              <button class="btn-edit" data-id="${item.id}">
                 <i class="fas fa-edit mr-1"></i>修改
               </button>
-              <button class="btn btn-danger btn-delete" data-id="${item.id}">
-                <i class="fas fa-trash-alt mr-1"></i>刪除
+              <button class="btn-delete" data-id="${item.id}">
+                <i class="fas fa-trash mr-1"></i>刪除
               </button>
             </div>
           </div>
@@ -735,6 +821,37 @@
               console.error("頭像加載錯誤:", error);
               avatarElement.src = defaultAvatar; // 失敗時使用預設頭像
           }
+      });
+
+      // ======================= 使用者名稱獲取與顯示 =======================
+      async function fetchUserName() {
+          try {
+              const API_BASE = 'http://localhost:3000/api';
+              const response = await fetch(`${API_BASE}/user/profile`, {
+                  headers: {
+                      'Authorization': `Bearer ${localStorage.getItem("token")}`
+                  }
+              });
+              
+              if (response.ok) {
+                  const userData = await response.json();
+                  if (userData.name) {
+                      document.getElementById('username-display').textContent = userData.name;
+                  }
+              } else {
+                  console.error("獲取使用者名稱失敗");
+              }
+          } catch (error) {
+              console.error("獲取使用者名稱錯誤:", error);
+          }
+      }
+
+      // 在DOM加載完成後調用
+      document.addEventListener("DOMContentLoaded", function() {
+          // 現有的頭像獲取代碼...
+          
+          // 新增使用者名稱獲取
+          fetchUserName();
       });
     </script>
   </body>

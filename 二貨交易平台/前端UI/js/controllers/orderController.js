@@ -308,7 +308,7 @@ exports.completeOrder = async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
 
-  const conn = await db.getConnection(); // 取出連線
+  const conn = await db.getConnection();
   try {
     const [orders] = await conn.query('SELECT * FROM orders WHERE id = ?', [orderId]);
     if (orders.length === 0) {
@@ -325,7 +325,11 @@ exports.completeOrder = async (req, res) => {
 
     await conn.beginTransaction();
 
-    await conn.query('UPDATE orders SET status = ? WHERE id = ?', ['completed', orderId]);
+    // ✅ 同時更新狀態與完成時間
+    await conn.query(
+      'UPDATE orders SET status = ?, completed_at = NOW() WHERE id = ?',
+      ['completed', orderId]
+    );
 
     await conn.query(
       `UPDATE items SET status = 'sold' 
@@ -381,7 +385,7 @@ exports.cancelOrder = async (req, res) => {
     await conn.query('UPDATE orders SET status = ? WHERE id = ?', ['cancelled', orderId]);
 
     await conn.query(
-    `UPDATE items SET status = 'rejected' 
+    `UPDATE items SET status = 'available' 
     WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
     [orderId]
   );
@@ -397,6 +401,47 @@ exports.cancelOrder = async (req, res) => {
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
+
+// 📌 查詢「完成交易訂單」(賣家專用)
+exports.getSellerCompletedOrders = async (req, res) => {
+  const sellerId = req.user.id;
+
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        o.id AS id,
+        o.status,
+        o.created_at,
+        o.trade_time,
+        o.completed_at,
+        o.total_price,
+
+        -- 買家資訊
+        buyer.id AS buyer_id,
+        buyer.name AS buyer_name,
+        buyer.avatar_url AS buyer_avatar,
+
+        -- 商品資訊
+        i.id AS item_id,
+        i.name AS item_name,
+        i.image_url AS item_image,
+        i.location AS item_location
+
+      FROM orders o
+      JOIN users buyer ON o.buyer_id = buyer.id
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN items i ON oi.item_id = i.id
+      WHERE o.seller_id = ? AND o.status = 'completed'
+      ORDER BY o.completed_at DESC
+    `, [sellerId]);
+
+    res.json({ message: "查詢成功", data: rows });
+  } catch (err) {
+    console.error("❌ 獲取完成交易訂單錯誤:", err);
+    res.status(500).json({ error: "伺服器錯誤" });
+  }
+};
+
 
 
 // 📌 查詢單筆訂單詳情
@@ -438,5 +483,182 @@ exports.getOrderDetail = async (req, res) => {
   } catch (err) {
     console.error('❌ 查詢訂單詳情錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
+  }
+};
+
+//  ---------------買家部分功能---------------
+// 📌 買家 - 待確認訂單
+exports.getBuyerPendingOrders = async (req, res) => {
+  const buyerId = req.user.id;
+
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        o.id AS order_id,
+        o.status,
+        o.created_at,
+        o.trade_time,
+        o.total_price,
+
+        -- 買家資訊
+        buyer.id AS buyer_id,
+        buyer.name AS buyer_name,
+        buyer.avatar_url AS buyer_avatar,
+
+        -- 賣家資訊（買家最需要看到這個）
+        seller.id AS seller_id,
+        seller.name AS seller_name,
+        seller.avatar_url AS seller_avatar,
+
+        -- 商品資訊（地點抓 order_items）
+        i.id AS item_id,
+        i.name AS item_name,
+        i.image_url AS item_image,
+        oi.location AS order_location,
+        oi.price AS item_price
+
+      FROM orders o
+      JOIN users buyer ON o.buyer_id = buyer.id
+      JOIN users seller ON o.seller_id = seller.id
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN items i ON oi.item_id = i.id
+      WHERE o.buyer_id = ? AND o.status = 'pending'
+      ORDER BY o.created_at DESC
+    `, [buyerId]);
+
+    res.json({ message: '查詢成功', data: rows });
+  } catch (err) {
+    console.error("❌ 獲取買家待確認訂單錯誤:", err);
+    res.status(500).json({ error: "伺服器錯誤" });
+  }
+};
+
+// 📌 買家 - 已確認訂單
+exports.getBuyerConfirmedOrders = async (req, res) => {
+  const buyerId = req.user.id;
+
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        o.id AS order_id,
+        o.status,
+        o.created_at,
+        o.trade_time,
+        o.total_price,
+
+        buyer.id AS buyer_id,
+        buyer.name AS buyer_name,
+        buyer.avatar_url AS buyer_avatar,
+
+        seller.id AS seller_id,
+        seller.name AS seller_name,
+        seller.avatar_url AS seller_avatar,
+
+        i.id AS item_id,
+        i.name AS item_name,
+        i.image_url AS item_image,
+        oi.location AS order_location,
+        oi.price AS item_price
+
+      FROM orders o
+      JOIN users buyer ON o.buyer_id = buyer.id
+      JOIN users seller ON o.seller_id = seller.id
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN items i ON oi.item_id = i.id
+      WHERE o.buyer_id = ? AND o.status = 'confirmed'
+      ORDER BY o.created_at DESC
+    `, [buyerId]);
+
+    res.json({ message: '查詢成功', data: rows });
+  } catch (err) {
+    console.error("❌ 查詢買家已確認訂單錯誤:", err);
+    res.status(500).json({ error: '伺服器錯誤' });
+  }
+};
+
+// 📌 買家 - 已完成訂單
+exports.getBuyerCompletedOrders = async (req, res) => {
+  const buyerId = req.user.id;
+
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        o.id AS order_id,
+        o.status,
+        o.created_at,
+        o.trade_time,
+        o.completed_at,
+        o.total_price,
+
+        buyer.id AS buyer_id,
+        buyer.name AS buyer_name,
+        buyer.avatar_url AS buyer_avatar,
+
+        seller.id AS seller_id,
+        seller.name AS seller_name,
+        seller.avatar_url AS seller_avatar,
+
+        i.id AS item_id,
+        i.name AS item_name,
+        i.image_url AS item_image,
+        oi.location AS order_location,
+        oi.price AS item_price
+
+      FROM orders o
+      JOIN users buyer ON o.buyer_id = buyer.id
+      JOIN users seller ON o.seller_id = seller.id
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN items i ON oi.item_id = i.id
+      WHERE o.buyer_id = ? AND o.status = 'completed'
+      ORDER BY o.completed_at DESC
+    `, [buyerId]);
+
+    res.json({ message: "查詢成功", data: rows });
+  } catch (err) {
+    console.error("❌ 獲取買家完成交易訂單錯誤:", err);
+    res.status(500).json({ error: "伺服器錯誤" });
+  }
+};
+
+// 📌 買家 - 已取消訂單
+exports.getBuyerCancelledOrders = async (req, res) => {
+  const buyerId = req.user.id;
+
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        o.id AS order_id,
+        o.status,
+        o.created_at,
+        o.trade_time,
+        o.total_price,
+
+        buyer.id AS buyer_id,
+        buyer.name AS buyer_name,
+        buyer.avatar_url AS buyer_avatar,
+
+        seller.id AS seller_id,
+        seller.name AS seller_name,
+        seller.avatar_url AS seller_avatar,
+
+        i.id AS item_id,
+        i.name AS item_name,
+        i.image_url AS item_image,
+        oi.location AS order_location,
+        oi.price AS item_price
+
+      FROM orders o
+      JOIN users buyer ON o.buyer_id = buyer.id
+      JOIN users seller ON o.seller_id = seller.id
+      JOIN order_items oi ON o.id = oi.order_id
+      JOIN items i ON oi.item_id = i.id
+      WHERE o.buyer_id = ? AND o.status = 'cancelled'
+      ORDER BY o.created_at DESC
+    `, [buyerId]);
+
+    res.json({ message: '查詢成功', data: rows });
+  } catch (err) {
+    console.error("❌ 查詢買家已取消訂單錯誤:", err);
+    res.status(500).json({ error: '伺服器錯誤' });
   }
 };

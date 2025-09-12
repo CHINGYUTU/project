@@ -144,23 +144,19 @@ exports.getPendingItems = async (req, res) => {
   }
 };
 
-// 📌 賣家查看自己上架的商品（可看到 pending 與 available）
+// 📌 查詢個人上架商品（含 pending/available/rejected）
 exports.getMyItems = async (req, res) => {
-  const userId = req.user.id;
-
-  if (req.user.role === 'admin') {
-    return res.status(403).json({ message: '管理員無法查看個人商品' });
-  }
-
   try {
-    const [rows] = await db.query(`
-      SELECT 
-        id, name, description, price, category_id,
-        IFNULL(image_url, 'default-product.png') AS image_url,
-        location, status
-      FROM items
-      WHERE user_id = ?
-    `, [userId]);
+    const userId = req.user.id;
+
+    const [rows] = await db.query(
+      `SELECT i.*, c.name AS category_name
+       FROM items i
+       LEFT JOIN categories c ON i.category_id = c.id
+       WHERE i.user_id = ?
+       ORDER BY i.created_at DESC`,
+      [userId]
+    );
 
     res.json({ message: '查詢成功', data: rows });
   } catch (err) {

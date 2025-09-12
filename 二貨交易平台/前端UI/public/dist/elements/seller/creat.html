@@ -141,15 +141,18 @@
 
 			<!-- 頭像顯示區域 -->
       <div class="m-header flex items-center py-4 px-6 h-header-height">
-          <!-- 頭像容器 - 添加加載狀態處理 -->
-          <div class="avatar-container relative w-12 h-12 rounded-full overflow-hidden">
-              <img id="avatar-display" 
-                  src="../assets/images/3.png"
-                  class="w-full h-full object-cover"
-                  onerror="this.src='../assets/images/3.png'">
-              <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
-          </div>
-          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
+        <!-- 頭像容器 - 添加加載狀態處理 -->
+        <div class="avatar-container relative w-12 h-12 rounded-full overflow-hidden">
+            <img id="avatar-display" 
+                src="../assets/images/3.png"
+                class="w-full h-full object-cover"
+                onerror="this.src='../assets/images/3.png'">
+            <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
+        </div>
+        <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white ml-2">
+            <span id="user-greeting">您好，</span>
+            <span id="username-display">使用者</span>
+        </p>
       </div>
     <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
       <ul class="pc-navbar">
@@ -184,12 +187,6 @@
           <a href="../../elements/seller/finish.html" class="pc-link">
             <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="check-circle"></i></span>
             <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">完成交易訂單</span>
-          </a>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="../../elements/seller/cancle.html" class="pc-link">
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-micon"> <i data-feather="x-circle"></i></span>
-            <span style="color: rgba(100, 100, 159, 100);" class="pc-mtext">取消交易訂單</span>
           </a>
         </li>
         <li class="pc-item pc-caption">
@@ -257,7 +254,6 @@
             </div>
             <ul class="breadcrumb">
               <li class="breadcrumb-item"><a href="../../../index.html">回首頁</a></li>
-              <li class="breadcrumb-item"><a href="../../elements/profile.html">個人檔案</a></li>
               <li class="breadcrumb-item"><a href="../../elements/seller/shop.html">賣家專區</a></li>
               <li class="breadcrumb-item" aria-current="page">商品上架</li>
             </ul>
@@ -566,6 +562,37 @@
 
         // 初始化
         init();
+      });
+
+      // ======================= 使用者名稱獲取與顯示 =======================
+      async function fetchUserName() {
+          try {
+              const API_BASE = 'http://localhost:3000/api';
+              const response = await fetch(`${API_BASE}/user/profile`, {
+                  headers: {
+                      'Authorization': `Bearer ${localStorage.getItem("token")}`
+                  }
+              });
+              
+              if (response.ok) {
+                  const userData = await response.json();
+                  if (userData.name) {
+                      document.getElementById('username-display').textContent = userData.name;
+                  }
+              } else {
+                  console.error("獲取使用者名稱失敗");
+              }
+          } catch (error) {
+              console.error("獲取使用者名稱錯誤:", error);
+          }
+      }
+
+      // 在DOM加載完成後調用
+      document.addEventListener("DOMContentLoaded", function() {
+          // 現有的頭像獲取代碼...
+          
+          // 新增使用者名稱獲取
+          fetchUserName();
       });
     </script>
   </body>

@@ -1,22 +1,21 @@
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
   <!-- [Head] start -->
-
   <head>
-    <title>個人檔案</title>
+    <title>最近瀏覽</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
       name="description"
-      content="Datta Able is trending dashboard template made using Bootstrap 5 design framework. Datta Able is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies."
+      content="二貨 - 最近瀏覽商品"
     />
     <meta
       name="keywords"
-      content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard"
+      content="二手交易, 瀏覽紀錄"
     />
-    <meta name="author" content="CodedThemes" />
+    <meta name="author" content="二貨" />
 
     <!-- [Favicon] icon -->
     <link href="../assets/images/logo.png" rel="icon" type="image/x-icon"><!-- [Font] Family -->
@@ -36,164 +35,353 @@
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
     <style>
-	   .password-checklist li {
-	       font-size: 15px;
-	       margin-bottom: 4px;
-	   }
-	   .progress {
-	       height: 8px;
-	       margin-top: 8px;
-	       background-color: #e0e0e0;
-	       border-radius: 10px;
-	       overflow: hidden;
-	   }
-	   .progress-bar {
-	       transition: width 0.5s ease, background-color 0.4s ease;
-	       border-radius: 10px;
-	   }
-	   #strengthText {
-	       transition: color 0.4s ease;
-	   }
-		/* 確保圖片容器保持正方形 */
-		.avatar-container {
-            width: 50px;
-            height: 50px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0; /* 灰色邊框 */
-            flex-shrink: 0; /* 防止壓縮 */
-        }
-		/* 預覽大頭貼 */
-		.avatar-preview-image {
-			max-width: 100px;
-			max-height: 100px;
-			border: 1px dashed #ccc;
-			margin-top: 5px;
-		}
-		/* 圖片樣式 */
-		 #avatar-display {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+      /* 商品卡片容器 */
+      #viewed-products-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+      
+      /* 商品卡片樣式 */
+      .viewed-product-card {
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+      }
 
-	</style>
+      .viewed-product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      }
+      
+      /* 商品圖片容器 */
+      .product-image-container {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8fafc;
+      }
 
+      .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+      
+      .viewed-product-card:hover .product-image {
+        transform: scale(1.05);
+      }
+      
+    /* 賣家資訊樣式 */
+    .seller-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #edf2f7;
+    }
+
+    .seller-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #e9ecef;
+    }
+
+    .seller-name {
+      margin-left: 0.5rem;
+      font-size: 0.9rem;
+      color: #4a5568;
+      font-weight: 500;
+    }
+
+      /* 商品内容區域 */
+      .product-content {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      }
+      
+      /* 商品標题 */
+      .product-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      
+      /* 商品描述 */
+      .product-description {
+        color: #718096;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+      }
+      
+      /* 商品資訊 */
+      .product-info {
+        margin-bottom: 1rem;
+      }
+      
+      .product-location, .product-viewed {
+        color: #718096;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.25rem;
+      }
+      
+      /* 價格和操作區域 */
+      .product-action {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+      }
+      
+      .price-display {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #6474E1;
+      }
+      
+      .btn-buy {
+        background-color: #6474E1;
+        color: white;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      
+      .btn-buy:hover {
+        background-color: #4f5bb5;
+        transform: translateY(-1px);
+      }
+      
+      /* 響應式調整 */
+      @media (max-width: 768px) {
+        #viewed-products-container {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+        
+        .product-image-container {
+          height: 180px;
+        }
+      }
+      
+      /* 空狀態樣式 */
+      .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background-color: #f8fafc;
+        border-radius: 12px;
+        border: 1px dashed #e2e8f0;
+        grid-column: 1 / -1;
+      }
+      
+      .empty-state i {
+        font-size: 3rem;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+      }
+      /* 狀態徽章樣式 */
+      .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .status-reserved {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+
+      .status-sold {
+        background-color: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .status-rejected {
+        background-color: #e5e7eb;
+        color: #374151;
+      }
+
+      /* 商品狀態覆蓋層 */
+      .product-status-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        z-index: 10;
+      }
+
+      .product-image-container {
+        position: relative;
+      }
+
+      /* 狀態覆蓋層顏色 */
+      .status-reserved {
+        background-color: rgba(251, 191, 36, 0.9);
+        color: #78350f;
+      }
+
+      .status-sold {
+        background-color: rgba(239, 68, 68, 0.9);
+        color: white;
+      }
+
+      .status-rejected {
+        background-color: rgba(156, 163, 175, 0.9);
+        color: white;
+      }
+
+      /* 禁用狀態下的價格樣式 */
+      .product-action .price-display.disabled {
+        color: #9ca3af;
+        text-decoration: line-through;
+      }
+    </style>
   </head>
   <!-- [Head] end -->
   <!-- [Body] Start -->
 
   <body>
     <!-- [ Pre-loader ] start -->
-<div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
-  <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
-    <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
-  </div>
-</div>
-<!-- [ Pre-loader ] End -->
-<nav class="pc-sidebar">
-		<div class="navbar-wrapper">
-			<div class="m-header flex items-center py-4 px-6 h-header-height">
-				<a class="b-brand flex items-center gap-3" href="../../index.html"><!-- ========   Change your logo from here   ============ -->
-				 <img alt="Logo" class="logo" id="logo" src="../assets/images/logo.png" width="50">
-				<p class="text-xl sm:text-3xl font-semibold text-slate-900 dark:text-white">二貨</p></a>
-			</div>
+    <div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
+      <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
+        <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
+      </div>
+    </div>
+    <!-- [ Pre-loader ] End -->
+    <nav class="pc-sidebar">
+      <div class="navbar-wrapper">
+        <div class="m-header flex items-center py-4 px-6 h-header-height">
+          <a class="b-brand flex items-center gap-3" href="../../index.html">
+            <img alt="Logo" class="logo" id="logo" src="../assets/images/logo.png" width="50">
+            <p class="text-xl sm:text-3xl font-semibold text-slate-900 dark:text-white">二貨</p>
+          </a>
+        </div>
 
-			<!-- 頭像顯示區域 -->
-      <div class="m-header flex items-center py-4 px-6 h-header-height">
+        <!-- 頭像顯示區域 -->
+        <div class="m-header flex items-center py-4 px-6 h-header-height">
           <!-- 頭像容器 - 添加加載狀態處理 -->
           <div class="avatar-container relative w-12 h-12 rounded-full overflow-hidden">
-              <img id="avatar-display" 
-                  src="../assets/images/3.png"
-                  class="w-full h-full object-cover"
-                  onerror="this.src='../assets/images/3.png'">
-              <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
+            <img id="avatar-display" 
+                src="../assets/images/3.png"
+                class="w-full h-full object-cover"
+                onerror="this.src='../assets/images/3.png'">
+            <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
           </div>
-          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
+          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white ml-2">
+            <span id="user-greeting">您好，</span>
+            <span id="username-display">使用者</span>
+          </p>
+        </div>
+
+        <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
+          <ul class="pc-navbar">
+            <li class="pc-item pc-caption"><label>個人檔案</label></li>
+            <li class="pc-item pc-hasmenu">
+              <a class="pc-link" href="../elements/edit.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="edit"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">修改資料</span></a>
+            </li>
+            <li class="pc-item pc-caption"><label>訂單查詢</label> <i data-feather="monitor"></i></li>
+            <li class="pc-item pc-hasmenu">
+              <a class="pc-link" href="../elements/collect.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="eye"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">檢視收藏</span></a>
+            </li>
+            <li class="pc-item pc-hasmenu">
+              <a class="pc-link" href="../elements/order.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="package"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">檢視訂單</span></a>
+            </li>
+            <li class="pc-item pc-hasmenu">
+              <a class="pc-link" href="../elements/trade.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="briefcase"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">交易紀錄</span></a>
+            </li>
+            <li class="pc-item pc-hasmenu">
+              <a class="pc-link" href="../elements/browse.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="grid"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">瀏覽紀錄</span></a>
+            </li>
+            <li class="pc-item pc-caption"><label>其他</label> <i data-feather="sidebar"></i></li>
+            <li class="pc-item">
+              <a class="pc-link" href="../../index.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="home"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">回首頁</span></a>
+            </li>
+            <li class="pc-item">
+              <a class="pc-link" href="../../index.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="log-out"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">登出</span></a>
+            </li>
+          </ul>
+        </div>
       </div>
-
-			<div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
-				<ul class="pc-navbar">
-					<li class="pc-item pc-caption"><label>個人檔案</label></li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/edit.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="edit"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">修改資料</span></a>
-					</li>
-					<li class="pc-item"></li>
-					<li class="pc-item pc-caption"><label>賣家商場</label> <i data-feather="feather"></i></li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/seller/shop.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="shopping-cart"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">進入商場</span></a>
-					</li>
-					<li class="pc-item pc-caption"><label>買家專區</label> <i data-feather="monitor"></i></li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/collect.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="eye"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">檢視收藏</span></a>
-					</li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/order.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="package"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">檢視訂單</span></a>
-					</li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/trade.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="briefcase"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">交易紀錄</span></a>
-					</li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/browse.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="grid"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">瀏覽紀錄</span></a>
-					</li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/point.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="feather"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">環保點數</span></a>
-					</li>
-					<li class="pc-item pc-caption"><label>其他</label> <i data-feather="sidebar"></i></li>
-					<li class="pc-item">
-						<a class="pc-link" href="../../index.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="home"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">回首頁</span></a>
-					</li>
-					<li class="pc-item">
-						<a class="pc-link" href="../../index.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="log-out"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">登出</span></a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</nav><!-- [ Sidebar Menu ] end -->
- <!-- [ Header Topbar ] start -->
-<header class="pc-header">
-  <div class="header-wrapper flex max-sm:px-[15px] px-[25px] grow"><!-- [Mobile Media Block] start -->
-    <div class="me-auto pc-mob-drp">
-      <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
-        <!-- ======= Menu collapse Icon ===== -->
-        <li class="pc-h-item pc-sidebar-collapse max-lg:hidden lg:inline-flex">
-          <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="sidebar-hide">
-            <i data-feather="menu"></i>
-          </a>
-        </li>
-        <li class="pc-h-item pc-sidebar-popup lg:hidden">
-          <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="mobile-collapse">
-            <i data-feather="menu"></i>
-          </a>
-        </li>
-      </ul>
-    </div>
-    <!-- [Mobile Media Block end] -->
-    <div class="ms-auto">
-      <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
-        <li class="dropdown pc-h-item">
-          <a class="pc-head-link dropdown-toggle me-0" data-pc-toggle="dropdown" href="#" role="button"
-            aria-haspopup="false" aria-expanded="false">
-            <i data-feather="sun"></i>
-          </a>
-          <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
-            <a href="#!" class="dropdown-item" onclick="layout_change('dark')">
-              <i data-feather="moon"></i>
-              <span>深色</span>
-            </a>
-            <a href="#!" class="dropdown-item" onclick="layout_change('light')">
-              <i data-feather="sun"></i>
-              <span>明亮</span>
-            </a>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</header>
-<!-- [ Header ] end -->
-
-
+    </nav><!-- [ Sidebar Menu ] end -->
+    
+    <!-- [ Header Topbar ] start -->
+    <header class="pc-header">
+      <div class="header-wrapper flex max-sm:px-[15px] px-[25px] grow">
+        <!-- [Mobile Media Block] start -->
+        <div class="me-auto pc-mob-drp">
+          <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
+            <!-- ======= Menu collapse Icon ===== -->
+            <li class="pc-h-item pc-sidebar-collapse max-lg:hidden lg:inline-flex">
+              <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="sidebar-hide">
+                <i data-feather="menu"></i>
+              </a>
+            </li>
+            <li class="pc-h-item pc-sidebar-popup lg:hidden">
+              <a href="#" class="pc-head-link ltr:!ml-0 rtl:!mr-0" id="mobile-collapse">
+                <i data-feather="menu"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- [Mobile Media Block end] -->
+        <div class="ms-auto">
+          <ul class="inline-flex *:min-h-header-height *:inline-flex *:items-center">
+            <li class="dropdown pc-h-item">
+              <a class="pc-head-link dropdown-toggle me-0" data-pc-toggle="dropdown" href="#" role="button"
+                aria-haspopup="false" aria-expanded="false">
+                <i data-feather="sun"></i>
+              </a>
+              <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
+                <a href="#!" class="dropdown-item" onclick="layout_change('dark')">
+                  <i data-feather="moon"></i>
+                  <span>深色</span>
+                </a>
+                <a href="#!" class="dropdown-item" onclick="layout_change('light')">
+                  <i data-feather="sun"></i>
+                  <span>明亮</span>
+                </a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+    <!-- [ Header ] end -->
 
     <!-- [ Main Content ] start -->
     <div class="pc-container">
@@ -206,90 +394,37 @@
             </div>
             <ul class="breadcrumb">
               <li class="breadcrumb-item"><a href="../../index.html">回首頁</a></li>
-              <li class="breadcrumb-item"><a href="../dashboard/profile.html">個人檔案</a></li>
+              <li class="breadcrumb-item"><a href="../elements/profile.html">個人檔案</a></li>
               <li class="breadcrumb-item">瀏覽紀錄</li>
             </ul>
           </div>
         </div>
         <!-- [ breadcrumb ] end -->
 
-        
-        <div>
+        <div class="flex justify-between items-center mb-4">
           <h3>瀏覽紀錄</h3>
+          <button id="clear-history-btn" class="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600">
+            清除紀錄
+          </button>
         </div>
+        <div id="viewed-list" class="grid gap-4"></div>
+        
         <!-- [ Main Content ] start -->
-        <div class="grid grid-cols-12 gap-x-6">
-          <div class="col-span-12 xl:col-span-4 md:col-span-6">
-            <div class="card">
-              <img src="../assets/images/3.png" style="display: block; margin: 0 auto; padding-top: 20px;" height="250px" width="250px">
-              <div class="card-header !pb-0 !border-b-0">
-                <h4>商品名稱</h4>
-                <p>商品標題</p>
-                <p>交易地點</p>
-              </div>
-              <div class="card-body">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    $ 249
-                  </h3>
-                  <button onclick="showPurchasePopup('商品名稱', 249, '../assets/images/3.png', '台北市 中正區')"
-                          style="float: left; font-size: 18pt; color: white; border-radius: 12px; height: 30pt; width: 50pt; background-color: rgba(100, 100, 225, 100);">
-                    購買
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-12 xl:col-span-4 md:col-span-6">
-            <div class="card">
-              <img src="../assets/images/3.png" style="display: block; margin: 0 auto; padding-top: 20px;" height="250px" width="250px">
-              <div class="card-header !pb-0 !border-b-0">
-                <h4>商品名稱</h4>
-                <p>商品標題</p>
-                <p>交易地點</p>
-              </div>
-              <div class="card-body">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    $ 1500
-                  </h3>
-                  <button onclick="showPurchasePopup('商品名稱', 249, '../assets/images/3.png', '台北市 中正區')"
-                          style="float: left; font-size: 18pt; color: white; border-radius: 12px; height: 30pt; width: 50pt; background-color: rgba(100, 100, 225, 100);">
-                    購買
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-12 xl:col-span-4 md:col-span-6">
-            <div class="card">
-              <img src="../assets/images/3.png" style="display: block; margin: 0 auto; padding-top: 20px;" height="250px" width="250px">
-              <div class="card-header !pb-0 !border-b-0">
-                <h4>商品名稱</h4>
-                <p>商品標題</p>
-                <p>交易地點</p>
-              </div>
-              <div class="card-body">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    $ 57
-                  </h3>
-                  <button onclick="showPurchasePopup('商品名稱', 249, '../assets/images/3.png', '台北市 中正區')"
-                          style="float: left; font-size: 18pt; color: white; border-radius: 12px; height: 30pt; width: 50pt; background-color: rgba(100, 100, 225, 100);">
-                    購買
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div class="grid grid-cols-12 gap-x-6 mt-4" id="viewed-products-container">
+          <!-- 商品卡片將在這裡動態生成 -->
+          <div class="col-span-12 text-center p-4">
+            <div class="animate-spin inline-block w-8 h-8 border-4 border-primary-500 rounded-full"></div>
+            <p class="mt-2">載入中...</p>
           </div>
         </div>
         <!-- [ Main Content ] end -->
       </div>
     </div>
     <!-- [ Main Content ] end -->
+    
     <footer class="pc-footer">
     </footer>
- 
+
     <!-- Required Js -->
     <script src="../assets/js/plugins/simplebar.min.js"></script>
     <script src="../assets/js/plugins/popper.min.js"></script>
@@ -298,129 +433,445 @@
     <script src="../assets/js/component.js"></script>
     <script src="../assets/js/theme.js"></script>
     <script src="../assets/js/script.js"></script>
-
-    <div class="floting-button fixed bottom-[50px] right-[30px] z-[1030]">
-    </div>
-
-    
-    <script>
-      layout_change('false');
-    </script>
-     
-    
-    <script>
-      layout_theme_sidebar_change('dark');
-    </script>
-    
-     
-    <script>
-      change_box_container('false');
-    </script>
-     
-    <script>
-      layout_caption_change('true');
-    </script>
-     
-    <script>
-      layout_rtl_change('false');
-    </script>
-     
-    <script>
-      preset_change('preset-1');
-    </script>
-     
-    <script>
-      main_layout_change('vertical');
-    </script>
-    <script src="../assets/js/script.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-    // ======================= 頭像獲取與顯示 =======================
-    document.addEventListener("DOMContentLoaded", async function() {
-        const avatarElement = document.getElementById("avatar-display");
-        const defaultAvatar = "../assets/images/3.png"; // 預設頭像路徑
-        
-        try {
-            // 1. 先檢查本地緩存
-            const cachedAvatar = localStorage.getItem("userAvatar");
-            if (cachedAvatar) {
-                avatarElement.src = cachedAvatar;
-                return; // 如果有緩存就直接使用
-            }
-            
-            // 2. 從API獲取頭像URL
-            const response = await fetch(`${API_BASE}/user/avatar`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem("token")}`
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data.avatarUrl) {
-                    // 添加時間戳避免緩存問題
-                    const avatarUrl = `${data.avatarUrl}?t=${new Date().getTime()}`;
-                    avatarElement.src = avatarUrl;
-                    localStorage.setItem("userAvatar", avatarUrl); // 緩存到本地
-                }
-            } else {
-                throw new Error("獲取頭像失敗");
-            }
-        } catch (error) {
-            console.error("頭像加載錯誤:", error);
-            avatarElement.src = defaultAvatar; // 失敗時使用預設頭像
-        }
-    });
-    </script>
 
-  <script>
-    function showPurchasePopup(itemName, price, imagePath, place) {
-      Swal.fire({
-        title: `確認購買「${itemName}」？`,
-        html: `
-          <p>價格：$${price}</p>
-          <p>交易地點：${place}</p>
-        `,
-        imageUrl: imagePath,
-        imageWidth: 200,
-        imageHeight: 200,
-        showCancelButton: true,
-        confirmButtonText: '確認購買',
-        cancelButtonText: '取消',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: '✅ 已加入購物車！',
-            text: `${itemName} 已成功加入購物車。`,
-            icon: 'success',
-            confirmButtonText: '知道了',
-            confirmButtonColor: '#6474E1'
+    <script>
+      // API 配置
+      const API_BASE = 'http://localhost:3000';
+      
+      // 顯示加載狀態
+      function showLoading() {
+        const container = document.getElementById("viewed-products-container");
+        container.innerHTML = `
+          <div class="col-span-12 text-center p-4">
+            <div class="animate-spin inline-block w-8 h-8 border-4 border-primary-500 rounded-full"></div>
+            <p class="mt-2">載入中...</p>
+          </div>
+        `;
+      }
+
+      // 顯示錯誤訊息
+      function showError(message) {
+        const container = document.getElementById("viewed-products-container");
+        container.innerHTML = `
+          <div class="col-span-12 p-4 bg-red-50 border border-red-200 rounded">
+            <h3 class="font-bold text-red-800">錯誤</h3>
+            <p class="mt-2 text-red-700">${message}</p>
+            <button onclick="loadViewedProducts()" class="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+              重新嘗試
+            </button>
+          </div>
+        `;
+      }
+
+      // 顯示空狀態
+      function showEmptyState() {
+        const container = document.getElementById("viewed-products-container");
+        container.innerHTML = `
+          <div class="col-span-12">
+            <div class="empty-state">
+              <i class="fas fa-eye-slash fa-3x text-gray-400 mb-3"></i>
+              <h4 class="text-gray-600">暫無瀏覽紀錄</h4>
+              <p class="text-gray-500">您還沒有瀏覽過任何商品</p>
+              <a href="../../index.html" class="btn btn-primary mt-3">去逛逛</a>
+            </div>
+          </div>
+        `;
+      }
+
+      // 圖片處理函數
+      function getSafeImageUrl(url, type = 'product') {
+        const defaultProductImage = '../assets/images/default-product.png';
+        const defaultAvatar = '../assets/images/default-avatar.png';
+        const defaultImage = type === 'avatar' ? defaultAvatar : defaultProductImage;
+        
+        // 處理空值或是無效值
+        if (!url || url === 'NULL' || url === 'null' || url === 'undefined') {
+          return defaultImage;
+        }
+        
+        // 如果已經是完整URL則直接使用
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+          return url;
+        }
+        
+        // 確保BASE_URL不以斜線结尾
+        const baseUrl = API_BASE.endsWith('/') 
+          ? API_BASE.slice(0, -1) 
+          : API_BASE;
+        
+        // 處理URL路徑樣式
+        let imagePath = url;
+        if (!imagePath.startsWith('/')) {
+          imagePath = '/' + imagePath;
+        }
+        
+        return `${baseUrl}/uploads${imagePath}`;
+      }
+
+      // 獲取最近瀏覽的商品
+      async function loadViewedProducts() {
+        try {
+          showLoading(); // 先顯示 loading
+
+          const res = await fetch('http://localhost:3000/api/view-history/recent?limit=50', {
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
           });
+
+          if (!res.ok) throw new Error('獲取失敗');
+          const data = await res.json();
+          console.log('✅ 最近瀏覽紀錄:', data);
+
+          if (data.length === 0) {
+            showEmptyState();
+          } else {
+            displayViewedProducts(data);  // ✅ 這裡補上渲染畫面
+          }
+        } catch (err) {
+          console.error('❌ 載入最近瀏覽紀錄失敗:', err.message);
+          showError(err.message);
+        }
+      }
+
+      // 顯示瀏覽的商品
+      function displayViewedProducts(products) {
+        const viewedProductsContainer = document.getElementById("viewed-products-container");
+        if (!viewedProductsContainer) return;
+
+        viewedProductsContainer.innerHTML = products.map(item => {
+          // 根據商品狀態決定按鈕顯示
+          let actionButton = '';
+          if (item.status === 'reserved') {
+            actionButton = '<span class="status-badge status-reserved">已預訂</span>';
+          } else if (item.status === 'sold') {
+            actionButton = '<span class="status-badge status-sold">已售出</span>';
+          } else if (item.status === 'rejected') {
+            actionButton = '<span class="status-badge status-rejected">該商品遭下架</span>';
+          } else {
+            // 只有可用狀態顯示購買按鈕
+            actionButton = `
+              <button class="btn-buy" onclick="showPurchasePopup(
+                '${item.item_id}', 
+                '${(item.item_name || "未命名商品").replace(/'/g, "\\'")}', 
+                ${item.price || 0}, 
+                '${getSafeImageUrl(item.image_url)}',
+                '${(item.location || item.trade_location || "未指定").replace(/'/g, "\\'")}',
+                '${(item.seller_name || "未知賣家").replace(/'/g, "\\'")}',
+                '${item.seller_id}'
+              )">購買</button>
+            `;
+          }
+
+          return `
+            <div class="viewed-product-card">
+              <div class="product-image-container">
+                <img src="${getSafeImageUrl(item.image_url)}" 
+                    alt="${item.item_name || '商品圖片'}"
+                    class="product-image">
+                ${item.status !== 'available' && item.status !== 'pending' ? 
+                  `<div class="product-status-overlay status-${item.status}">
+                    ${item.status === 'reserved' ? '已預訂' : 
+                      item.status === 'sold' ? '已售出' : 
+                      item.status === 'rejected' ? '已下架' : ''}
+                  </div>` : ''}
+              </div>
+              
+              <div class="product-content">
+                <!-- 賣家信息 -->
+                <div class="seller-info">
+                  <div class="avatar-container" style="width: 32px; height: 32px;">
+                    <img src="${getSafeImageUrl(item.seller_avatar, 'avatar')}" 
+                        alt="${item.seller_name || '賣家'}" 
+                        class="seller-avatar"
+                        onerror="this.src='../assets/images/default-avatar.png'">
+                  </div>
+                  <span class="seller-name">${item.seller_name || '未知賣家'}</span>
+                </div>
+                
+                <h4 class="product-title">${item.item_name || "未命名商品"}</h4>
+                
+                <p class="product-description">
+                  ${item.description || "暫無描述"}
+                </p>
+                
+                <div class="product-info">
+                  <div class="product-location">
+                    <i class="fas fa-map-marker-alt mr-1"></i>
+                    交易地點: ${item.location || item.trade_location || "未指定"}
+                  </div>
+                  <div class="product-viewed">
+                    <i class="fas fa-clock mr-1"></i>
+                    瀏覽時間: ${new Date(item.viewed_at).toLocaleString()}
+                  </div>
+                </div>
+                
+                <div class="product-action">
+                  <div class="price-display">\$${item.price || "0.00"}</div>
+                  ${actionButton}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      //  清除瀏覽紀錄
+      document.getElementById("clear-history-btn").addEventListener("click", async () => {
+        const confirmClear = await Swal.fire({
+          title: "確定要清除嗎？",
+          text: "這會刪除所有瀏覽紀錄，無法復原！",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "清除",
+          cancelButtonText: "取消"
+        });
+
+        if (!confirmClear.isConfirmed) return;
+
+        try {
+          const res = await fetch("http://localhost:3000/api/view-history/clear", {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          if (!res.ok) throw new Error("清除失敗");
+
+          await Swal.fire("已清除", "瀏覽紀錄已刪除", "success");
+
+          // 🔄 重整頁面
+          location.reload();
+        } catch (error) {
+          console.error("清除瀏覽紀錄失敗:", error);
+          Swal.fire("錯誤", "清除失敗，請稍後再試", "error");
         }
       });
-    }
-  </script>
-  
-  <script>
-    const logo = document.getElementById("logo");
-    function updateLogo() {
-      const isDark = document.documentElement.getAttribute("data-pc-theme") === "dark";
-      logo.src = isDark ? "../assets/images/logo-w.png" : "../assets/images/logo.png";
-    }
 
-    // 初始設定一次
-    updateLogo();
+      // 顯示購買彈窗
+      function showPurchasePopup(itemId, itemName, price, imageUrl, location, sellerName, sellerId) {
+        // 計算現在時間和三天後的時間
+        const now = new Date();
+        const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        
+        // 設定最小時間為三天後（不能選擇現在到三天內的時間）
+        const minDate = new Date(threeDaysLater.getTime());
+        
+        // 格式化為 datetime-local 輸入框需要的格式 (YYYY-MM-DDTHH:MM)
+        const minDateFormatted = formatDateForInput(minDate);
+        const defaultDate = formatDateForInput(minDate); // 預設為最小時間（三天後）
+        
+        // 創建時間選擇器的HTML
+        const timePickerHTML = `
+          <div class="time-picker-container mt-3">
+            <label class="form-label"><strong>選擇面交時間：</strong></label>
+            <input type="datetime-local" class="form-control" id="tradeTimePicker" 
+                  value="${defaultDate}" 
+                  min="${minDateFormatted}" 
+                  required>
+            <div class="form-text">⚠️ 面交時間必須在三天後，不能選擇立即或三天內的時間</div>
+          </div>
+        `;
 
-    // 監聽深色模式切換
-    const darkModeObserver = new MutationObserver(updateLogo);
-    darkModeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-pc-theme"]
-    });
-  </script>
+        Swal.fire({
+          title: `確認購買「${itemName}」？`,
+          html: `<div class="text-start">
+            <p><strong>價格：</strong>$${price}</p>
+            <p><strong>賣家：</strong>${sellerName}</p>
+            <p><strong>交易地點：</strong>${location}</p>
+            ${timePickerHTML}
+            <img src="${imageUrl}" alt="${itemName}" style="max-width: 100%; border-radius: 8px; margin-top: 10px;">
+            </div>`,
+          showCancelButton: true,
+          confirmButtonText: '✅ 確認購買',
+          cancelButtonText: '取消',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          showLoaderOnConfirm: true,
+          preConfirm: async () => {
+            try {
+              const token = localStorage.getItem('token');
+              if (!token) {
+                throw new Error("請先登入再購買");
+              }
+              
+              // 獲取選擇的時間
+              const tradeTime = document.getElementById('tradeTimePicker').value;
+              if (!tradeTime) {
+                throw new Error("請選擇面交時間");
+              }
+
+              // 檢查選擇的時間是否在有效範圍內（必須在三天後）
+              const selectedTime = new Date(tradeTime);
+              const minAllowedTime = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+              if (selectedTime < minAllowedTime) {
+                throw new Error("面交時間必須在三天後，不能選擇立即或三天內的時間");
+              }
+
+              // 1️⃣ 先建立訂單（傳遞tradeTime）
+              const createRes = await fetch(`${API_BASE}/api/order/purchase`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                  itemId, 
+                  tradeTime,
+                  sellerId // 新增賣家ID參數
+                })
+              });
+
+              if (!createRes.ok) {
+                const err = await createRes.json();
+                throw new Error(err.message || "建立訂單失敗");
+              }
+
+              const orderData = await createRes.json();
+              const orderId = orderData.data?.orderId;
+              if (!orderId) throw new Error("後端未回傳訂單 ID");
+
+              // 2️⃣ 更新訂單狀態為 pending
+              const updateRes = await fetch(`${API_BASE}/api/order/update-status/${orderId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                  newStatus: "pending"
+                })
+              });
+
+              if (!updateRes.ok) {
+                const err = await updateRes.json();
+                throw new Error(err.message || "更新訂單狀態失敗");
+              }
+
+              return await updateRes.json();
+            } catch (error) {
+              Swal.showValidationMessage(`購買失敗: ${error.message}`);
+              return false;
+            }
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const tradeTime = document.getElementById('tradeTimePicker').value;
+            Swal.fire({
+              title: '✅ 購買成功！',
+              html: `「${itemName}」已成功預定，請待商家審核。<br>
+                  <strong>預定面交時間：</strong>${formatDateTimeForDisplay(tradeTime)}`,
+              icon: 'success',
+              confirmButtonText: '知道了',
+              confirmButtonColor: '#6474E1'
+            });
+          }
+        });
+      }
+
+      // 輔助函數：格式化日期時間用於輸入框 (YYYY-MM-DDTHH:MM)
+      function formatDateForInput(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+      }
+
+      // 輔助函數：格式化日期時間用於顯示
+      function formatDateTimeForDisplay(dateTimeString) {
+        const date = new Date(dateTimeString);
+        return `${date.getFullYear()}年${(date.getMonth() + 1).toString().padStart(2, '0')}月${date.getDate().toString().padStart(2, '0')}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      }
+
+      // 頁面加載完成後初始化
+      document.addEventListener('DOMContentLoaded', () => {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            window.location.href = '../../index.html';
+            return;
+          }
+          
+          // 載入瀏覽紀錄
+          loadViewedProducts();
+          
+          if (typeof feather !== 'undefined') {
+            feather.replace();
+          }
+        } catch (error) {
+          console.error('頁面初始化錯誤:', error);
+        }
+      });
+
+      // ======================= 頭像獲取與顯示 =======================
+      document.addEventListener("DOMContentLoaded", async function() {
+        const avatarElement = document.getElementById("avatar-display");
+        const defaultAvatar = "../assets/images/3.png";
+        
+        try {
+          const cachedAvatar = localStorage.getItem("userAvatar");
+          if (cachedAvatar) {
+            avatarElement.src = cachedAvatar;
+            return;
+          }
+          
+          const response = await fetch(`${API_BASE}/api/user/profile`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.avatarUrl || data.avatar) {
+              const avatarUrl = `${API_BASE}${data.avatarUrl || data.avatar}?t=${new Date().getTime()}`;
+              avatarElement.src = avatarUrl;
+              localStorage.setItem("userAvatar", avatarUrl);
+            } else {
+              avatarElement.src = defaultAvatar;
+            }
+          } else {
+            throw new Error("獲取用戶資料失敗");
+          }
+        } catch (error) {
+          console.error("頭像加載錯誤:", error);
+          avatarElement.src = defaultAvatar;
+        }
+      });
+
+      // ======================= 使用者名稱獲取與顯示 =======================
+      async function fetchUserName() {
+        try {
+          const response = await fetch(`${API_BASE}/api/user/profile`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            if (userData.name) {
+              document.getElementById('username-display').textContent = userData.name;
+            }
+          } else {
+            console.error("獲取使用者名稱失敗");
+          }
+        } catch (error) {
+          console.error("獲取使用者名稱錯誤:", error);
+        }
+      }
+
+      // 在DOM加載完成後調用
+      document.addEventListener("DOMContentLoaded", function() {
+        fetchUserName();
+      });
+    </script>
   </body>
   <!-- [Body] end -->
 </html>

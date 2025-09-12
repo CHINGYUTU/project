@@ -200,7 +200,7 @@
 			</div>
 
 			<!-- 頭像顯示區域 -->
-      <div class="m-header flex items-center py-4 px-6 h-header-height">
+        <div class="m-header flex items-center py-4 px-6 h-header-height">
           <!-- 頭像容器 - 添加加載狀態處理 -->
           <div class="avatar-container relative w-12 h-12 rounded-full overflow-hidden">
               <img id="avatar-display" 
@@ -209,19 +209,17 @@
                   onerror="this.src='../assets/images/3.png'">
               <div id="avatar-loader" class="hidden absolute inset-0 bg-gray-200 animate-pulse"></div>
           </div>
-          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white">您好</p>
-      </div>
+          <p class="text-base sm:text-xl font-medium text-slate-900 dark:text-white ml-2">
+              <span id="user-greeting">您好，</span>
+              <span id="username-display">使用者</span>
+          </p>
+        </div>
 
 			<div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
 				<ul class="pc-navbar">
 					<li class="pc-item pc-caption"><label>個人檔案</label></li>
 					<li class="pc-item pc-hasmenu">
 						<a class="pc-link" href="../elements/edit.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="edit"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">修改資料</span></a>
-					</li>
-					<li class="pc-item"></li>
-					<li class="pc-item pc-caption"><label>賣家商場</label> <i data-feather="feather"></i></li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/seller/shop.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="shopping-cart"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">進入商場</span></a>
 					</li>
 					<li class="pc-item pc-caption"><label>買家專區</label> <i data-feather="monitor"></i></li>
 					<li class="pc-item pc-hasmenu">
@@ -235,9 +233,6 @@
 					</li>
 					<li class="pc-item pc-hasmenu">
 						<a class="pc-link" href="../elements/browse.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="grid"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">瀏覽紀錄</span></a>
-					</li>
-					<li class="pc-item pc-hasmenu">
-						<a class="pc-link" href="../elements/point.html"><span class="pc-micon" style="color: rgba(100, 100, 159, 100);"><i data-feather="feather"></i></span> <span class="pc-mtext" style="color: rgba(100, 100, 159, 100);">環保點數</span></a>
 					</li>
 					<li class="pc-item pc-caption"><label>其他</label> <i data-feather="sidebar"></i></li>
 					<li class="pc-item">
@@ -304,7 +299,7 @@
             </div>
             <ul class="breadcrumb">
               <li class="breadcrumb-item"><a href="../../index.html">回首頁</a></li>
-              <li class="breadcrumb-item"><a href="../dashboard/profile.html">個人檔案</a></li>
+              <li class="breadcrumb-item"><a href="../elements/profile.html">個人檔案</a></li>
               <li class="breadcrumb-item">檢視收藏</li>
             </ul>
           </div>
@@ -738,6 +733,36 @@
         }).format(price);
       }
 
+      // ======================= 使用者名稱獲取與顯示 =======================
+      async function fetchUserName() {
+          try {
+              const API_BASE = 'http://localhost:3000/api';
+              const response = await fetch(`${API_BASE}/user/profile`, {
+                  headers: {
+                      'Authorization': `Bearer ${localStorage.getItem("token")}`
+                  }
+              });
+              
+              if (response.ok) {
+                  const userData = await response.json();
+                  if (userData.name) {
+                      document.getElementById('username-display').textContent = userData.name;
+                  }
+              } else {
+                  console.error("獲取使用者名稱失敗");
+              }
+          } catch (error) {
+              console.error("獲取使用者名稱錯誤:", error);
+          }
+      }
+
+      // 在DOM加載完成後調用
+      document.addEventListener("DOMContentLoaded", function() {
+          // 現有的頭像獲取代碼...
+          
+          // 新增使用者名稱獲取
+          fetchUserName();
+      });
     </script>
   </body>
   <!-- [Body] end -->

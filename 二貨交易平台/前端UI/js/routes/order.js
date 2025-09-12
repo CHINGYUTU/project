@@ -3,6 +3,13 @@ const router = express.Router();
 const orderController = require('../controllers/orderController');
 const verifyToken = require('../middleware/verifyToken');
 
+
+// 買家專用 API
+router.get('/buyer-pending-orders', verifyToken, orderController.getBuyerPendingOrders);
+router.get('/buyer-confirmed-orders', verifyToken, orderController.getBuyerConfirmedOrders);
+router.get('/buyer-completed-orders', verifyToken, orderController.getBuyerCompletedOrders);
+router.get('/buyer-cancelled-orders', verifyToken, orderController.getBuyerCancelledOrders);
+
 // 查詢個人訂單(僅限user)
 router.get('/my-orders', verifyToken, orderController.getMyOrders); 
 
@@ -18,6 +25,9 @@ router.get("/pending-orders", verifyToken, orderController.getPendingOrdersWithD
 // 新增 API：拿完整的待交易訂單資訊（賣家專用）
 router.get("/seller-confirmed-orders", verifyToken, orderController.getSellerConfirmedOrders);
 
+// 新增 API：拿完整的交易完成訂單資訊（賣家專用）
+router.get("/seller-completed-orders", verifyToken, orderController.getSellerCompletedOrders);
+
 // 新增訂單狀態更新路由
 router.patch('/update-status/:orderId', verifyToken, orderController.updateOrderStatus);
 
@@ -32,5 +42,6 @@ router.patch('/complete/:orderId', verifyToken, orderController.completeOrder);
 
 // 取消訂單
 router.patch('/cancel/:orderId', verifyToken, orderController.cancelOrder);
+
 
 module.exports = router;
