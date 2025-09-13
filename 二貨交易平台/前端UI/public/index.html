@@ -373,148 +373,130 @@
         const API_BASE = 'http://localhost:3000';
 
         // 頁面載入時執行
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             showMenu();
-            fetchProducts();
+            await loadFavoritesFromStorage(); // 從本地存儲載入收藏狀態
+            await fetchProducts();      // 然後再獲取商品並渲染
             setupEventListeners();
         });
 
         // ======================= 收藏功能相關API =======================
-        // ✅ 載入使用者收藏清單
+        // 載入使用者收藏清單
         async function fetchUserFavorites() {
-        if (!localStorage.getItem("token")) {
-            userFavorites = new Set();
-            return;
-        }
-
-        try {
-            const res = await fetch(`${API_BASE}/favorites/list`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            });
-
-            if (res.ok) {
-            const data = await res.json();
-            userFavorites = new Set(data.data.map(fav => fav.item_id));
-            } else {
-            userFavorites = new Set();
+            if (!localStorage.getItem("token")) {
+                userFavorites = new Set();
+                return;
             }
-        } catch (err) {
-            console.error("❌ 載入收藏清單失敗:", err);
-            userFavorites = new Set();
+
+            try {
+                const res = await fetch(`${API_BASE}/api/favorite/list`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    userFavorites = new Set(data.data.map(fav => fav.item_id));
+                } else {
+                    userFavorites = new Set();
+                }
+            } catch (err) {
+                console.error("❌ 載入收藏清單失敗:", err);
+                userFavorites = new Set();
+            }
         }
+
+        // 從本地存儲載入收藏狀態
+        function loadFavoritesFromStorage() {
+            try {
+                const storedFavorites = localStorage.getItem('userFavorites');
+                if (storedFavorites) {
+                    const favoritesArray = JSON.parse(storedFavorites);
+                    userFavorites = new Set(favoritesArray);
+                } else {
+                    userFavorites = new Set();
+                }
+            } catch (error) {
+                console.error('載入收藏狀態失敗:', error);
+                userFavorites = new Set();
+            }
+        }
+
+        // 保存收藏狀態到本地存儲
+        function saveFavoritesToStorage() {
+            try {
+                const favoritesArray = Array.from(userFavorites);
+                localStorage.setItem('userFavorites', JSON.stringify(favoritesArray));
+            } catch (error) {
+                console.error('保存收藏狀態失敗:', error);
+            }
         }
 
         // ✅ 收藏按鈕渲染 
         function renderFavoriteButton(itemId) {
-        const isFavorited = userFavorites.has(itemId);
-        return `
-            <button class="favorite-btn ${isFavorited ? "favorited" : ""}" data-item-id="${itemId}">
-            <i class="bi ${isFavorited ? "bi-heart-fill" : "bi-heart"}"></i>
-            </button>
-        `;
+            const isFavorited = userFavorites.has(itemId);
+            return `
+                <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-item-id="${itemId}">
+                    <i class="bi ${isFavorited ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                </button>
+            `;
         }
 
-        // ✅ 新增收藏
-        async function addToFavorites(itemId) {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            Swal.fire("請先登入", "需要登入才能收藏商品", "warning");
-            return false;
+        // ✅ 切換收藏狀態 - 修改為更可靠的實現
+        function renderFavoriteButton(itemId) {
+            const isFavorited = userFavorites.has(itemId);
+            return `
+                <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-item-id="${itemId}">
+                    <i class="bi ${isFavorited ? 'bi-heart-fill' : 'bi-heart'}"></i>
+                </button>
+            `;
         }
 
-        try {
-            const response = await fetch(`${API_BASE}/api/favorite/add`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ item_id: itemId }),
-            });
-
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || "新增收藏失敗");
-
-            Swal.fire("收藏成功", "", "success");
-            return true;
-        } catch (err) {
-            console.error("新增收藏失敗:", err);
-            Swal.fire("收藏失敗", err.message, "error");
-            return false;
-        }
-        }
-
-        // ✅ 移除收藏
-        async function removeFromFavorites(itemId) {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            Swal.fire("請先登入", "需要登入才能取消收藏", "warning");
-            return false;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE}/api/favorite/remove`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ item_id: itemId }),
-            });
-
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || "移除收藏失敗");
-
-            Swal.fire("已取消收藏", "", "success");
-            return true;
-        } catch (err) {
-            console.error("移除收藏失敗:", err);
-            Swal.fire("取消收藏失敗", err.message, "error");
-            return false;
-        }
-        }
-
-        // ✅ 切換收藏狀態
+        // ✅ 切換收藏狀態 - 修改為同時更新本地存儲
         async function toggleFavorite(itemId, button) {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
-                Swal.fire("請先登入", "需要登入才能收藏商品", "warning");
-                return;
+                    Swal.fire("請先登入", "需要登入才能收藏商品", "warning");
+                    return;
                 }
 
                 const res = await fetch(`${API_BASE}/api/favorite/toggle`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ item_id: itemId }),
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ item_id: itemId }),
                 });
 
                 const data = await res.json();
 
                 if (res.ok) {
-                // 更新本地收藏狀態
-                if (data.favorited) {
-                    userFavorites.add(itemId);
-                    button.classList.add("favorited");
-                    button.innerHTML = '<i class="bi bi-heart-fill"></i>';
+                    // 根據後端返回的狀態更新
+                    if (data.favorited) {
+                        userFavorites.add(itemId);
+                        button.classList.add("favorited");
+                        button.innerHTML = '<i class="bi bi-heart-fill"></i>';
+                        Swal.fire("收藏成功", "", "success");
+                    } else {
+                        userFavorites.delete(itemId);
+                        button.classList.remove("favorited");
+                        button.innerHTML = '<i class="bi bi-heart"></i>';
+                        Swal.fire("已取消收藏", "", "success");
+                    }
+                    
+                    // 保存收藏狀態到本地存儲
+                    saveFavoritesToStorage();
                 } else {
-                    userFavorites.delete(itemId);
-                    button.classList.remove("favorited");
-                    button.innerHTML = '<i class="bi bi-heart"></i>';
-                }
-                } else {
-                alert(data.message || "操作失敗");
+                    Swal.fire("操作失敗", data.message || "請稍後再試", "error");
                 }
             } catch (err) {
                 console.error("收藏切換錯誤:", err);
+                Swal.fire("網路錯誤", "請檢查網路連線後再試", "error");
             }
         }
-
         // ======================= 商品功能相關 =======================
 
         // 設定事件監聽器
@@ -563,9 +545,6 @@
         async function fetchProducts() {
             try {
                 showLoading(true);
-                
-                // 先取得使用者收藏列表
-                await fetchUserFavorites();
                 
                 const response = await fetch(`${API_BASE}/api/item/available`);
                 if (!response.ok) {
@@ -675,94 +654,89 @@
 
         // ---------- renderProducts（含購買、與滑鼠停留 5 秒記錄） ----------
         function renderProducts(products) {
-        const container = document.getElementById('productContainer');
-        const noProductsMsg = document.getElementById('noProducts');
-        container.innerHTML = '';
+            const container = document.getElementById('productContainer');
+            const noProductsMsg = document.getElementById('noProducts');
+            container.innerHTML = '';
 
-        if (!products || !Array.isArray(products) || products.length === 0) {
-            noProductsMsg.style.display = 'block';
-            return;
-        }
-        noProductsMsg.style.display = 'none';
-
-        const defaultProductImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-
-        products.forEach((item) => {
-            // card 元素
-            const card = document.createElement('div');
-            card.className = 'product-card position-relative';
-            card.dataset.itemId = item.id;
-
-            // 格式化日期
-            const createdAt = new Date(item.created_at || Date.now());
-            const formattedDate = `${createdAt.getFullYear()}/${(createdAt.getMonth()+1).toString().padStart(2,'0')}/${createdAt.getDate().toString().padStart(2,'0')}`;
-
-            // 狀態
-            let statusBadge = '';
-            if (item.status === 'available') statusBadge = '<span class="status-badge bg-success">可購買</span>';
-            else if (item.status === 'reserved') statusBadge = '<span class="status-badge bg-warning text-dark">預訂中</span>';
-            else statusBadge = '<span class="status-badge bg-secondary">已售出</span>';
-
-            // 處理圖片路徑
-            let imageUrl = defaultProductImage;
-            if (item.image_url) {
-            if (item.image_url.startsWith('http')) {
-                imageUrl = item.image_url;
-            } else if (item.image_url.startsWith('/')) {
-                imageUrl = `${API_BASE}/uploads${item.image_url}`;
-            } else {
-                imageUrl = `${API_BASE}/${item.image_url}`;
+            if (!products || !Array.isArray(products) || products.length === 0) {
+                noProductsMsg.style.display = 'block';
+                return;
             }
-            }
+            noProductsMsg.style.display = 'none';
 
-            // 是否已收藏
-            const isFavorited = userFavorites.has(item.id);
+            const defaultProductImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-            // 內部 HTML
-            card.innerHTML = `
-            ${statusBadge}
-            <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-item-id="${item.id}">
-                <i class="bi ${isFavorited ? 'bi-heart-fill' : 'bi-heart'}"></i>
-            </button>
+            products.forEach((item) => {
+                // card 元素
+                const card = document.createElement('div');
+                card.className = 'product-card position-relative';
+                card.dataset.itemId = item.id;
 
-            <img src="${imageUrl}" alt="${escapeHtml(item.name || '')}" onerror="this.src='${defaultProductImage}'">
-            <h3>${escapeHtml(item.name || '無名稱')}</h3>
-            <p class="text-muted small">${categoryNames[item.category_id] || `分類${item.category_id}`}</p>
-            <p class="description">${escapeHtml(item.description || '暫無描述')}</p>
-            <p class="price">$${escapeHtml(String(item.price || '0'))}</p>
-            <p class="seller"><i class="bi bi-person"></i> 賣家: ${escapeHtml(item.seller_name || '')}</p>
-            <p class="location"><i class="bi bi-geo-alt"></i> ${escapeHtml(item.location || '')}</p>
-            <p class="date"><i class="bi bi-clock"></i> ${formattedDate}</p>
-            <button class="btn btn-primary btn-buy" data-item-id="${item.id}">
-                <i class="bi bi-cart-plus"></i> 購買
-            </button>
-            `;
+                // 格式化日期
+                const createdAt = new Date(item.created_at || Date.now());
+                const formattedDate = `${createdAt.getFullYear()}/${(createdAt.getMonth()+1).toString().padStart(2,'0')}/${createdAt.getDate().toString().padStart(2,'0')}`;
 
-            // append card
-            container.appendChild(card);
+                // 狀態
+                let statusBadge = '';
+                if (item.status === 'available') statusBadge = '<span class="status-badge bg-success">可購買</span>';
+                else if (item.status === 'reserved') statusBadge = '<span class="status-badge bg-warning text-dark">預訂中</span>';
+                else statusBadge = '<span class="status-badge bg-secondary">已售出</span>';
 
-            // --- 綁定事件
-            // 收藏按鈕
-            const favBtn = card.querySelector('.favorite-btn');
-            favBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const id = Number(favBtn.dataset.itemId);
-            await toggleFavorite(id, favBtn);
+                // 處理圖片路徑
+                let imageUrl = defaultProductImage;
+                if (item.image_url) {
+                if (item.image_url.startsWith('http')) {
+                    imageUrl = item.image_url;
+                } else if (item.image_url.startsWith('/')) {
+                    imageUrl = `${API_BASE}/uploads${item.image_url}`;
+                } else {
+                    imageUrl = `${API_BASE}/${item.image_url}`;
+                }
+                }
+
+                // 內部 HTML
+                card.innerHTML = `
+                ${statusBadge}
+                ${renderFavoriteButton(item.id)} <!-- 使用統一的函數 -->
+
+                <img src="${imageUrl}" alt="${escapeHtml(item.name || '')}" onerror="this.src='${defaultProductImage}'">
+                <h3>${escapeHtml(item.name || '無名稱')}</h3>
+                <p class="text-muted small">${categoryNames[item.category_id] || `分類${item.category_id}`}</p>
+                <p class="description">${escapeHtml(item.description || '暫無描述')}</p>
+                <p class="price">$${escapeHtml(String(item.price || '0'))}</p>
+                <p class="seller"><i class="bi bi-person"></i> 賣家: ${escapeHtml(item.seller_name || '')}</p>
+                <p class="location"><i class="bi bi-geo-alt"></i> ${escapeHtml(item.location || '')}</p>
+                <p class="date"><i class="bi bi-clock"></i> ${formattedDate}</p>
+                <button class="btn btn-primary btn-buy" data-item-id="${item.id}">
+                    <i class="bi bi-cart-plus"></i> 購買
+                </button>
+                `;
+
+                // append card
+                container.appendChild(card);
+
+                // --- 綁定事件
+                // 收藏按鈕事件綁定 - 確保使用正確的函數
+                const favBtn = card.querySelector('.favorite-btn');
+                favBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const id = Number(favBtn.dataset.itemId);
+                    await toggleFavorite(id, favBtn);
+                });
+
+                // 購買按鈕（先記錄瀏覽，再開購買視窗）
+                const buyBtn = card.querySelector('.btn-buy');
+                buyBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = Number(buyBtn.dataset.itemId);
+                    trackPurchaseView(id).catch(err => console.error(err));
+                    showPurchasePopup(id, item.name, item.price, imageUrl, item.location, item.seller_name);
+                });
+
+                // 滑鼠停留 5 秒的瀏覽追蹤
+                card.addEventListener('mouseenter', () => startViewTimer(item.id, card));
+                card.addEventListener('mouseleave', () => clearViewTimer(item.id));
             });
-
-            // 購買按鈕（先記錄瀏覽，再開購買視窗）
-            const buyBtn = card.querySelector('.btn-buy');
-            buyBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = Number(buyBtn.dataset.itemId);
-            trackPurchaseView(id).catch(err => console.error(err));
-            showPurchasePopup(id, item.name, item.price, imageUrl, item.location, item.seller_name);
-            });
-
-            // 滑鼠停留 5 秒的瀏覽追蹤
-            card.addEventListener('mouseenter', () => startViewTimer(item.id, card));
-            card.addEventListener('mouseleave', () => clearViewTimer(item.id));
-        });
         }
 
         // HTML 跳脫函數
@@ -929,8 +903,7 @@
         function initViewHistoryTracking() {
             const productCards = document.querySelectorAll('.product-card');
             productCards.forEach(card => {
-                const itemId = card.querySelector('.btn-buy').getAttribute('onclick').match(/\d+/)[0];
-                
+                const itemId = card.querySelector('.btn-buy').getAttribute('data-item-id');
                 // 滑鼠進入事件
                 card.addEventListener('mouseenter', () => {
                     startViewTimer(itemId, card);
