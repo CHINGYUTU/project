@@ -20,6 +20,7 @@ const userRoutes = require('./routes/user');// 使用者個人資料路由
 const viewHistoryRoutes = require('./routes/viewHistory');// 瀏覽紀錄路由
 const logoutRoute = require('./routes/logout');// 使用者登出
 const messageRoutes = require('./routes/message'); // 聊天訊息路由
+const pointRoutes = require('./routes/point'); // 積分路由
 const messageController = require('./controllers/messageController');
 
 // 初始化 Express 應用程式
@@ -50,6 +51,7 @@ app.use('/api/user', userRoutes);// 使用者個人功能（大頭貼、密碼�
 app.use('/api/view-history', viewHistoryRoutes); // 瀏覽紀錄
 app.use('/logout', logoutRoute);// 商品圖片靜態檔案
 app.use('/api/message', messageRoutes); // 聊天訊息 API
+app.use('/api/point', pointRoutes); //積分加減計算
 
 app.use('/uploads', express.static('uploads'));
 app.use(express.static(path.join(__dirname, '..', 'public')));

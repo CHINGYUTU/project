@@ -537,7 +537,7 @@
                     <!-- 底部操作區域 -->
                     <div class="card-actions">
                     <div class="price-display">
-                        $${order.total_price || "0"}
+                        $${order.price || "0"}
                     </div>
                     <div class="flex gap-2">
                         <button class="btn-approve" onclick="approveOrder(${order.order_id})">

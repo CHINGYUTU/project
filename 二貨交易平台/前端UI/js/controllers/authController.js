@@ -24,9 +24,9 @@ exports.register = async (req, res) => {
     const verifyToken = crypto.randomBytes(32).toString('hex');
 
     await db.query(
-      `INSERT INTO users (name, email, password, role, points, created_at, is_verified, verify_token)
-       VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)`,
-      [name, email, hashedPassword, 'user', 0, 0, verifyToken]
+      `INSERT INTO users (name, email, password, role, created_at, is_verified, verify_token)
+       VALUES (?, ?, ?, ?, NOW(), ?, ?)`,
+      [name, email, hashedPassword, 'user', 0, verifyToken]
     );
 
     await sendVerificationEmail(email, verifyToken);

@@ -489,7 +489,7 @@
               <!-- 底部信息區域 -->
               <div class="card-info">
               <div class="price-display">
-                  $${order.total_price || "0"}
+                  $${order.price || "0"}
               </div>
               <div class="completed-time">
                   交易已於 ${formatDateTime(order.completed_at || order.updated_at)} 完成

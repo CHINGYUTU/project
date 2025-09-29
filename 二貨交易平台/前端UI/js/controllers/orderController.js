@@ -105,7 +105,7 @@ exports.getPendingOrdersWithDetails = async (req, res) => {
         o.id AS order_id,
         o.status,
         o.created_at,
-        o.total_price,
+        o.price,
         o.trade_time,
 
         -- 買家資訊
@@ -154,9 +154,9 @@ exports.createOrder = async (req, res) => {
 
     // 1️⃣ 建立訂單
     const [orderResult] = await db.query(
-      `INSERT INTO orders (buyer_id, seller_id, status, created_at, trade_time, total_price)
-       VALUES (?, ?, 'pending', NOW(), ?, ?)`, // 添加 total_price
-      [buyerId, item.user_id, tradeTime, item.price] // 添加商品價格
+      `INSERT INTO orders (buyer_id, seller_id, status, created_at, trade_time, price)
+       VALUES (?, ?, 'pending', NOW(), ?, ?)`,
+      [buyerId, item.user_id, tradeTime, item.price]
     );
 
     const orderId = orderResult.insertId;
@@ -210,7 +210,7 @@ exports.getSellerConfirmedOrders = async (req, res) => {
         o.status,
         o.created_at,
         o.trade_time,
-        o.total_price,
+        o.price,
         
         -- 买家信息
         buyer.id AS buyer_id,
@@ -304,9 +304,14 @@ exports.updateOrderStatus = async (req, res) => {
 };
 
 // 📌 完成訂單
+const Point = require('./pointController'); // 修正引入路徑
+
 exports.completeOrder = async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
+
+  console.log('Point class:', Point); // 除錯：檢查 Point 類
+  console.log('Point.isOrderPointsCalculated:', Point.isOrderPointsCalculated); // 除錯：檢查方法
 
   const conn = await db.getConnection();
   try {
@@ -323,11 +328,16 @@ exports.completeOrder = async (req, res) => {
       return res.status(403).json({ message: '只有賣家可以完成訂單' });
     }
 
+    const isPointsCalculated = await Point.isOrderPointsCalculated(orderId);
+    if (isPointsCalculated) {
+      conn.release();
+      return res.status(400).json({ message: '此訂單已計算過積分' });
+    }
+
     await conn.beginTransaction();
 
-    // ✅ 同時更新狀態與完成時間
     await conn.query(
-      'UPDATE orders SET status = ?, completed_at = NOW() WHERE id = ?',
+      'UPDATE orders SET status = ?, completed_time = NOW() WHERE id = ?',
       ['completed', orderId]
     );
 
@@ -337,15 +347,45 @@ exports.completeOrder = async (req, res) => {
       [orderId]
     );
 
+    const buyerPoints = Math.floor(order.price / 1.36);
+    const sellerPoints = Math.floor(order.price * 1.4705);
+
+    if (buyerPoints > 0) {
+      await Point.createPointRecord({
+        user_id: order.buyer_id,
+        order_id: orderId,
+        point_ac: buyerPoints,
+        add_cut: 'add'
+      });
+    }
+
+    if (sellerPoints > 0) {
+      await Point.createPointRecord({
+        user_id: order.seller_id,
+        order_id: orderId,
+        point_ac: sellerPoints,
+        add_cut: 'add'
+      });
+    }
+
     await conn.commit();
     conn.release();
 
-    res.json({ message: '訂單已完成' });
+    res.json({ message: '訂單已完成，積分已分配' });
   } catch (err) {
     await conn.rollback();
     conn.release();
-    console.error('❌ 完成訂單錯誤:', err);
-    res.status(500).json({ message: '伺服器錯誤', error: err.message });
+    console.error('❌ 完成訂單錯誤:', {
+      message: err.message,
+      stack: err.stack,
+      orderId,
+      userId
+    });
+    res.status(500).json({ 
+      message: '伺服器錯誤', 
+      error: err.message,
+      details: err.sqlMessage || '無詳細錯誤資訊'
+    });
   }
 };
 
@@ -413,8 +453,8 @@ exports.getSellerCompletedOrders = async (req, res) => {
         o.status,
         o.created_at,
         o.trade_time,
-        o.completed_at,
-        o.total_price,
+        o.completed_time,
+        o.price,
 
         -- 買家資訊
         buyer.id AS buyer_id,
@@ -432,7 +472,7 @@ exports.getSellerCompletedOrders = async (req, res) => {
       JOIN order_items oi ON o.id = oi.order_id
       JOIN items i ON oi.item_id = i.id
       WHERE o.seller_id = ? AND o.status = 'completed'
-      ORDER BY o.completed_at DESC
+      ORDER BY o.completed_time DESC
     `, [sellerId]);
 
     res.json({ message: "查詢成功", data: rows });
@@ -498,7 +538,7 @@ exports.getBuyerPendingOrders = async (req, res) => {
         o.status,
         o.created_at,
         o.trade_time,
-        o.total_price,
+        o.price,
 
         -- 買家資訊
         buyer.id AS buyer_id,
@@ -544,7 +584,7 @@ exports.getBuyerConfirmedOrders = async (req, res) => {
         o.status,
         o.created_at,
         o.trade_time,
-        o.total_price,
+        o.price,
 
         buyer.id AS buyer_id,
         buyer.name AS buyer_name,
@@ -587,8 +627,8 @@ exports.getBuyerCompletedOrders = async (req, res) => {
         o.status,
         o.created_at,
         o.trade_time,
-        o.completed_at,
-        o.total_price,
+        o.completed_time,
+        o.price,
 
         buyer.id AS buyer_id,
         buyer.name AS buyer_name,
@@ -610,7 +650,7 @@ exports.getBuyerCompletedOrders = async (req, res) => {
       JOIN order_items oi ON o.id = oi.order_id
       JOIN items i ON oi.item_id = i.id
       WHERE o.buyer_id = ? AND o.status = 'completed'
-      ORDER BY o.completed_at DESC
+      ORDER BY o.completed_time DESC
     `, [buyerId]);
 
     res.json({ message: "查詢成功", data: rows });
@@ -631,7 +671,7 @@ exports.getBuyerCancelledOrders = async (req, res) => {
         o.status,
         o.created_at,
         o.trade_time,
-        o.total_price,
+        o.price,
 
         buyer.id AS buyer_id,
         buyer.name AS buyer_name,

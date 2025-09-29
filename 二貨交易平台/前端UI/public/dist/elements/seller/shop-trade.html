@@ -521,7 +521,7 @@
               <!-- 底部操作區域 -->
               <div class="card-actions">
               <div class="price-display">
-                  $${order.total_price || "0"}
+                  $${order.price || "0"}
               </div>
               <div class="flex gap-2">
                   <button class="btn-complete" onclick="completeOrder(${order.id})">
@@ -557,7 +557,7 @@
 
           const data = await res.json();
           if (res.ok) {
-            Swal.fire('成功', '訂單已完成', 'success').then(() => {
+            Swal.fire('成功', data.message || '訂單已完成，積分已分配', 'success').then(() => {
               // 重新載入訂單列表
               loadConfirmedOrders();
             });
