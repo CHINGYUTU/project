@@ -540,14 +540,21 @@
       // ✅ 完成訂單
       async function completeOrder(orderId) {
         try {
+          console.log('🔄 開始完成訂單流程，訂單ID:', orderId);
+          
           const token = localStorage.getItem('token');
           if (!token) {
+            console.error('❌ 沒有找到 token');
             Swal.fire('錯誤', '請重新登入', 'error');
             return;
           }
 
-          // 使用 PATCH 方法更新訂單狀態為 completed
-          const res = await fetch(`${API_BASE}/api/order/complete/${orderId}`, {
+          console.log('🔑 Token 前20字元:', token.substring(0, 20) + '...');
+          
+          const apiUrl = `${API_BASE}/api/order/complete/${orderId}`;
+          console.log('📡 準備發送請求到:', apiUrl);
+          
+          const response = await fetch(apiUrl, {
             method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -555,18 +562,66 @@
             }
           });
 
-          const data = await res.json();
-          if (res.ok) {
-            Swal.fire('成功', data.message || '訂單已完成，積分已分配', 'success').then(() => {
-              // 重新載入訂單列表
-              loadConfirmedOrders();
-            });
-          } else {
-            Swal.fire('錯誤', data.message || '操作失敗', 'error');
+          console.log('📡 HTTP 狀態碼:', response.status);
+          console.log('📡 回應 OK:', response.ok);
+
+          // 檢查回應狀態
+          if (!response.ok) {
+            let errorMessage = `HTTP 錯誤! 狀態碼: ${response.status}`;
+            
+            try {
+              const errorData = await response.json();
+              console.log('❌ 錯誤回應資料:', errorData);
+              errorMessage = errorData.message || errorMessage;
+            } catch (parseError) {
+              console.error('❌ 解析錯誤回應失敗:', parseError);
+            }
+            
+            throw new Error(errorMessage);
           }
+
+          // 成功回應
+          const result = await response.json();
+          console.log('✅ 成功回應:', result);
+          
+          Swal.fire({
+            icon: 'success',
+            title: '成功',
+            text: result.message || '訂單已完成，積分已分配',
+            confirmButtonColor: '#6474E1'
+          }).then(() => {
+            loadConfirmedOrders(); // 重新載入列表
+          });
+
         } catch (error) {
-          console.error('完成訂單錯誤:', error);
-          Swal.fire('錯誤', '網路錯誤，請稍後再試', 'error');
+          console.error('❌ 完成訂單錯誤:', {
+            message: error.message,
+            stack: error.stack
+          });
+          
+          // 根據錯誤類型給出不同的提示
+          let errorTitle = '錯誤';
+          let errorText = error.message || '操作失敗，請稍後再試';
+          
+          if (error.message.includes('404')) {
+            errorTitle = 'API 端點不存在';
+            errorText = '請檢查後端路由設定或聯繫管理員';
+          } else if (error.message.includes('403')) {
+            errorTitle = '權限不足';
+            errorText = '您沒有權限執行此操作';
+          } else if (error.message.includes('401')) {
+            errorTitle = '登入失效';
+            errorText = '請重新登入';
+          } else if (error.message.includes('400')) {
+            errorTitle = '請求錯誤';
+          }
+          
+          Swal.fire({
+            icon: 'error',
+            title: errorTitle,
+            text: errorText,
+            confirmButtonColor: '#6474E1'
+          });
         }
       }
 

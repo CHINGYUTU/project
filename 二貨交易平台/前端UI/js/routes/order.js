@@ -31,9 +31,6 @@ router.get("/seller-completed-orders", verifyToken, orderController.getSellerCom
 // 新增訂單狀態更新路由
 router.patch('/update-status/:orderId', verifyToken, orderController.updateOrderStatus);
 
-// 查詢單筆訂單詳情（買家 / 賣家 / 管理員）
-router.get('/:orderId', verifyToken, orderController.getOrderDetail);
-
 // 修改訂單狀態
 router.patch('/review/:orderId', verifyToken, orderController.reviewOrder);
 
@@ -42,6 +39,9 @@ router.patch('/complete/:orderId', verifyToken, orderController.completeOrder);
 
 // 取消訂單
 router.patch('/cancel/:orderId', verifyToken, orderController.cancelOrder);
+
+// 查詢單筆訂單詳情（買家 / 賣家 / 管理員）
+router.get('/:orderId', verifyToken, orderController.getOrderDetail);
 
 
 module.exports = router;

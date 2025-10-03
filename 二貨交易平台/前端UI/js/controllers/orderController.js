@@ -307,86 +307,30 @@ exports.updateOrderStatus = async (req, res) => {
 const Point = require('./pointController'); // 修正引入路徑
 
 exports.completeOrder = async (req, res) => {
-  const { orderId } = req.params;
-  const userId = req.user.id;
+    try {
+        const orderId = parseInt(req.params.orderId); // 確保是數字
+        if (isNaN(orderId)) {
+            return res.status(400).json({ message: '訂單 ID 無效' });
+        }
 
-  console.log('Point class:', Point); // 除錯：檢查 Point 類
-  console.log('Point.isOrderPointsCalculated:', Point.isOrderPointsCalculated); // 除錯：檢查方法
+        // 先檢查訂單是否存在
+        const [orderRows] = await conn.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+        if (!orderRows.length) {
+            return res.status(404).json({ message: '訂單不存在' });
+        }
 
-  const conn = await db.getConnection();
-  try {
-    const [orders] = await conn.query('SELECT * FROM orders WHERE id = ?', [orderId]);
-    if (orders.length === 0) {
-      conn.release();
-      return res.status(404).json({ message: '找不到該訂單' });
+        // 更新訂單狀態為 completed
+        const [updateResult] = await conn.query(
+            'UPDATE orders SET status = ?, completed_time = NOW() WHERE id = ?',
+            ['completed', orderId]
+        );
+
+        return res.json({ message: '訂單已完成' });
+
+    } catch (err) {
+        console.error('completeOrder 錯誤:', err);
+        return res.status(500).json({ message: '伺服器錯誤', error: err.message });
     }
-
-    const order = orders[0];
-
-    if (userId !== order.seller_id) {
-      conn.release();
-      return res.status(403).json({ message: '只有賣家可以完成訂單' });
-    }
-
-    const isPointsCalculated = await Point.isOrderPointsCalculated(orderId);
-    if (isPointsCalculated) {
-      conn.release();
-      return res.status(400).json({ message: '此訂單已計算過積分' });
-    }
-
-    await conn.beginTransaction();
-
-    await conn.query(
-      'UPDATE orders SET status = ?, completed_time = NOW() WHERE id = ?',
-      ['completed', orderId]
-    );
-
-    await conn.query(
-      `UPDATE items SET status = 'sold' 
-       WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
-      [orderId]
-    );
-
-    const buyerPoints = Math.floor(order.price / 1.36);
-    const sellerPoints = Math.floor(order.price * 1.4705);
-
-    if (buyerPoints > 0) {
-      await Point.createPointRecord({
-        user_id: order.buyer_id,
-        order_id: orderId,
-        point_ac: buyerPoints,
-        add_cut: 'add'
-      });
-    }
-
-    if (sellerPoints > 0) {
-      await Point.createPointRecord({
-        user_id: order.seller_id,
-        order_id: orderId,
-        point_ac: sellerPoints,
-        add_cut: 'add'
-      });
-    }
-
-    await conn.commit();
-    conn.release();
-
-    res.json({ message: '訂單已完成，積分已分配' });
-  } catch (err) {
-    await conn.rollback();
-    conn.release();
-    console.error('❌ 完成訂單錯誤:', {
-      message: err.message,
-      stack: err.stack,
-      orderId,
-      userId
-    });
-    res.status(500).json({ 
-      message: '伺服器錯誤', 
-      error: err.message,
-      details: err.sqlMessage || '無詳細錯誤資訊'
-    });
-  }
 };
 
 // 📌 取消訂單
