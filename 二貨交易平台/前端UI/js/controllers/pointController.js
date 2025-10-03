@@ -1,67 +1,79 @@
 const db = require('../db');
 
 class Point {
-  // 新增積分記錄
-  static async createPointRecord(pointData, conn = null) {
-    const { user_id, order_id, point_ac, add_cut } = pointData;
-    const executor = conn || db; // 如果有傳 conn，用同一個 transaction
+  // 建立積分紀錄
+  static async createPointRecord({ user_id, order_id, point_ac, add_cut }, conn = db) {
+    // 查出目前總積分
+    const [lastRecord] = await conn.query(
+      'SELECT total_point FROM point WHERE user_id = ? ORDER BY id DESC LIMIT 1',
+      [user_id]
+    );
 
-    const sql = `
-      INSERT INTO point (user_id, order_id, point_ac, add_cut, Point, transaction_time) 
-      VALUES (?, ?, ?, ?, ?, NOW())
-    `;
-    
-    const [result] = await executor.query(sql, [user_id, order_id, point_ac, add_cut, point_ac]);
-    return result;
+    let total_point = 0;
+    if (lastRecord.length > 0) {
+      total_point = lastRecord[0].total_point;
+    }
+
+    // 計算新的總積分
+    if (add_cut === 'add') {
+      total_point += point_ac;
+    } else if (add_cut === 'cut') {
+      total_point -= point_ac;
+    }
+
+    // 插入新紀錄
+    const [result] = await conn.query(
+      `INSERT INTO point (user_id, order_id, point_ac, add_cut, total_point, transaction_time)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+      [user_id, order_id, point_ac, add_cut, total_point]
+    );
+
+    return result.insertId;
   }
 
-  // 獲取使用者總積分
-  static async getUserTotalPoints(userId, conn = null) {
-    const executor = conn || db;
-    const sql = `
-      SELECT SUM(CASE WHEN add_cut = 'add' THEN point_ac ELSE -point_ac END) as total_points 
-      FROM point 
-      WHERE user_id = ?
-    `;
-    
-    const [result] = await executor.query(sql, [userId]);
-    return result[0]?.total_points || 0;
+  // 判斷該訂單是否已經計算過積分
+  static async isOrderPointsCalculated(order_id, conn = db) {
+    const [rows] = await conn.query('SELECT id FROM point WHERE order_id = ?', [order_id]);
+    return rows.length > 0;
   }
 
-  // 獲取使用者的積分明細
-  static async getUserPointHistory(userId, conn = null) {
-    const executor = conn || db;
-    const sql = `
-      SELECT p.*, o.id as order_id, i.name as item_name
-      FROM point p
-      LEFT JOIN orders o ON p.order_id = o.id
-      LEFT JOIN order_items oi ON o.id = oi.order_id
-      LEFT JOIN items i ON oi.item_id = i.id
-      WHERE p.user_id = ?
-      ORDER BY p.transaction_time DESC
-    `;
-    
-    const [result] = await executor.query(sql, [userId]);
-    return result;
+  // ================== API 功能 ==================
+
+  // 取得使用者總積分
+  static async getUserTotalPoints(req, res) {
+    try {
+      const userId = req.user.id;
+      const [rows] = await db.query(
+        'SELECT total_point FROM point WHERE user_id = ? ORDER BY id DESC LIMIT 1',
+        [userId]
+      );
+
+      if (rows.length === 0) {
+        return res.json({ total_point: 0 });
+      }
+
+      res.json({ total_point: rows[0].total_point });
+    } catch (err) {
+      console.error('❌ 獲取總積分錯誤:', err);
+      res.status(500).json({ message: '伺服器錯誤' });
+    }
   }
 
-  // 檢查訂單是否已經計算過積分
-  static async isOrderPointsCalculated(orderId, conn = null) {
-    const executor = conn || db;
-    const sql = 'SELECT id FROM point WHERE order_id = ? LIMIT 1';
-    const [result] = await executor.query(sql, [orderId]);
-    return result.length > 0;
+  // 取得使用者積分歷史紀錄
+  static async getUserPointHistory(req, res) {
+    try {
+      const userId = req.user.id;
+      const [rows] = await db.query(
+        'SELECT add_cut, point_ac, total_point, transaction_time, order_id FROM point WHERE user_id = ? ORDER BY transaction_time DESC',
+        [userId]
+      );
+
+      res.json(rows);
+    } catch (err) {
+      console.error('❌ 獲取積分歷史錯誤:', err);
+      res.status(500).json({ message: '伺服器錯誤' });
+    }
   }
 }
-
-// 測試程式碼（可於測試後移除）
-(async () => {
-  try {
-    const result = await Point.isOrderPointsCalculated(60);
-    console.log('isOrderPointsCalculated result:', result);
-  } catch (err) {
-    console.error('Test error:', err);
-  }
-})();
 
 module.exports = Point;

@@ -1,4 +1,5 @@
 const db = require('../db');
+const Point = require('./pointController');
 
 // 📌 查詢個人訂單
 exports.getMyOrders = async (req, res) => {
@@ -56,42 +57,26 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// 📌 審核訂單（同意 / 拒絕）
+// 審核訂單（拒絕時更新為 rejected）
 exports.reviewOrder = async (req, res) => {
-  const { orderId } = req.params;
-  const { decision } = req.body; // 'agree' 或 'reject'
+  const orderId = parseInt(req.params.orderId);
+  const { approve } = req.body;
 
   try {
-    // 找訂單 & 對應的商品
-    const [orders] = await db.query(
-      `SELECT o.*, oi.item_id 
-       FROM orders o
-       JOIN order_items oi ON o.id = oi.order_id
-       WHERE o.id = ?`, 
-      [orderId]
-    );
-
-    if (orders.length === 0) {
-      return res.status(404).json({ message: '找不到該訂單' });
-    }
-
-    const order = orders[0];
-
-    if (decision === 'agree') {
-      // ✅ 同意 → 訂單狀態改為 confirmed (已確認)
+    if (approve) {
       await db.query('UPDATE orders SET status = ? WHERE id = ?', ['confirmed', orderId]);
-      return res.json({ message: '訂單審核通過' });
-    } else if (decision === 'reject') {
-      // ❌ 拒絕 → 商品恢復 available，刪除訂單
-      await db.query('UPDATE items SET status = ? WHERE id = ?', ['available', order.item_id]);
-      await db.query('DELETE FROM orders WHERE id = ?', [orderId]);
-      return res.json({ message: '拒絕審核，已重新上架' });
+      res.json({ message: '訂單已確認' });
     } else {
-      return res.status(400).json({ message: 'decision 必須是 agree 或 reject' });
+      await db.query('UPDATE orders SET status = ? WHERE id = ?', ['rejected', orderId]);
+      const [orderItems] = await db.query('SELECT item_id FROM order_items WHERE order_id = ?', [orderId]);
+      for (const oi of orderItems) {
+        await db.query('UPDATE items SET status = ? WHERE id = ?', ['available', oi.item_id]);
+      }
+      res.json({ message: '訂單已拒絕並釋放商品' });
     }
-  } catch (error) {
-    console.error('❌ 審核訂單錯誤:', error);
-    res.status(500).json({ message: '伺服器錯誤' });
+  } catch (err) {
+    console.error('❌ reviewOrder 錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
 
@@ -181,21 +166,27 @@ exports.createOrder = async (req, res) => {
 
 // 刪除訂單
 exports.deleteOrder = async (req, res) => {
-  const { orderId } = req.params;
+  const orderId = parseInt(req.params.orderId);
   const userId = req.user.id;
 
   try {
-    // 確認訂單是屬於這個使用者
-    const [rows] = await db.query('SELECT * FROM orders WHERE id = ? AND user_id = ?', [orderId, userId]);
-    if (rows.length === 0) {
-      return res.status(403).json({ message: '無權刪除此訂單或訂單不存在' });
+    const [rows] = await db.query(
+      'SELECT * FROM orders WHERE id = ? AND (buyer_id = ? OR seller_id = ?)',
+      [orderId, userId, userId]
+    );
+    if (!rows.length) return res.status(404).json({ message: '訂單不存在或無權限刪除' });
+
+    await db.query('UPDATE orders SET status = ? WHERE id = ?', ['rejected', orderId]);
+
+    const [orderItems] = await db.query('SELECT item_id FROM order_items WHERE order_id = ?', [orderId]);
+    for (const oi of orderItems) {
+      await db.query('UPDATE items SET status = ? WHERE id = ?', ['available', oi.item_id]);
     }
 
-    await db.query('DELETE FROM orders WHERE id = ?', [orderId]);
-    res.json({ message: '訂單已刪除' });
-  } catch (error) {
-    console.error('❌ 刪除訂單失敗:', error);
-    res.status(500).json({ message: '伺服器錯誤' });
+    res.json({ message: '訂單已標記為拒絕並釋放商品' });
+  } catch (err) {
+    console.error('❌ deleteOrder 錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
 
@@ -238,99 +229,93 @@ exports.getSellerConfirmedOrders = async (req, res) => {
   }
 };
 
-// 更新訂單狀態
+// 更新訂單狀態（僅限 pending → confirmed / cancelled）
 exports.updateOrderStatus = async (req, res) => {
-  const { orderId } = req.params;
-  const { newStatus, tradeTime } = req.body;
-  const userId = req.user.id;
+  const orderId = parseInt(req.params.orderId);
+  const { status } = req.body;
 
-  const validStatuses = ['pending' , 'confirmed', 'completed', 'cancelled'];
-  if (!validStatuses.includes(newStatus)) {
-    return res.status(400).json({ message: '不合法的訂單狀態' });
+  if (!['pending', 'confirmed', 'cancelled'].includes(status)) {
+    return res.status(400).json({ message: '無效的訂單狀態更新' });
   }
 
   try {
-    const [orders] = await db.query('SELECT * FROM orders WHERE id = ?', [orderId]);
-    if (orders.length === 0) {
-      return res.status(404).json({ message: '找不到該訂單' });
-    }
-
-    const order = orders[0];
-    if (order.buyer_id !== userId && order.seller_id !== userId) {
-      return res.status(403).json({ message: '無權限更新此訂單' });
-    }
-
-    // 權限檢查
-    if (newStatus === 'confirmed' && userId !== order.seller_id) {
-      return res.status(403).json({ message: '只有賣家可以確認訂單' });
-    }
-    if (newStatus === 'completed' && userId !== order.buyer_id) {
-      return res.status(403).json({ message: '只有買家可以完成訂單' });
-    }
-
-    // 更新狀態 & 可選更新 trade_time
-    if (tradeTime) {
-      await db.query(
-        `UPDATE orders SET status = ?, trade_time = ? WHERE id = ?`,
-        [newStatus, tradeTime, orderId]
-      );
-    } else {
-      await db.query(
-        `UPDATE orders SET status = ? WHERE id = ?`,
-        [newStatus, orderId]
-      );
-    }
-
-    // 根據狀態更新商品
-    if (newStatus === 'completed') {
-      await db.query(
-        `UPDATE items SET status = 'sold' 
-         WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
-        [orderId]
-      );
-    } else if (newStatus === 'cancelled') {
-      await db.query(
-        `UPDATE items SET status = 'available' 
-         WHERE id IN (SELECT item_id FROM order_items WHERE order_id = ?)`,
-        [orderId]
-      );
-    }
-
-    res.json({ message: `訂單狀態已更新為 ${newStatus}` });
+    await db.query('UPDATE orders SET status = ? WHERE id = ?', [status, orderId]);
+    res.json({ message: `訂單狀態已更新為 ${status}` });
   } catch (err) {
-    console.error('❌ 更新訂單狀態錯誤:', err);
+    console.error('❌ updateOrderStatus 錯誤:', err);
     res.status(500).json({ message: '伺服器錯誤', error: err.message });
   }
 };
 
-// 📌 完成訂單
-const Point = require('./pointController'); // 修正引入路徑
-
+// 完成訂單
 exports.completeOrder = async (req, res) => {
-    try {
-        const orderId = parseInt(req.params.orderId); // 確保是數字
-        if (isNaN(orderId)) {
-            return res.status(400).json({ message: '訂單 ID 無效' });
-        }
+  const orderId = parseInt(req.params.orderId);
+  if (isNaN(orderId)) {
+    return res.status(400).json({ message: '訂單 ID 無效' });
+  }
 
-        // 先檢查訂單是否存在
-        const [orderRows] = await conn.query('SELECT * FROM orders WHERE id = ?', [orderId]);
-        if (!orderRows.length) {
-            return res.status(404).json({ message: '訂單不存在' });
-        }
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
 
-        // 更新訂單狀態為 completed
-        const [updateResult] = await conn.query(
-            'UPDATE orders SET status = ?, completed_time = NOW() WHERE id = ?',
-            ['completed', orderId]
-        );
-
-        return res.json({ message: '訂單已完成' });
-
-    } catch (err) {
-        console.error('completeOrder 錯誤:', err);
-        return res.status(500).json({ message: '伺服器錯誤', error: err.message });
+    const [orderRows] = await conn.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+    if (!orderRows.length) {
+      conn.release();
+      return res.status(404).json({ message: '訂單不存在' });
     }
+    const order = orderRows[0];
+
+    // 更新訂單狀態為 completed
+    await conn.query(
+      'UPDATE orders SET status = ?, completed_time = NOW() WHERE id = ?',
+      ['completed', orderId]
+    );
+
+    // 將訂單中的商品狀態更新為 sold
+    const [orderItems] = await conn.query('SELECT * FROM order_items WHERE order_id = ?', [orderId]);
+    for (let item of orderItems) {
+      await conn.query('UPDATE items SET status = ? WHERE id = ?', ['sold', item.item_id]);
+    }
+
+    // 計算積分
+    if (!(await Point.isOrderPointsCalculated(orderId, conn))) {
+      const price = Number(order.price);
+      if (isNaN(price)) {
+        await conn.rollback();
+        conn.release();
+        return res.status(400).json({ message: '訂單價格錯誤，無法計算積分' });
+      }
+
+      const buyerPoints = Math.floor(price / 1.36);     // 買家積分
+      const sellerPoints = Math.floor(price * 1.4706);  // 賣家積分
+
+      // 增加買家積分
+      await Point.createPointRecord({
+        user_id: order.buyer_id,
+        order_id: orderId,
+        point_ac: buyerPoints,
+        add_cut: 'add'
+      }, conn);
+
+      // 增加賣家積分
+      await Point.createPointRecord({
+        user_id: order.seller_id,
+        order_id: orderId,
+        point_ac: sellerPoints,
+        add_cut: 'add'
+      }, conn);
+    }
+
+    await conn.commit();
+    conn.release();
+
+    res.json({ message: '訂單已完成，買家與賣家積分已正確發放' });
+  } catch (err) {
+    await conn.rollback();
+    conn.release();
+    console.error('❌ completeOrder 錯誤:', err);
+    res.status(500).json({ message: '伺服器錯誤', error: err.message });
+  }
 };
 
 // 📌 取消訂單
